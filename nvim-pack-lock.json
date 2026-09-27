@@ -175,14 +175,6 @@
       "rev": "b712479436948dd0a426b642220651eb89492810",
       "src": "https://github.com/ChuYanLon/telegram.nvim"
     },
-    "telescope-fzf-native.nvim": {
-      "rev": "b25b749b9db64d375d782094e2b9dce53ad53a40",
-      "src": "https://github.com/nvim-telescope/telescope-fzf-native.nvim"
-    },
-    "telescope.nvim": {
-      "rev": "40aedd8a68c78a656a10a8d62d80c54af59420fb",
-      "src": "https://github.com/nvim-telescope/telescope.nvim"
-    },
     "tiny-inline-diagnostic.nvim": {
       "rev": "6264451f14119d63a52580e5198d6baf8518b0b2",
       "src": "https://github.com/rachartier/tiny-inline-diagnostic.nvim"
