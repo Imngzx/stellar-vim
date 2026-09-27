@@ -2,7 +2,7 @@ local parsers = {
   'c', 'cpp', 'make', 'cmake', 'python', 'lua', 'vim', 'vimdoc', 'markdown', 'markdown_inline',
   'bash', 'json', 'yaml', 'toml', 'rust', 'zig', 'javascript', 'typescript', 'vue',
   'latex', 'html', 'regex', 'css', 'gitcommit', 'fish', 'kdl', 'powershell', 'luau', 'nix', 'just',
-  'meson',
+  'meson', 'scss', 'svelte', 'tsx', 'typst',
 }
 
 local function setup_compiler()
