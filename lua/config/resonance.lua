@@ -29,22 +29,39 @@ resonance.setup({
 -- UI keymap binding
 vim.keymap.set('n', '<leader>pL', resonance.open_ui, { desc = '[Float] Resonance UI' })
 
+local function safe_load(mod)
+  local ok, err = pcall(require, mod)
+  if not ok then
+    vim.notify('[config] Failed to load ' .. mod .. ': ' .. err, vim.log.levels.ERROR)
+  end
+  return ok
+end
+
+local function safe_setup(mod, setup_fn, ...)
+  local ok, err = pcall(setup_fn, ...)
+  if not ok then
+    vim.notify('[config] Failed to setup ' .. mod .. ': ' .. err, vim.log.levels.ERROR)
+  end
+  return ok
+end
+
+
 --plugins
 
 -- [Theme]
 -- load theme first to avoid flickering
-require('plugins.catppuccin')
+safe_load('plugins.catppuccin')
 
 -- load core ui elements at the same time
 local Snacks = require('plugins.snacks')
-require('plugins.cmdline')
-require('plugins.ui')
+safe_load('plugins.cmdline')
+safe_load('plugins.ui')
 
-require('plugins.tool')
+safe_load('plugins.tool')
 
 -- misc
 if require('libs.power').is_ac() then
-  require('plugins.discord')
+  safe_load('plugins.discord')
 end
 
 -- NOTE: the reson I wrap my plugins with this block is because the mechanics of luajit
@@ -57,9 +74,9 @@ vim.api.nvim_create_autocmd('User', {
   pattern = 'VeryLazy',
   callback = function()
     -- restore session
-    require('custom.session').setup()
-    require('custom.workspace').setup()
-    require('plugins.fzf')
+    safe_setup('custom.session', require('custom.session').setup)
+    safe_setup('custom.workspace', require('custom.workspace').setup)
+    safe_load('plugins.fzf')
 
     -- coding
     local fn, env = vim.fn, vim.env
@@ -70,41 +87,41 @@ vim.api.nvim_create_autocmd('User', {
       local sep = is_windows and ';' or ':'
       env.PATH = mason_bin .. sep .. env.PATH
     end
-    require('plugins.treesitter')
-    require('plugins.treesitter-context')
-    require('plugins.lsp')
-    require('plugins.colorful-lsp-menu')
-    require('plugins.ufo')
-    require('custom.pairs').setup()
-    require('custom.surround').setup()
-    require('custom.word-jump')
-    require('plugins.flash')
+    safe_load('plugins.treesitter')
+    safe_load('plugins.lsp')
+    safe_load('plugins.treesitter-context')
+    safe_load('plugins.colorful-lsp-menu')
+    safe_load('plugins.ufo')
+    safe_setup('custom.pairs', require('custom.pairs').setup)
+    safe_setup('custom.surround', require('custom.surround').setup)
+    safe_load('custom.word-jump')
+    safe_load('plugins.flash')
 
     -- UI
-    require('plugins.heirline')
-    require('custom.incline').setup()
-    require('custom.lsp-loading').setup()
-    require('custom.transparent').setup({ auto_enable = false })
-    require('plugins.minimap')
-    require('plugins.mini-hipatterns')
-    require('plugins.markdown')
-    require('plugins.csvview')
+    safe_load('plugins.heirline')
+    safe_setup('custom.incline', require('custom.incline').setup)
+    safe_setup('custom.lsp-loading', require('custom.lsp-loading').setup)
+    safe_setup('custom.transparent', require('custom.transparent').setup, { auto_enable = false })
+    safe_load('plugins.minimap')
+    safe_load('plugins.mini-hipatterns')
+    safe_load('plugins.markdown')
+    safe_load('plugins.csvview')
 
     -- Util
-    require('custom.coderunner').setup()
-    require('custom.repl').setup()
-    require('plugins.venv-selector')
-    require('plugins.dap')
-    require('plugins.jisho')
-    require('plugins.AI')
-    require('plugins.atone')
+    safe_setup('custom.coderunner', require('custom.coderunner').setup)
+    safe_setup('custom.repl', require('custom.repl').setup)
+    safe_load('plugins.venv-selector')
+    safe_load('plugins.dap')
+    safe_load('plugins.jisho')
+    safe_load('plugins.AI')
+    safe_load('plugins.atone')
     if not require('libs.utils').is_windows() then
-      require('custom.language-switcher').setup()
-      require('plugins.telegram')
+      safe_setup('custom.language-switcher', require('custom.language-switcher').setup)
+      safe_load('plugins.telegram')
     end
-    require('config.neovide')
-    require('custom.todo').setup()
-    require('custom.sudo')
+    safe_load('config.neovide')
+    safe_setup('custom.todo', require('custom.todo').setup)
+    safe_load('custom.sudo')
 
 
     -- [git]
