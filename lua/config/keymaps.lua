@@ -51,10 +51,10 @@ map('n', '<leader>ps', '<c-w>s', { desc = '[Panel] Split window below', remap = 
 map('n', '<leader>pv', '<c-w>v', { desc = '[Panel] Split window right', remap = true })
 
 -- Move between windows
-map('n', '<c-h>', '<c-w>h', { desc = 'Move to left window' })
-map('n', '<c-j>', '<c-w>j', { desc = 'Move to below window' })
-map('n', '<c-k>', '<c-w>k', { desc = 'Move to above window' })
-map('n', '<c-l>', '<c-w>l', { desc = 'Move to right window' })
+-- map('n', '<c-h>', '<c-w>h', { desc = 'Move to left window' })
+-- map('n', '<c-j>', '<c-w>j', { desc = 'Move to below window' })
+-- map('n', '<c-k>', '<c-w>k', { desc = 'Move to above window' })
+-- map('n', '<c-l>', '<c-w>l', { desc = 'Move to right window' })
 
 -- Resize splits
 map('n', '<c-left>', function() vim.cmd('vertical resize -' .. vim.v.count1) end,
