@@ -1,5 +1,5 @@
 require('resonance').load({
-  'https://github.com/onion108/flash.nvim',
+  'https://github.com/folke/flash.nvim',
   keys = {
     { { 'n', 'x', 'o' }, '<CR>', function() require('flash').jump() end, { desc = 'Flash' } },
     { { 'n', 'x', 'o' }, '<S-CR>', function() require('flash').treesitter() end, { desc = 'Flash treesitter' } },
