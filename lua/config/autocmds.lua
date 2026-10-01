@@ -2,13 +2,13 @@ local api = vim.api
 local o = vim.o
 local opt = vim.opt
 local create_autocmd = api.nvim_create_autocmd
-local write = io.write
+-- local write = io.write
 local create_augroup = api.nvim_create_augroup
 local schedule = vim.schedule
 local ui_group = create_augroup('AutoUIVisibility', { clear = true })
 local map = vim.keymap.set
 local user_command = vim.api.nvim_create_user_command
-local bg_sync_group = vim.api.nvim_create_augroup('TerminalBgSync', { clear = true })
+-- local bg_sync_group = vim.api.nvim_create_augroup('TerminalBgSync', { clear = true })
 
 local function augroup(name)
   return create_augroup('cameron_' .. name, { clear = true })
