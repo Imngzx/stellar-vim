@@ -5,7 +5,7 @@ local opt = vim.opt
 local g = vim.g
 
 if g.neovide then
-  o.guifont = 'JetBrainsMono Nerd Font:h13'
+  o.guifont = 'Maple Mono NF CN:h13'
   -- vim.g.neovide_window_blurred = true
   -- vim.g.neovide_opacity = 0.93
   g.neovide_floating_blur_amount_x = 3.0
