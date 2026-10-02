@@ -91,7 +91,7 @@ map('n', '<leader>pt', function()
 
   cmd('term ' .. shell)
   cmd('startinsert')
-end, { desc = 'Open Smart Terminal' })
+end, { desc = '[Panel] Open Smart Terminal' })
 
 -- Search (Better n/N behavior)
 map('n', 'n', "'Nn'[v:searchforward].'zv'", { expr = true, desc = 'Next search result' })
@@ -140,7 +140,7 @@ map('n', '<leader>fy', function() require('custom.yazi').open() end, { desc = 'F
 map('n', '<leader>sK', '<cmd>ShowkeysToggle<cr>', { desc = 'Toggle Showkeys' })
 
 -- Package update
-map('n', '<leader>pu', function() vim.pack.update() end, { desc = 'Update plugins' })
+map('n', '<leader>pu', function() vim.pack.update() end, { desc = '[Panel] Update plugins' })
 
 map('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
