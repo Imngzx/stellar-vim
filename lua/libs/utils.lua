@@ -1,4 +1,21 @@
+-- this is for highly repetition codes
 local M = {}
+
+M.safe_load = function(mod)
+  local ok, err = pcall(require, mod)
+  if not ok then
+    vim.notify('[config] Failed to load ' .. mod .. ': ' .. err, vim.log.levels.ERROR)
+  end
+  return ok
+end
+
+M.safe_setup = function(mod, setup_fn, ...)
+  local ok, err = pcall(setup_fn, ...)
+  if not ok then
+    vim.notify('[config] Failed to setup ' .. mod .. ': ' .. err, vim.log.levels.ERROR)
+  end
+  return ok
+end
 
 M.is_windows = function()
   return jit.os == 'Windows'

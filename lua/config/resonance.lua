@@ -29,22 +29,9 @@ resonance.setup({
 -- UI keymap binding
 vim.keymap.set('n', '<leader>pL', resonance.open_ui, { desc = '[Float] Resonance UI' })
 
-local function safe_load(mod)
-  local ok, err = pcall(require, mod)
-  if not ok then
-    vim.notify('[config] Failed to load ' .. mod .. ': ' .. err, vim.log.levels.ERROR)
-  end
-  return ok
-end
-
-local function safe_setup(mod, setup_fn, ...)
-  local ok, err = pcall(setup_fn, ...)
-  if not ok then
-    vim.notify('[config] Failed to setup ' .. mod .. ': ' .. err, vim.log.levels.ERROR)
-  end
-  return ok
-end
-
+local utils = require('libs.utils')
+local safe_load = utils.safe_load
+local safe_setup = utils.safe_setup
 
 --plugins
 
