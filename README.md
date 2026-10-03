@@ -20,6 +20,8 @@ Use this on Linux for best experience ฅ₍^•⩊ •マⳊ
 | ![Preview image](https://github.com/user-attachments/assets/75fd8e84-747e-4c48-93d1-0154aa0b94a7) | ![Preview image](https://github.com/user-attachments/assets/6c84841c-fb4f-4a1d-a34d-85528bec0cb5) |
 | --------------------------------------------------------- | --------------------------------------------------------- |
 
+![Discord Presence](https://github.com/user-attachments/assets/2f496144-e675-4558-8bd6-bbc80e9e025f)
+
 ## Features
 
 ### Summarization
