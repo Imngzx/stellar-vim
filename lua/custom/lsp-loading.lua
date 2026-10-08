@@ -40,7 +40,14 @@ local config = {
   },
   border = 'none', -- none, single or rounded
   keep_done_ms = 1000,
+  ignore_clients = { 'rumdl' },
 }
+
+-- O(1) ignore lookup (hoisted, built once)
+local ignore_set = {}
+for _, name in ipairs(config.ignore_clients) do
+  ignore_set[name] = true
+end
 
 -- ⚡ Struct of Arrays (SoA) for extreme performance
 local t_tokens = {}
@@ -153,8 +160,8 @@ local function update_window()
     local chunks = {
       { icon .. ' ', icon_hl },
       { client_name, config.highlights.client },
-      { title, config.highlights.title },
-      { left_part, config.highlights.text },
+      { title,       config.highlights.title },
+      { left_part,   config.highlights.text },
     }
     all_chunks[i] = chunks
 
@@ -248,6 +255,9 @@ function M.setup()
       local client = vim.lsp.get_client_by_id(client_id)
 
       if not client or not token then return end
+
+      -- Ignore configured clients
+      if ignore_set[client.name] then return end
 
       if value.kind == 'begin' then
         t_count = t_count + 1
