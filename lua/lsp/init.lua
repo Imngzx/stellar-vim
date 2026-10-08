@@ -36,7 +36,7 @@ local custom_servers = setmetatable({}, {
     if k == 'luau_lsp' then return require('lsp.servers.luau') end
 
     -- single file with multiple lsp's config
-    if k == 'lua_ls' then return require('lsp.servers.lua').lua_ls end
+    if k == 'lua-language-server' then return require('lsp.servers.lua').lua_ls end
     -- if k == 'basedpyright' then return require('lsp.servers.python').basedpyright end
     if k == 'ty' then return require('lsp.servers.python').ty end
     if k == 'ruff' then return require('lsp.servers.python').ruff end
@@ -64,7 +64,7 @@ local custom_server_keys = {
   'luau_lsp',
 
   -- lua
-  'lua_ls',
+  'lua-language-server',
 
   -- python
   -- 'basedpyright',
