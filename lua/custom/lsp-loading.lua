@@ -33,10 +33,10 @@ local config = {
   icons = { check = '✓', error = '✗' },
   highlights = {
     spinner = 'DiagnosticWarn',
-    check = 'DiagnosticOk',
-    text = 'Comment',
-    client = 'String',
+    check = 'DiagnosticHint',
+    client = 'Directory',
     title = 'Normal',
+    text = 'Comment',
   },
   border = 'none', -- none, single or rounded
   keep_done_ms = 1000,
