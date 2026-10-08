@@ -5,10 +5,10 @@ A standalone script to safely update the Git repository and manage Neovim plugin
 """
 
 import os
-import sys
-import shutil
 import platform
+import shutil
 import subprocess
+import sys
 
 
 def get_paths():

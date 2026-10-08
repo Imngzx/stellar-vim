@@ -37,8 +37,10 @@ local custom_servers = setmetatable({}, {
 
     -- single file with multiple lsp's config
     if k == 'lua_ls' then return require('lsp.servers.lua').lua_ls end
-    if k == 'basedpyright' then return require('lsp.servers.python').basedpyright end
+    -- if k == 'basedpyright' then return require('lsp.servers.python').basedpyright end
+    if k == 'ty' then return require('lsp.servers.python').ty end
     if k == 'ruff' then return require('lsp.servers.python').ruff end
+
     -- if k == 'vtsls' then return require('lsp.servers.vue') end
   end
 })
@@ -65,8 +67,9 @@ local custom_server_keys = {
   'lua_ls',
 
   -- python
-  'basedpyright',
+  -- 'basedpyright',
   'ruff',
+  'ty',
 
   'rumdl',
   'markdown-oxide'
