@@ -2,8 +2,9 @@
 
 return {
   lua_ls = {
+    mason = true,
     cmd = { 'lua-language-server' },
-    mason = false,
+    filetypes = { 'lua' },
 
     ---@type lspconfig.settings.lua_ls
     settings = {
