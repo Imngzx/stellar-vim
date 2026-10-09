@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
   "runtime": {
     "version": "LuaJIT",
     "path": [
@@ -8,15 +9,19 @@
   },
   "workspace": {
     "library": [
+      "$VIMRUNTIME",
       "${3rd}/luv/library",
-      "/usr/share/nvim/runtime/lua"
+      "/usr/share/nvim/runtime/lua/",
+      "./lua",
+      "$HOME/.local/share/bob/nightly/share/nvim/runtime/lua/"
     ],
     "checkThirdParty": false
   },
   "diagnostics": {
     "globals": [
       "vim",
-      "bit",
+      "Snacks",
+      "big",
       "jit"
     ],
     "disable": [
