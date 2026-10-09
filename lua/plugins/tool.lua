@@ -7,7 +7,7 @@ require('resonance').load({
       local wk = require('which-key')
 
       wk.setup({
-        preset = 'modern', -- 可选: classic, modern, helix
+        preset = 'modern',               -- 可选: classic, modern, helix
         delay = function(ctx)
           return ctx.plugin and 0 or 250 -- 稍微延迟，避免快速盲打时屏幕闪烁
         end,
@@ -123,9 +123,9 @@ require('resonance').load({
 
     cmd = 'Neogit',
     keys = {
-      { 'n', '<leader>gpt', function() require('neogit').open() end, { desc = 'Neogit (Tab)' } },
+      { 'n', '<leader>gpt', function() require('neogit').open() end,                             { desc = 'Neogit (Tab)' } },
       { 'n', '<leader>gps', function() require('neogit').open({ kind = 'split_below_all' }) end, { desc = 'Neogit (Split Below)' } },
-      { 'n', '<leader>gpv', function() require('neogit').open({ kind = 'vsplit' }) end, { desc = 'Neogit (VSplit)' } },
+      { 'n', '<leader>gpv', function() require('neogit').open({ kind = 'vsplit' }) end,          { desc = 'Neogit (VSplit)' } },
     },
 
     setup = function()
