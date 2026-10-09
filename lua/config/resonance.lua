@@ -89,6 +89,7 @@ vim.api.nvim_create_autocmd('User', {
     safe_setup('custom.incline', require('custom.incline').setup)
     safe_setup('custom.lsp-loading', require('custom.lsp-loading').setup)
     safe_setup('custom.transparent', require('custom.transparent').setup, { auto_enable = false })
+    safe_setup('custom.multicursor', require('custom.multicursor').setup)
     safe_load('plugins.minimap')
     safe_load('plugins.mini-hipatterns')
     safe_load('plugins.markdown')
@@ -102,7 +103,7 @@ vim.api.nvim_create_autocmd('User', {
     safe_load('plugins.jisho')
     safe_load('plugins.AI')
     safe_load('plugins.atone')
-    if not require('libs.utils').is_windows() then
+    if not require('libs.utils').is_windows() and not require('libs.utils').is_wsl() then
       safe_setup('custom.language-switcher', require('custom.language-switcher').setup)
       safe_load('plugins.telegram')
     end
