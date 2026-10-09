@@ -2,6 +2,7 @@
 
 return {
   ruff = {
+    filetypes = { 'python' },
     root_markers = { 'pyproject.toml', 'ruff.toml', '.ruff.toml', '.git' },
     capabilities = {
       general = {
@@ -17,8 +18,8 @@ return {
   },
 
   basedpyright = {
-
     ---@type lspconfig.settings.basedpyright
+    filetypes = { 'python' },
     settings = {
       basedpyright = {
         analysis = {
@@ -42,13 +43,29 @@ return {
       offsetEncoding = { 'utf-16' },
     },
   },
+
   ty = {
     -- NOTE: uv tool install ty
     mason = false,
+    filetypes = { 'python' },
     root_markers = { 'ty.toml', 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', '.git' },
     cmd = { 'ty', 'server' },
     capabilities = {
       offsetEncoding = { 'utf-16' },
+    },
+  },
+
+  pyrefly = {
+    cmd = { 'pyrefly', 'lsp' },
+    filetypes = { 'python' },
+    root_markers = {
+      'pyrefly.toml',
+      'pyproject.toml',
+      'setup.py',
+      'setup.cfg',
+      'requirements.txt',
+      'Pipfile',
+      '.git',
     },
   }
 }
