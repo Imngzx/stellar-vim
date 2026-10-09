@@ -16,7 +16,7 @@ return {
   },
   sections = {
     { section = 'header' },
-    { section = 'keys', gap = 1, padding = 1 },
+    { section = 'keys',  gap = 1, padding = 1 },
     function()
       local stats = require('resonance').stats()
       local ms = string.format('%.2f ms', stats.startuptime)

@@ -20,9 +20,9 @@ local resonance = require('resonance')
 
 resonance.setup({
   ui = {
-    border = 'rounded', -- 边框样式 (可选: "none", "single", "double", "rounded", "solid", "shadow")
-    width = 0.65,       -- 浮窗宽度（占屏幕百分比，0.65 = 65%）
-    height = 0.75,      -- 浮窗高度（占屏幕百分比，0.75 = 75%）
+    border = 'rounded',
+    width = 0.65,
+    height = 0.75,
   }
 })
 

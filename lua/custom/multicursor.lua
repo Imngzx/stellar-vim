@@ -108,8 +108,10 @@ local function setup_keymaps()
     follow_mode_state()
   end, { desc = 'Multicursor: Toggle follow mode' })
 
-  map('n', '<leader>j*', multicursor_word_under_cursor, { desc = 'Multicursor: all matches of word under cursor' })
-  map('n', '<leader>j/', multicursor_all_matches, { desc = 'Multicursor: all matches of search pattern' })
+  map('n', '<leader>j*', multicursor_word_under_cursor,
+    { desc = 'Multicursor: all matches of word under cursor' })
+  map('n', '<leader>j/', multicursor_all_matches,
+    { desc = 'Multicursor: all matches of search pattern' })
   map('n', '<leader>jn', 'zqgn', { desc = 'Multicursor: add cursor at next match' })
   map('n', '<leader>jN', 'zqgN', { desc = 'Multicursor: add cursor at prev match' })
 
@@ -118,15 +120,21 @@ local function setup_keymaps()
 
   map('x', '<leader>j', 'zq', { desc = 'Multicursor: at motion' })
   map('x', '<leader>jl', 'vQ', { desc = 'Multicursor: each line in selection' })
-  map('x', '<leader>j*', multicursor_visual_matches, { desc = 'Multicursor: each match in selection' })
+  map('x', '<leader>j*', multicursor_visual_matches,
+    { desc = 'Multicursor: each match in selection' })
 
   map('n', '<leader>ji', multicursor_numbers, { desc = 'Multicursor: insert numbers 1,2,3...' })
-  map('n', '<leader>jI', multicursor_numbers_padded, { desc = 'Multicursor: insert padded numbers 001,002...' })
+  map('n', '<leader>jI', multicursor_numbers_padded,
+    { desc = 'Multicursor: insert padded numbers 001,002...' })
 
-  map('n', ']c', function() jump_next_cursor(false) end, { desc = 'Multicursor: jump to next cursor' })
-  map('n', '[c', function() jump_prev_cursor(false) end, { desc = 'Multicursor: jump to prev cursor' })
-  map('n', ']C', function() jump_next_cursor(true) end, { desc = 'Multicursor: jump to next cursor & remove' })
-  map('n', '[C', function() jump_prev_cursor(true) end, { desc = 'Multicursor: jump to prev cursor & remove' })
+  map('n', ']c', function() jump_next_cursor(false) end,
+    { desc = 'Multicursor: jump to next cursor' })
+  map('n', '[c', function() jump_prev_cursor(false) end,
+    { desc = 'Multicursor: jump to prev cursor' })
+  map('n', ']C', function() jump_next_cursor(true) end,
+    { desc = 'Multicursor: jump to next cursor & remove' })
+  map('n', '[C', function() jump_prev_cursor(true) end,
+    { desc = 'Multicursor: jump to prev cursor & remove' })
 end
 
 function M.setup()
@@ -136,4 +144,3 @@ function M.setup()
 end
 
 return M
-
