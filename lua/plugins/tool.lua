@@ -28,6 +28,7 @@ require('resonance').load({
         { '<leader>g', group = 'Git', icon = '󰊢 ' },
         { '<leader>gp', group = 'Neogit Panel', icon = '󰊢 ' },
         { '<leader>H', group = 'Open Dahsboard (Home)', icon = ' ' },
+        { '<leader>j', group = 'Multicursor', icon = '󰪥 ' },
         { '<leader>n', group = 'Minimap', icon = '🗺️ ' },
         { '<leader>p', group = 'Panel/Project', icon = '󰏖 ' },
         { '<leader>q', group = 'Quit', icon = '󰗼 ' },
