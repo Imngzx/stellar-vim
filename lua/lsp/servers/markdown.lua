@@ -1,4 +1,4 @@
----@module 'lspconfig'
+---@type vim.lsp.Config
 
 return {
   rumdl = {
@@ -28,7 +28,7 @@ return {
             '*.tmp.md',
           },
           MD025 = {
-            front_matter_title = "",
+            front_matter_title = '',
             allow_document_sections = true,
           },
           MD073 = {
@@ -46,6 +46,7 @@ return {
       }
     }
   },
+
   markdown_oxide = {
     mason = true,
     cmd = { 'markdown-oxide' },

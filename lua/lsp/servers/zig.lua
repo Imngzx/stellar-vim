@@ -1,11 +1,10 @@
----@module 'lspconfig'
+---@type vim.lsp.Config
 
 return {
   mason = true,
 
   cmd = { 'zls' },
 
-  ---@type lspconfig.settings.zls
   settings = {
     zls = {
       -- clean useless imports

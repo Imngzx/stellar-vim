@@ -1,4 +1,4 @@
----@module 'lspconfig'
+---@type vim.lsp.Config
 
 local vue_language_server_path = vim.fn.stdpath('data') ..
   '/mason/packages/vue-language-server/node_modules/@vue/language-server'
@@ -11,7 +11,6 @@ local vue_plugin = {
 }
 
 return {
-  ---@type lspconfig.settings.vtsls
 
   settings = {
     vtsls = {

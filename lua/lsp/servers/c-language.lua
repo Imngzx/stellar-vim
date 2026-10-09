@@ -1,7 +1,10 @@
----@module 'lspconfig'
+---@type vim.lsp.Config
 
 return {
   mason = false, --NOTE: uncomment this to make mason install it
+
+  root_markers = { '.clangd', '.clang-tidy', '.clang-format', 'compile_commands.json', 'compile_flags.txt', 'configure.ac', '.git' },
+
   cmd = {
     'clangd',
     '--background-index',

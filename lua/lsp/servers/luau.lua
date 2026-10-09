@@ -1,4 +1,4 @@
----@module 'lspconfig'
+---@type vim.lsp.Config
 
 return {
   mason = true,

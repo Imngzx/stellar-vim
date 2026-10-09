@@ -1,16 +1,22 @@
----@module 'lspconfig'
+---@type vim.lsp.Config
 
 return {
   lua_ls = {
     mason = true,
     cmd = { 'lua-language-server' },
     filetypes = { 'lua' },
+    root_markers = { '.luarc.json', '.git', '.luacheckrc' },
 
     ---@type lspconfig.settings.lua_ls
     settings = {
       Lua = {
-        workspace = { checkThirdParty = false },
-        codeLens = { enable = false },
+        runtime = {
+          version = 'LuaJIT',
+        },
+        workspace = {
+          checkThirdParty = false,
+        },
+        codeLens = { enable = true },
         completion = { callSnippet = 'Replace' },
         doc = { privateName = { '^_' } },
         hint = { enable = true },

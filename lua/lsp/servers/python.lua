@@ -1,7 +1,8 @@
----@module 'lspconfig'
+---@type vim.lsp.Config
 
 return {
   ruff = {
+    root_markers = { 'pyproject.toml', 'ruff.toml', '.ruff.toml', '.git' },
     capabilities = {
       general = {
         positionEncodings = { 'utf-16' },
@@ -9,7 +10,6 @@ return {
     },
     cmd_env = { RUFF_TRACE = 'messages' },
     init_options = {
-      ---@type lspconfig.settings.ruff
       settings = {
         logLevel = 'error',
       },
@@ -45,6 +45,7 @@ return {
   ty = {
     -- NOTE: uv tool install ty
     mason = false,
+    root_markers = { 'ty.toml', 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', '.git' },
     cmd = { 'ty', 'server' },
     capabilities = {
       offsetEncoding = { 'utf-16' },
