@@ -13,7 +13,7 @@ Server spec format:
   - Complex (table): name = { config_module, mason?, mason_name?, config_key?, formatter? }
     clangd = { 'c-language', mason = false, formatter = { name = 'clang_format', mason = 'clang-format', ft = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' } } }
     ruff = { 'python', mason = true, config_key = 'ruff', formatter = { name = 'ruff_format', mason = false, ft = { 'python' } } }
-    ['lua-language-server'] = { 'lua', mason = true, config_key = 'lua_ls' }  -- uses lua-ls built-in formatter (no external formatter)
+    ['lua-language-server'] = { 'lua', mason = true, config_key = 'lua_ls' }  -- uses lua-ls built-in formatter
     taplo = { false, mason = true, formatter = { name = 'taplo', mason = false, ft = { 'toml' } } }  -- no config module, has formatter
     bashls = { false, mason = true, mason_name = 'bash-language-server', formatter = { name = 'shfmt', mason = 'shfmt', ft = { 'sh', 'bash' } } }
 
@@ -81,7 +81,7 @@ M.servers = {
   rust_analyzer = {
     'rust',
     mason = false,
-    formatter = { name = 'rustfmt', mason = 'rustfmt', ft = { 'rust' } },
+    formatter = { name = 'rustfmt', mason = false, ft = { 'rust' } },
   },
 
   -- [qml] (for quickshell)
