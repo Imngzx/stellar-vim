@@ -15,17 +15,6 @@ end
 require('resonance').load({
   'https://github.com/nvim-treesitter/nvim-treesitter',
   version = 'main',
-  build = function()
-    setup_compiler()
-    vim.schedule(function()
-      local ok, ts = pcall(require, 'nvim-treesitter')
-      if ok and ts.update then
-        ts.update()()
-      else
-        pcall(function() vim.cmd('TSUpdate') end)
-      end
-    end)
-  end,
 
   event = { 'BufReadPre', 'BufNewFile' },
 
