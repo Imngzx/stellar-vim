@@ -4,6 +4,7 @@ return {
   mason = true,
 
   cmd = { 'zls' },
+  filetypes = { 'zig', 'zir' },
 
   settings = {
     zls = {

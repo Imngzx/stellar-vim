@@ -3,6 +3,7 @@
 return {
   mason = false,
   cmd = { 'rust-analyzer' },
+  filetypes = { 'rust' },
 
   ---@type lspconfig.settings.rust_analyzer
   settings = {
