@@ -13,7 +13,7 @@ Server spec format:
   - Complex (table): name = { config_module, mason?, mason_name?, config_key?, formatter?, ft? }
     clangd = { 'c-language', mason = false, formatter = { name = 'clang_format', mason = 'clang-format' } }
     ruff = { 'python', mason = true, config_key = 'ruff', formatter = { name = 'ruff_format', mason = false } }
-    ['lua-language-server'] = { 'lua', mason = true, config_key = 'lua_ls', formatter = { name = 'stylua', mason = 'stylua' }, ft = 'lua' }
+    ['lua-language-server'] = { 'lua', mason = true, config_key = 'lua_ls', ft = 'lua' }  -- uses lua-ls built-in formatter
     taplo = { false, mason = true, formatter = { name = 'taplo', mason = false } }  -- no config module, has formatter
     bashls = { false, mason = true, mason_name = 'bash-language-server', formatter = { name = 'shfmt', mason = 'shfmt' }, ft = { 'sh', 'bash' } }
 
@@ -99,7 +99,6 @@ M.servers = {
     "lua",
     mason = true,
     config_key = "lua_ls",
-    formatter = { name = "stylua", mason = "stylua" },
     ft = { "lua" },
   },
 
