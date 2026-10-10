@@ -15,10 +15,10 @@ Use this on Linux for best experience ฅ₍^•⩊ •マⳊ
 ![Preview image](https://github.com/user-attachments/assets/9a469134-1fb6-4be4-b310-510057dea321)
 
 | ![Preview image](https://github.com/user-attachments/assets/d320b9b2-b3d1-479d-a092-96c5b6d3fa59) | ![Preview image](https://github.com/user-attachments/assets/dcd7d37b-3443-4fd0-9a0e-8512d927f1e5) |
-| --------------------------------------------------------- | --------------------------------------------------------- |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 
 | ![Preview image](https://github.com/user-attachments/assets/75fd8e84-747e-4c48-93d1-0154aa0b94a7) | ![Preview image](https://github.com/user-attachments/assets/6c84841c-fb4f-4a1d-a34d-85528bec0cb5) |
-| --------------------------------------------------------- | --------------------------------------------------------- |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 
 ![Discord Presence](https://github.com/user-attachments/assets/2f496144-e675-4558-8bd6-bbc80e9e025f)
 
@@ -63,7 +63,7 @@ Use this on Linux for best experience ฅ₍^•⩊ •マⳊ
 ```sh
 ❯ nvim --startuptime nvim_speed.log +q && nvim nvim_speed.log
 # or
-❯ PROF=1 nvim 
+❯ PROF=1 nvim
 
 #NOTE: if you on windows, please:
 ❯ $env:PROF="1"; nvim # for pwsh
