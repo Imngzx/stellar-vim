@@ -109,7 +109,7 @@ function M.get_conform_config()
     if spec.formatter_only then
       ft_list = spec.ft
     elseif spec.formatter then
-      ft_list = spec.ft or { name }
+      ft_list = spec.formatter.ft or { name }
     else
       goto continue
     end

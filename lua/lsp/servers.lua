@@ -10,12 +10,12 @@ Server spec format:
     jsonls = 'json-lsp',        -- Mason package 'json-lsp', server name 'jsonls'
     -- Note: simple specs don't support formatters
 
-  - Complex (table): name = { config_module, mason?, mason_name?, config_key?, formatter?, ft? }
-    clangd = { 'c-language', mason = false, formatter = { name = 'clang_format', mason = 'clang-format' } }
-    ruff = { 'python', mason = true, config_key = 'ruff', formatter = { name = 'ruff_format', mason = false } }
-    ['lua-language-server'] = { 'lua', mason = true, config_key = 'lua_ls', ft = 'lua' }  -- uses lua-ls built-in formatter
-    taplo = { false, mason = true, formatter = { name = 'taplo', mason = false } }  -- no config module, has formatter
-    bashls = { false, mason = true, mason_name = 'bash-language-server', formatter = { name = 'shfmt', mason = 'shfmt' }, ft = { 'sh', 'bash' } }
+  - Complex (table): name = { config_module, mason?, mason_name?, config_key?, formatter? }
+    clangd = { 'c-language', mason = false, formatter = { name = 'clang_format', mason = 'clang-format', ft = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' } } }
+    ruff = { 'python', mason = true, config_key = 'ruff', formatter = { name = 'ruff_format', mason = false, ft = { 'python' } } }
+    ['lua-language-server'] = { 'lua', mason = true, config_key = 'lua_ls' }  -- uses lua-ls built-in formatter (no external formatter)
+    taplo = { false, mason = true, formatter = { name = 'taplo', mason = false, ft = { 'toml' } } }  -- no config module, has formatter
+    bashls = { false, mason = true, mason_name = 'bash-language-server', formatter = { name = 'shfmt', mason = 'shfmt', ft = { 'sh', 'bash' } } }
 
   - Formatter-only (no LSP server): name = { formatter_only = true, ft = {...}, mason = ..., name = ... }
     prettier = { formatter_only = true, ft = { 'javascript', 'html', 'css' }, mason = 'prettier', name = 'prettier' }
@@ -24,6 +24,7 @@ Server spec format:
 formatter sub-spec:
   - name: conform.nvim formatter name (required)
   - mason: false (bundled with LSP), true (same name), string (Mason package name)
+  - ft: filetypes this formatter applies to (required if formatter present)
 
 config_module:
   - string: module name under 'lsp.servers.*' (e.g., 'c-language' -> lsp.servers.c-language)
@@ -43,15 +44,14 @@ M.servers = {
 
   -- ============ Complex servers (require config modules or formatters) ============
   -- [toml]
-  taplo = { false, mason = true, formatter = { name = 'taplo', mason = false } },
+  taplo = { false, mason = true, formatter = { name = 'taplo', mason = false, ft = { 'toml' } } },
 
   -- [bash, sh]
   bashls = {
     false,
     mason = true,
     mason_name = 'bash-language-server',
-    formatter = { name = 'shfmt', mason = 'shfmt' },
-    ft = { 'sh', 'bash' },
+    formatter = { name = 'shfmt', mason = 'shfmt', ft = { 'sh', 'bash' } },
   },
 
   -- [HTML]
@@ -59,15 +59,14 @@ M.servers = {
     false,
     mason = true,
     mason_name = 'html-lsp',
-    formatter = { name = 'prettier', mason = 'prettier' },
-    ft = { 'html' },
+    formatter = { name = 'prettier', mason = 'prettier', ft = { 'html' } },
   },
 
   -- [c, c++]
   clangd = {
     'c-language',
     mason = false,
-    ft = { 'c', 'c.doxygen', 'cpp', 'cpp.doxygen', 'objc', 'objcpp', 'cuda' },
+    formatter = { name = 'clang_format', mason = 'clang-format', ft = { 'c', 'c.doxygen', 'cpp', 'cpp.doxygen', 'objc', 'objcpp', 'cuda' } },
   },
 
   -- [zig]
@@ -75,16 +74,14 @@ M.servers = {
     'zig',
     mason = true,
     mason_name = 'zls',
-    formatter = { name = 'zigfmt' },
-    ft = { 'zig', 'zir' },
+    formatter = { name = 'zigfmt', mason = 'zig', ft = { 'zig', 'zir' } },
   },
 
   -- [rust]
   rust_analyzer = {
     'rust',
     mason = false,
-    formatter = { name = 'rustfmt', mason = 'rustfmt' },
-    ft = { 'rust' },
+    formatter = { name = 'rustfmt', mason = 'rustfmt', ft = { 'rust' } },
   },
 
   -- [qml] (for quickshell)
@@ -98,17 +95,16 @@ M.servers = {
     'lua',
     mason = true,
     config_key = 'lua_ls',
-    ft = { 'lua' },
+    -- uses lua-ls built-in formatter, no external formatter
   },
 
   -- [python]
-  -- basedpyright = { 'python', mason = true, config_key = 'basedpyright', formatter = { name = 'ruff_format', mason = false }, ft = { 'python' } },
+  -- basedpyright = { 'python', mason = true, config_key = 'basedpyright', formatter = { name = 'ruff_format', mason = false, ft = { 'python' } } },
   ruff = {
     'python',
     mason = true,
     config_key = 'ruff',
-    formatter = { name = 'ruff_format', mason = false },
-    ft = { 'python' },
+    formatter = { name = 'ruff_format', mason = false, ft = { 'python' } },
   },
   ty = { 'python', mason = true, config_key = 'ty' },
 
@@ -117,13 +113,12 @@ M.servers = {
     'markdown',
     mason = true,
     config_key = 'rumdl',
-    formatter = { name = 'rumdl', mason = false },
-    ft = { 'markdown' },
+    formatter = { name = 'rumdl', mason = false, ft = { 'markdown' } },
   },
   ['markdown-oxide'] = { 'markdown', mason = true, config_key = 'markdown_oxide' },
 
   -- vue (commented)
-  -- vtsls = { 'vue', mason = 'vue-language-server', config_key = 'vtsls', formatter = { name = 'prettier', mason = 'prettier' } },
+  -- vtsls = { 'vue', mason = 'vue-language-server', config_key = 'vtsls', formatter = { name = 'prettier', mason = 'prettier', ft = { 'vue', 'typescript', 'javascript' } } },
 
   -- ============ Formatter-only (no LSP server) ============
   prettier = {
