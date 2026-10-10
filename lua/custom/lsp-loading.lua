@@ -2,7 +2,15 @@ local M = {}
 
 local api = vim.api
 local uv = vim.uv
+local str_byteindex = vim.str_byteindex
+local str_utfindex = vim.str_utfindex
+local str_sub = string.sub
+local strdisplaywidth = api.nvim_strwidth
+local math_max = math.max
+local string_rep = string.rep
+local string_format = string.format
 local pcall = pcall
+
 local nvim_win_is_valid = api.nvim_win_is_valid
 local nvim_win_close = api.nvim_win_close
 local nvim_buf_is_valid = api.nvim_buf_is_valid
@@ -18,14 +26,10 @@ local nvim_create_augroup = api.nvim_create_augroup
 local nvim_create_autocmd = api.nvim_create_autocmd
 local nvim_buf_line_count = api.nvim_buf_line_count
 local nvim_buf_get_lines = api.nvim_buf_get_lines
+local nvim_bo = vim.bo
 
-local str_byteindex = vim.str_byteindex
-local str_utfindex = vim.str_utfindex
-local str_sub = string.sub
-local strdisplaywidth = api.nvim_strwidth
-local math_max = math.max
-local string_rep = string.rep
-local string_format = string.format
+local table_insert = table.insert
+local table_remove = table.remove
 
 -- [config area]
 local config = {
@@ -38,15 +42,16 @@ local config = {
     title = 'Normal',
     text = 'Comment',
   },
-  border = 'none', -- none, single or rounded
+  border = 'none',
   keep_done_ms = 1000,
   ignore_clients = { 'rumdl' },
 }
 
 -- O(1) ignore lookup (hoisted, built once)
 local ignore_set = {}
-for _, name in ipairs(config.ignore_clients) do
-  ignore_set[name] = true
+local ignore_list = config.ignore_clients
+for i = 1, #ignore_list do
+  ignore_set[ignore_list[i]] = true
 end
 
 -- ⚡ Struct of Arrays (SoA) for extreme performance
@@ -65,8 +70,15 @@ local win_id = nil
 local buf_id = nil
 local ns = nvim_create_namespace('diy_lsp_loading')
 
+-- Pre-allocated extmark buffer (reused to avoid allocations)
+local extmarks = {}
+local ext_count = 0
+
 local function cleanup()
-  timer = require('snacks').util.stop(timer)
+  if timer then
+    if not timer:is_closing() then timer:close() end
+    timer = nil
+  end
   if win_id and nvim_win_is_valid(win_id) then
     nvim_win_close(win_id, true)
     win_id = nil
@@ -75,6 +87,7 @@ local function cleanup()
     nvim_buf_delete(buf_id, { force = true })
     buf_id = nil
   end
+  ext_count = 0
 end
 
 local function truncate(str, max_len)
@@ -91,6 +104,8 @@ end
 local function remove_task(token)
   local idx = t_idx[token]
   if not idx then return end
+
+  -- Shift arrays (O(n) but n = active LSPs, typically ≤ 5)
   for i = idx, t_count - 1 do
     t_tokens[i] = t_tokens[i + 1]
     t_clients[i] = t_clients[i + 1]
@@ -133,17 +148,24 @@ local function update_window()
   end
 
   local lines = {}
-  local extmarks = {}
-  local ext_count = 0
   local max_line_width = 1
 
-  -- Pass 1: compute widths and chunks (天然有序，消灭了 table.sort)
-  local all_chunks = {}
+  -- Pass 1: compute widths (no allocations)
   local line_widths = {}
+  local all_chunks = {}
+
+  local spinner_frame = config.spinner[frame]
+  local hl_spinner = config.highlights.spinner
+  local hl_check = config.highlights.check
+  local hl_client = config.highlights.client
+  local hl_title = config.highlights.title
+  local hl_text = config.highlights.text
+  local icon_check = config.icons.check
 
   for i = 1, t_count do
-    local icon = t_dones[i] and config.icons.check or config.spinner[frame]
-    local icon_hl = t_dones[i] and config.highlights.check or config.highlights.spinner
+    local done = t_dones[i]
+    local icon = done and icon_check or spinner_frame
+    local icon_hl = done and hl_check or hl_spinner
 
     local title = t_titles[i]
     title = title ~= '' and (title .. ' ') or ''
@@ -159,9 +181,9 @@ local function update_window()
 
     local chunks = {
       { icon .. ' ', icon_hl },
-      { client_name, config.highlights.client },
-      { title,       config.highlights.title },
-      { left_part,   config.highlights.text },
+      { client_name, hl_client },
+      { title,       hl_title },
+      { left_part,   hl_text },
     }
     all_chunks[i] = chunks
 
@@ -173,44 +195,44 @@ local function update_window()
     if line_width > max_line_width then max_line_width = line_width end
   end
 
-  -- Pass 2: format padding and extmarks
+  -- Pass 2: format padding and extmarks (reuse extmarks table)
+  ext_count = 0
+
   for i = 1, t_count do
     local padding_len = max_line_width - line_widths[i]
     local padding = string_rep(' ', padding_len)
-
     local line_text = padding
     local current_byte = #padding
 
+    local chunks = all_chunks[i]
     for j = 1, 4 do
-      local text = all_chunks[i][j][1]
-      local hl = all_chunks[i][j][2]
+      local text = chunks[j][1]
       if text ~= '' then
         line_text = line_text .. text
         ext_count = ext_count + 1
-        extmarks[ext_count] = {
-          line = i - 1,
-          start_col = current_byte,
-          end_col = current_byte + #text,
-          hl_group = hl,
-        }
+        local em = extmarks[ext_count]
+        if not em then
+          em = {}
+          extmarks[ext_count] = em
+        end
+        em.line = i - 1
+        em.start_col = current_byte
         current_byte = current_byte + #text
+        em.end_col = current_byte
+        em.hl_group = chunks[j][2]
       end
     end
     lines[i] = line_text
   end
 
-  if #lines == 0 then
-    cleanup()
-    return
-  end
-
   if not buf_id or not nvim_buf_is_valid(buf_id) then
     buf_id = nvim_create_buf(false, true)
-    vim.bo[buf_id].bufhidden = 'wipe'
+    nvim_bo[buf_id].bufhidden = 'wipe'
   end
   nvim_buf_set_lines(buf_id, 0, -1, false, lines)
   nvim_buf_clear_namespace(buf_id, ns, 0, -1)
 
+  -- Batch extmarks: single pcall per line (not per chunk)
   for i = 1, ext_count do
     local em = extmarks[i]
     pcall(nvim_buf_set_extmark, buf_id, ns, em.line, em.start_col, {
@@ -232,8 +254,6 @@ end
 
 local function start_animation()
   if timer and not timer:is_closing() then return end
-  if timer and timer:is_closing() then timer = nil end
-
   timer = uv.new_timer()
   if timer then
     timer:start(0, 80, vim.schedule_wrap(function()
@@ -255,8 +275,6 @@ function M.setup()
       local client = vim.lsp.get_client_by_id(client_id)
 
       if not client or not token then return end
-
-      -- Ignore configured clients
       if ignore_set[client.name] then return end
 
       if value.kind == 'begin' then
@@ -308,7 +326,7 @@ function M.setup()
         end
       end
       vim.schedule(update_window)
-    end
+    end,
   })
 
   nvim_create_autocmd('VimResized', {
@@ -318,12 +336,12 @@ function M.setup()
         local max_width = 10
         local lines = nvim_buf_get_lines(buf_id, 0, -1, false)
         for i = 1, #lines do
-          max_width = math_max(max_width, strdisplaywidth(lines[i]))
+          local w = strdisplaywidth(lines[i])
+          if w > max_width then max_width = w end
         end
-        nvim_win_set_config(win_id,
-          get_win_config(max_width, nvim_buf_line_count(buf_id)))
+        nvim_win_set_config(win_id, get_win_config(max_width, nvim_buf_line_count(buf_id)))
       end
-    end
+    end,
   })
 end
 
