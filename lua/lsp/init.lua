@@ -7,7 +7,6 @@ local servers = require('lsp.servers')
 local vim_deepcopy = vim.deepcopy
 local vim_list_extend = vim.list_extend
 local pairs_iter = pairs
-local ipairs_iter = ipairs
 local type_check = type
 
 M.enabled_servers = {}
@@ -20,8 +19,6 @@ local function get_config_module(spec)
   if type_check(spec) == 'string' or spec == true then
     return nil
   end
-  -- Complex spec: first element is config module name
-  -- If formatter_only, no config module
   if spec.formatter_only then
     return nil
   end
@@ -74,7 +71,6 @@ function M.setup()
     local mason_pkg = get_mason_pkg(name, spec)
     local mason_enabled = is_mason_enabled(spec)
 
-    -- Skip formatter-only entries (they don't have LSP config)
     if not spec.formatter_only and config_module then
       local mod = require('lsp.servers.' .. config_module)
       local config = vim_deepcopy(mod[config_key] or mod)
@@ -84,7 +80,6 @@ function M.setup()
         table.insert(M.mason_tools, mason_pkg)
       end
 
-      -- Strip internal fields not meant for vim.lsp.config
       config.mason = nil
       config.mason_name = nil
       config.config_key = nil
@@ -92,19 +87,14 @@ function M.setup()
 
       vim.lsp.config(name, config)
     elseif not spec.formatter_only and not config_module then
-      -- Simple string spec without config module (e.g., jsonls = 'json-lsp')
-      -- Note: simple string specs don't support formatters
-      -- Use complex spec { config_module = false, formatter = {...} } if formatter needed
       table.insert(M.enabled_servers, name)
       if mason_enabled then
         table.insert(M.mason_tools, mason_pkg)
       end
       vim.lsp.config(name, {})
     end
-    -- formatter_only entries skipped for LSP config
   end
 
-  -- Add non-LSP Mason tools (debuggers, linters, etc.)
   vim_list_extend(M.mason_tools, servers.tools)
 end
 
@@ -126,7 +116,8 @@ function M.get_conform_config()
 
     local formatter_name = spec.formatter and spec.formatter.name or (spec.formatter_only and spec.name)
 
-    for _, ft in ipairs_iter(ft_list) do
+    for i = 1, #ft_list do
+      local ft = ft_list[i]
       if not fmt[ft] then
         fmt[ft] = { formatter_name }
       else
@@ -142,7 +133,8 @@ function M.get_conform_config()
     if type_check(v) == 'table' then
       local seen = {}
       local unique = {}
-      for _, f in ipairs_iter(v) do
+      for i = 1, #v do
+        local f = v[i]
         if not seen[f] then
           seen[f] = true
           table.insert(unique, f)
@@ -161,13 +153,11 @@ function M.get_mason_tools()
   local tools = {}
 
   for name, spec in pairs_iter(servers.servers) do
-    -- LSP server Mason package
     if not spec.formatter_only and is_mason_enabled(spec) then
       local mason_pkg = get_mason_pkg(name, spec)
       if mason_pkg then table.insert(tools, mason_pkg) end
     end
 
-    -- Formatter Mason package (if different from LSP)
     if spec.formatter and spec.formatter.mason and spec.formatter.mason ~= false then
       local mason_pkg = spec.formatter.mason == true and (spec.formatter.name or name) or spec.formatter.mason
       if mason_pkg then table.insert(tools, mason_pkg) end
@@ -176,13 +166,13 @@ function M.get_mason_tools()
     end
   end
 
-  -- Add non-LSP tools
   vim_list_extend(tools, servers.tools)
 
   -- Deduplicate
   local seen = {}
   local unique = {}
-  for _, t in ipairs_iter(tools) do
+  for i = 1, #tools do
+    local t = tools[i]
     if not seen[t] then
       seen[t] = true
       table.insert(unique, t)
