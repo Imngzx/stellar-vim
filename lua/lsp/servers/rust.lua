@@ -1,7 +1,6 @@
 ---@type vim.lsp.Config
 
 return {
-  mason = false,
   cmd = { 'rust-analyzer' },
   filetypes = { 'rust' },
 

@@ -1,7 +1,6 @@
 ---@type vim.lsp.Config
 
 return {
-  mason = true,
   cmd = { vim.fn.stdpath('data') .. '/mason/bin/luau-lsp', 'lsp', '--stdio' },
   filetypes = { 'luau' },
   root_markers = { '.git', 'selene.toml', 'selene.yml' },

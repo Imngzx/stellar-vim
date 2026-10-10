@@ -2,7 +2,6 @@
 
 return {
   lua_ls = {
-    mason = true,
     cmd = { 'lua-language-server' },
     filetypes = { 'lua' },
     root_markers = { '.luarc.json', '.git', '.luacheckrc' },

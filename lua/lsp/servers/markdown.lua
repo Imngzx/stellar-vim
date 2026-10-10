@@ -3,7 +3,6 @@
 return {
   rumdl = {
     root_markers = { '.git', '.rumdl.toml', },
-    mason = true,
     filetypes = { 'markdown' },
     settings = {
       rumdl = {
@@ -48,7 +47,6 @@ return {
   },
 
   markdown_oxide = {
-    mason = true,
     cmd = { 'markdown-oxide' },
     filetypes = { 'markdown' },
     root_markers = { '.moxide.toml', '.obsidian', '.git' },

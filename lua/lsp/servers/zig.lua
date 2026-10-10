@@ -1,8 +1,6 @@
 ---@type vim.lsp.Config
 
 return {
-  mason = true,
-
   cmd = { 'zls' },
   filetypes = { 'zig', 'zir' },
 
