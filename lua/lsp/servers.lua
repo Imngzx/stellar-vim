@@ -66,7 +66,11 @@ M.servers = {
   clangd = {
     'c-language',
     mason = false,
-    formatter = { name = 'clang_format', mason = 'clang-format', ft = { 'c', 'c.doxygen', 'cpp', 'cpp.doxygen', 'objc', 'objcpp', 'cuda' } },
+    formatter = {
+      name = 'clang_format',
+      mason = false,
+      ft = { 'c', 'c.doxygen', 'cpp', 'cpp.doxygen', 'objc', 'objcpp', 'cuda' }
+    },
   },
 
   -- [zig]
@@ -74,7 +78,11 @@ M.servers = {
     'zig',
     mason = true,
     mason_name = 'zls',
-    formatter = { name = 'zigfmt', mason = 'zig', ft = { 'zig', 'zir' } },
+    formatter = {
+      name = 'zigfmt',
+      mason = false,
+      ft = { 'zig', 'zir' }
+    },
   },
 
   -- [rust]
