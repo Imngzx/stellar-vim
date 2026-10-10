@@ -2,7 +2,10 @@
   "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
   "runtime": {
     "version": "LuaJIT",
-    "path": ["lua/?.lua", "lua/?/init.lua"]
+    "path": [
+      "lua/?.lua",
+      "lua/?/init.lua"
+    ]
   },
   "workspace": {
     "library": [
@@ -15,7 +18,12 @@
     "checkThirdParty": false
   },
   "diagnostics": {
-    "globals": ["vim", "Snacks", "big", "jit"],
+    "globals": [
+      "vim",
+      "Snacks",
+      "big",
+      "jit"
+    ],
     "disable": [
       "lowercase-global",
       "undefined-global",
