@@ -1,5 +1,8 @@
 local M = {}
 
+local api = vim.api
+local nvim_buf_get_name = api.nvim_buf_get_name
+
 M.config = {
   stage_action = nil,
   get_git_root = nil
@@ -23,7 +26,7 @@ local function make_item(git_root, rel_path, status)
 end
 
 function M.toggle_stage()
-  local bufname = vim.api.nvim_buf_get_name(0)
+  local bufname = nvim_buf_get_name(0)
   if bufname == '' then
     vim.notify('Current buffer has no associated file', vim.log.levels.ERROR)
     return
