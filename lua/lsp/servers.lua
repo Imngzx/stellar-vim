@@ -33,95 +33,94 @@ config_module:
 M.servers = {
   -- ============ Simple servers (no custom config, no formatter) ============
   -- [json]
-  jsonls = "json-lsp",
+  jsonls = 'json-lsp',
 
   -- [for .fish files]
-  fish_lsp = "fish-lsp",
+  fish_lsp = 'fish-lsp',
 
   -- [HTML]
-  emmet_language_server = "emmet-language-server",
+  emmet_language_server = 'emmet-language-server',
 
   -- ============ Complex servers (require config modules or formatters) ============
   -- [toml]
-  taplo = { false, mason = true, formatter = { name = "taplo", mason = false } },
+  taplo = { false, mason = true, formatter = { name = 'taplo', mason = false } },
 
   -- [bash, sh]
   bashls = {
     false,
     mason = true,
-    mason_name = "bash-language-server",
-    formatter = { name = "shfmt", mason = "shfmt" },
-    ft = { "sh", "bash" },
+    mason_name = 'bash-language-server',
+    formatter = { name = 'shfmt', mason = 'shfmt' },
+    ft = { 'sh', 'bash' },
   },
 
   -- [HTML]
   html = {
     false,
     mason = true,
-    mason_name = "html-lsp",
-    formatter = { name = "prettier", mason = "prettier" },
-    ft = { "html" },
+    mason_name = 'html-lsp',
+    formatter = { name = 'prettier', mason = 'prettier' },
+    ft = { 'html' },
   },
 
-  -- c, c++
+  -- [c, c++]
   clangd = {
-    "c-language",
+    'c-language',
     mason = false,
-    formatter = { name = "clang_format", mason = "clang-format" },
-    ft = { "c", "cpp", "objc", "objcpp", "cuda" },
+    ft = { 'c', 'c.doxygen', 'cpp', 'cpp.doxygen', 'objc', 'objcpp', 'cuda' },
   },
 
-  -- zig
+  -- [zig]
   zls = {
-    "zig",
+    'zig',
     mason = true,
-    mason_name = "zls",
-    formatter = { name = "zigfmt", mason = "zig" },
-    ft = { "zig", "zir" },
+    mason_name = 'zls',
+    formatter = { name = 'zigfmt' },
+    ft = { 'zig', 'zir' },
   },
 
-  -- rust
+  -- [rust]
   rust_analyzer = {
-    "rust",
+    'rust',
     mason = false,
-    formatter = { name = "rustfmt", mason = "rustfmt" },
-    ft = { "rust" },
+    formatter = { name = 'rustfmt', mason = 'rustfmt' },
+    ft = { 'rust' },
   },
 
-  -- qml (for quickshell)
-  qmlls6 = { "qml", mason = false },
+  -- [qml] (for quickshell)
+  qmlls6 = { 'qml', mason = false },
 
   -- luau (Roblox)
-  ["luau-lsp"] = { "luau", mason = "luau-lsp" },
+  ['luau-lsp'] = { 'luau', mason = 'luau-lsp' },
 
-  -- lua
-  ["lua-language-server"] = {
-    "lua",
+  -- [lua]
+  ['lua-language-server'] = {
+    'lua',
     mason = true,
-    config_key = "lua_ls",
-    ft = { "lua" },
+    config_key = 'lua_ls',
+    ft = { 'lua' },
   },
 
-  -- python
+  -- [python]
   -- basedpyright = { 'python', mason = true, config_key = 'basedpyright', formatter = { name = 'ruff_format', mason = false }, ft = { 'python' } },
   ruff = {
-    "python",
+    'python',
     mason = true,
-    config_key = "ruff",
-    formatter = { name = "ruff_format", mason = false },
-    ft = { "python" },
+    config_key = 'ruff',
+    formatter = { name = 'ruff_format', mason = false },
+    ft = { 'python' },
   },
-  ty = { "python", mason = true, config_key = "ty" },
+  ty = { 'python', mason = true, config_key = 'ty' },
 
-  -- markdown
+  -- [markdown]
   rumdl = {
-    "markdown",
+    'markdown',
     mason = true,
-    config_key = "rumdl",
-    formatter = { name = "rumdl", mason = false },
-    ft = { "markdown" },
+    config_key = 'rumdl',
+    formatter = { name = 'rumdl', mason = false },
+    ft = { 'markdown' },
   },
-  ["markdown-oxide"] = { "markdown", mason = true, config_key = "markdown_oxide" },
+  ['markdown-oxide'] = { 'markdown', mason = true, config_key = 'markdown_oxide' },
 
   -- vue (commented)
   -- vtsls = { 'vue', mason = 'vue-language-server', config_key = 'vtsls', formatter = { name = 'prettier', mason = 'prettier' } },
@@ -130,42 +129,42 @@ M.servers = {
   prettier = {
     formatter_only = true,
     ft = {
-      "javascript",
-      "javascriptreact",
-      "typescript",
-      "typescriptreact",
-      "html",
-      "css",
-      "json",
-      "yaml",
-      "markdown",
+      'javascript',
+      'javascriptreact',
+      'typescript',
+      'typescriptreact',
+      'html',
+      'css',
+      'json',
+      'yaml',
+      'markdown',
     },
-    mason = "prettier",
-    name = "prettier",
+    mason = 'prettier',
+    name = 'prettier',
   },
   prettierd = {
     formatter_only = true,
-    ft = { "javascript", "javascriptreact", "typescript", "typescriptreact", "html", "css" },
-    mason = "prettierd",
-    name = "prettierd",
+    ft = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'html', 'css' },
+    mason = 'prettierd',
+    name = 'prettierd',
   },
-  shfmt = { formatter_only = true, ft = { "sh", "bash" }, mason = "shfmt", name = "shfmt" },
+  shfmt = { formatter_only = true, ft = { 'sh', 'bash' }, mason = 'shfmt', name = 'shfmt' },
   cmake_format = {
     formatter_only = true,
-    ft = { "cmake" },
-    mason = "cmakelang",
-    name = "cmake_format",
+    ft = { 'cmake' },
+    mason = 'cmakelang',
+    name = 'cmake_format',
   },
-  jq = { formatter_only = true, ft = { "json" }, mason = "jq", name = "jq" },
+  jq = { formatter_only = true, ft = { 'json' }, mason = 'jq', name = 'jq' },
 }
 
 -- Non-LSP tools installed via Mason (debuggers, linters, etc. - no formatter entry)
 M.tools = {
-  "codelldb", -- C/C++/Rust debugger
-  "debugpy", -- Python debugger
-  "htmlhint", -- HTML linter
-  "shellcheck", -- Shell linter (used by bashls)
-  "mpls", -- Markdown preview LSP
+  'codelldb', -- C/C++/Rust debugger
+  'debugpy', -- Python debugger
+  'htmlhint', -- HTML linter
+  'shellcheck', -- Shell linter (used by bashls)
+  'mpls', -- Markdown preview LSP
   -- 'vue-language-server', -- Vue LSP (commented)
 }
 
