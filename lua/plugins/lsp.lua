@@ -4,28 +4,10 @@ local H = {}
 local lsp_manager = require('lsp.init')
 lsp_manager.setup()
 
-H.conform = {
-  python = function(bufnr)
-    if require('conform').get_formatter_info('ruff_format', bufnr).available then
-      return { 'ruff_format' }
-    else
-      return { 'isort', 'black' }
-    end
-  end,
-  javascript = { 'prettierd', 'prettier', stop_after_first = true },
-  html = { 'prettierd', 'prettier', stop_after_first = true },
-  css = { 'prettierd', 'prettier', stop_after_first = true },
-  rust = { 'rustfmt' },
-  c = { 'clang_format' },
-  cpp = { 'clang_format' },
-  sh = { 'shfmt' },
-  bash = { 'shfmt' },
-  toml = { 'taplo' },
-  cmake = { 'cmake_format' },
-  json = { 'jq' },
-  zig = { 'zigfmt' },
-  markdown = { 'rumdl' }
-}
+-- Generate conform config from unified registry (lazy - call at setup time)
+local function get_conform_config()
+  return lsp_manager.get_conform_config()
+end
 
 vim.g.markdown_fenced_languages = {
   'sh', 'bash=sh', 'python', 'py=python', 'javascript', 'js=javascript',
@@ -42,7 +24,7 @@ require('resonance').load({
         vim.cmd('Mason')
         local registry = require('mason-registry')
         registry.refresh(function()
-          local tools = lsp_manager.mason_tools
+          local tools = lsp_manager.get_mason_tools()
           for i = 1, #tools do
             local pkg_name = tools[i]
             local ok, pkg = pcall(registry.get_package, pkg_name)
@@ -81,12 +63,18 @@ require('resonance').load({
       end, { desc = 'Format file' } }
     },
     setup = function()
-      require('conform').setup({
-        formatters_by_ft = H.conform,
-        format_on_save = {
-          timeout_ms = 800,
-          lsp_format = 'fallback',
-        },
+      local conform = require('conform')
+      conform.setup({
+        formatters_by_ft = get_conform_config(),
+        format_on_save = function(bufnr)
+          local ft = vim.bo[bufnr].filetype
+          local multi = { javascript = true, javascriptreact = true, typescript = true, typescriptreact = true, html = true, css = true }
+          return {
+            timeout_ms = 800,
+            lsp_format = 'fallback',
+            stop_after_first = multi[ft] or false,
+          }
+        end,
       })
     end
   },
@@ -358,21 +346,27 @@ require('resonance').load({
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('LspKepmap', {}),
-  callback = function(ev)
-    local client = vim.lsp.get_client_by_id(ev.data.client_id)
-    if client and client:supports_method('textDocument/inlayHint') then
-      vim.lsp.inlay_hint.enable(
-        not vim.lsp.inlay_hint.is_enabled({ bufnr = ev.buf }),
-        { bufnr = ev.buf }
-      )
+  callback = function(args)
+    local bufnr = args.buf
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if not client then return end
+
+    local map = function(mode, lhs, rhs, desc)
+      vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
     end
-    -- LSP keymaps
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buf = ev.buf, desc = 'LSP hover' })
-    vim.keymap.set('n', '<leader>cr', vim.lsp.buf.rename, { buf = ev.buf, desc = 'Rename symbol' })
-    vim.keymap.set({ 'n', 'x' }, '<leader>ca', vim.lsp.buf.code_action,
-      { buf = ev.buf, desc = 'Code action' })
-    vim.keymap.set('i', '<c-k>', vim.lsp.buf.signature_help,
-      { buf = ev.buf, desc = 'Signature help' })
-    vim.keymap.set('n', '<leader>pl', '<cmd>checkhealth vim.lsp<cr>', { desc = '[Panel] Lsp info' })
+
+    map('n', 'gd', vim.lsp.buf.definition, 'Goto Definition')
+    map('n', 'gr', vim.lsp.buf.references, 'Goto References')
+    map('n', 'gI', vim.lsp.buf.implementation, 'Goto Implementation')
+    map('n', '<leader>D', vim.lsp.buf.type_definition, 'Type Definition')
+    map('n', '<leader>ds', vim.lsp.buf.document_symbol, 'Document Symbols')
+    map('n', '<leader>ws', vim.lsp.buf.workspace_symbol, 'Workspace Symbols')
+    map('n', '<leader>rn', vim.lsp.buf.rename, 'Rename')
+    map('n', '<leader>ca', vim.lsp.buf.code_action, 'Code Action')
+    map('n', 'K', vim.lsp.buf.hover, 'Hover')
+    map('n', 'gK', vim.lsp.buf.signature_help, 'Signature Help')
+    map('i', '<C-k>', vim.lsp.buf.signature_help, 'Signature Help')
   end,
 })
+
+return H
