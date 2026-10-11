@@ -6,7 +6,6 @@ local str_byteindex = vim.str_byteindex
 local str_utfindex = vim.str_utfindex
 local str_sub = string.sub
 local strdisplaywidth = api.nvim_strwidth
-local math_max = math.max
 local string_rep = string.rep
 local string_format = string.format
 local pcall = pcall
@@ -27,9 +26,6 @@ local nvim_create_autocmd = api.nvim_create_autocmd
 local nvim_buf_line_count = api.nvim_buf_line_count
 local nvim_buf_get_lines = api.nvim_buf_get_lines
 local nvim_bo = vim.bo
-
-local table_insert = table.insert
-local table_remove = table.remove
 
 -- [config area]
 local config = {
@@ -93,8 +89,10 @@ end
 local function truncate(str, max_len)
   if not str or str == '' then return '' end
   if #str <= max_len then return str end
+  ---@diagnostic disable-next-line: missing-parameter
   local char_len = str_utfindex(str)
   if char_len > max_len then
+    ---@diagnostic disable-next-line: missing-parameter
     local byte_idx = str_byteindex(str, max_len - 3)
     return str_sub(str, 1, byte_idx) .. '...'
   end
@@ -182,8 +180,8 @@ local function update_window()
     local chunks = {
       { icon .. ' ', icon_hl },
       { client_name, hl_client },
-      { title,       hl_title },
-      { left_part,   hl_text },
+      { title, hl_title },
+      { left_part, hl_text },
     }
     all_chunks[i] = chunks
 
