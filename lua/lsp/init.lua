@@ -4,7 +4,6 @@
 local M = {}
 
 local servers = require('lsp.servers')
-local vim_deepcopy = vim.deepcopy
 local vim_list_extend = vim.list_extend
 local type_check = type
 local table_insert = table.insert
@@ -144,7 +143,9 @@ local function register_server(name, spec)
   end
 
   local mod = require('lsp.servers.' .. config_module)
-  local config = vim_deepcopy(mod[get_config_key(name, spec)] or mod)
+  local src = mod[get_config_key(name, spec)] or mod
+  local config = {}
+  for k, v in next, src do config[k] = v end
   config.mason = nil
   config.mason_name = nil
   config.config_key = nil
