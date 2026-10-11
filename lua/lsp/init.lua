@@ -238,7 +238,7 @@ function M.lsp_config()
   vim_lsp.enable(M.enabled_servers)
 
   vim_api.nvim_create_autocmd('LspAttach', {
-    group = vim_api.nvim_create_augroup('LspKepmap', {}),
+    group = vim_api.nvim_create_augroup('LspKeymaps', { clear = true }),
     callback = function(args)
       local bufnr = args.buf
       local client = vim_lsp.get_client_by_id(args.data.client_id)
@@ -248,7 +248,6 @@ function M.lsp_config()
           not vim_lsp.inlay_hint.is_enabled({ bufnr = args.buf }),
           { bufnr = args.buf }
         )
-        if not client then return end
       end
 
       local map = function(mode, lhs, rhs, desc)
@@ -268,23 +267,6 @@ function M.lsp_config()
       map('i', '<C-k>', vim_lsp_buf_sign, 'Signature Help')
       map('n', '<leader>pl', '<cmd>che vim.lsp<cr>', '[Panel] LSP Info')
 
-      vim.diagnostic.config({
-        virtual_text = false, --leave this with false when you using this plugin
-        underline = true,
-        update_in_insert = false,
-        severity_sort = true,
-        float = {
-          border = 'rounded',
-        },
-        signs = {
-          text = {
-            [vim_diagnostic_severity.ERROR] = icon.error,
-            [vim_diagnostic_severity.WARN] = icon.warn,
-            [vim_diagnostic_severity.HINT] = icon.hint,
-            [vim_diagnostic_severity.INFO] = icon.info,
-          },
-        },
-      })
       local diagnostic_goto = function(next, severity)
         return function()
           vim_diagnostic.jump({
@@ -304,6 +286,24 @@ function M.lsp_config()
       map('n', ']w', diagnostic_goto(true, 'WARN'), 'Next Warning')
       map('n', '[w', diagnostic_goto(false, 'WARN'), 'Prev Warning')
     end,
+
+    vim.diagnostic.config({
+      virtual_text = false, --leave this with false when you using this plugin
+      underline = true,
+      update_in_insert = false,
+      severity_sort = true,
+      float = {
+        border = 'rounded',
+      },
+      signs = {
+        text = {
+          [vim_diagnostic_severity.ERROR] = icon.error,
+          [vim_diagnostic_severity.WARN] = icon.warn,
+          [vim_diagnostic_severity.HINT] = icon.hint,
+          [vim_diagnostic_severity.INFO] = icon.info,
+        },
+      },
+    })
   })
 end
 
