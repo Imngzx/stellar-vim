@@ -286,24 +286,24 @@ function M.lsp_config()
       map('n', ']w', diagnostic_goto(true, 'WARN'), 'Next Warning')
       map('n', '[w', diagnostic_goto(false, 'WARN'), 'Prev Warning')
     end,
+  })
 
-    vim.diagnostic.config({
-      virtual_text = false, --leave this with false when you using this plugin
-      underline = true,
-      update_in_insert = false,
-      severity_sort = true,
-      float = {
-        border = 'rounded',
+  vim.diagnostic.config({
+    virtual_text = false, --leave this with false when you using this plugin
+    underline = true,
+    update_in_insert = false,
+    severity_sort = true,
+    float = {
+      border = 'rounded',
+    },
+    signs = {
+      text = {
+        [vim_diagnostic_severity.ERROR] = icon.error,
+        [vim_diagnostic_severity.WARN] = icon.warn,
+        [vim_diagnostic_severity.HINT] = icon.hint,
+        [vim_diagnostic_severity.INFO] = icon.info,
       },
-      signs = {
-        text = {
-          [vim_diagnostic_severity.ERROR] = icon.error,
-          [vim_diagnostic_severity.WARN] = icon.warn,
-          [vim_diagnostic_severity.HINT] = icon.hint,
-          [vim_diagnostic_severity.INFO] = icon.info,
-        },
-      },
-    })
+    },
   })
 end
 
