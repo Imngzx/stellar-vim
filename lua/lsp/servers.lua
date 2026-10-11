@@ -33,6 +33,9 @@ config_module:
 
 M.servers = {
   -- ============ Simple servers (no custom config, no formatter) ============
+  --[Meson]
+  mesonlsp = 'mesonlsp',
+
   -- [json]
   jsonls = 'json-lsp',
 
