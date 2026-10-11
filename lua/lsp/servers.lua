@@ -79,6 +79,17 @@ M.servers = {
       ft = { 'c', 'c.doxygen', 'cpp', 'cpp.doxygen', 'objc', 'objcpp', 'cuda' }
     },
   },
+  neocmake = {
+    'cmake',
+    mason = true,
+    mason_name = 'neocmakelsp',
+    formatter = {
+      name = 'cmake_format',
+      mason = true,
+      ft = { 'cmake' }
+    }
+
+  },
 
   -- [zig]
   zls = {
@@ -163,12 +174,7 @@ M.servers = {
     name = 'prettierd',
   },
   shfmt = { formatter_only = true, ft = { 'sh', 'bash' }, mason = 'shfmt', name = 'shfmt' },
-  cmake_format = {
-    formatter_only = true,
-    ft = { 'cmake' },
-    mason = 'cmakelang',
-    name = 'cmake_format',
-  },
+  cmakelang = { formatter_only = true, ft = { 'cmake' }, mason = 'cmakelang', name = 'cmakelang' },
   jq = { formatter_only = true, ft = { 'json' }, mason = 'jq', name = 'jq' },
 }
 
