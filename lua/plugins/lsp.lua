@@ -1,14 +1,10 @@
 local H = {}
 
 -- calls the second init in this config
-local lsp_manager = require('lsp.init')
+local lsp_manager = require('lsp')
 lsp_manager.setup()
-vim.lsp.enable(lsp_manager.enabled_servers)
 
--- Generate conform config from unified registry (lazy - call at setup time)
-local function get_conform_config()
-  return lsp_manager.get_conform_config()
-end
+lsp_manager.lsp_config()
 
 vim.g.markdown_fenced_languages = {
   'sh', 'bash=sh', 'python', 'py=python', 'javascript', 'js=javascript',
@@ -62,7 +58,8 @@ require('resonance').load({
     setup = function()
       local conform = require('conform')
       conform.setup({
-        formatters_by_ft = get_conform_config(),
+        -- Generate conform config from unified registry (lazy - call at setup time)
+        formatters_by_ft = lsp_manager.get_conform_config(),
         format_on_save = function(bufnr)
           local ft = vim.bo[bufnr].filetype
           local multi = { javascript = true, javascriptreact = true, typescript = true, typescriptreact = true, html = true, css = true }
@@ -300,70 +297,8 @@ require('resonance').load({
           },
         },
       })
-      vim.diagnostic.config({
-        virtual_text = false, --leave this with false when you using this plugin
-        underline = true,
-        update_in_insert = false,
-        severity_sort = true,
-        float = {
-          border = 'rounded',
-        },
-        signs = {
-          text = {
-            [vim.diagnostic.severity.ERROR] = I.lsp.error,
-            [vim.diagnostic.severity.WARN] = I.lsp.warn,
-            [vim.diagnostic.severity.HINT] = I.lsp.hint,
-            [vim.diagnostic.severity.INFO] = I.lsp.info,
-          },
-        },
-      })
-
-      -- Keymap
-      local diagnostic_goto = function(next, severity)
-        return function()
-          vim.diagnostic.jump({
-            count = (next and 1 or -1) * vim.v.count1,
-            severity = severity and vim.diagnostic.severity[severity] or nil,
-            on_jump = function()
-              vim.diagnostic.open_float()
-            end,
-          })
-        end
-      end
-      vim.keymap.set('n', '<leader>cl', vim.diagnostic.open_float, { desc = 'Line Diagnostics' })
-      vim.keymap.set('n', ']d', diagnostic_goto(true), { desc = 'Next Diagnostic' })
-      vim.keymap.set('n', '[d', diagnostic_goto(false), { desc = 'Prev Diagnostic' })
-      vim.keymap.set('n', ']e', diagnostic_goto(true, 'ERROR'), { desc = 'Next Error' })
-      vim.keymap.set('n', '[e', diagnostic_goto(false, 'ERROR'), { desc = 'Prev Error' })
-      vim.keymap.set('n', ']w', diagnostic_goto(true, 'WARN'), { desc = 'Next Warning' })
-      vim.keymap.set('n', '[w', diagnostic_goto(false, 'WARN'), { desc = 'Prev Warning' })
     end
   }
-})
-
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = vim.api.nvim_create_augroup('LspKepmap', {}),
-  callback = function(args)
-    local bufnr = args.buf
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    if not client then return end
-
-    local map = function(mode, lhs, rhs, desc)
-      vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
-    end
-
-    map('n', 'gd', vim.lsp.buf.definition, 'Goto Definition')
-    map('n', 'gr', vim.lsp.buf.references, 'Goto References')
-    map('n', 'gI', vim.lsp.buf.implementation, 'Goto Implementation')
-    map('n', '<leader>D', vim.lsp.buf.type_definition, 'Type Definition')
-    map('n', '<leader>ds', vim.lsp.buf.document_symbol, 'Document Symbols')
-    map('n', '<leader>ws', vim.lsp.buf.workspace_symbol, 'Workspace Symbols')
-    map('n', '<leader>rn', vim.lsp.buf.rename, 'Rename')
-    map('n', '<leader>ca', vim.lsp.buf.code_action, 'Code Action')
-    map('n', 'K', vim.lsp.buf.hover, 'Hover')
-    map('n', 'gK', vim.lsp.buf.signature_help, 'Signature Help')
-    map('i', '<C-k>', vim.lsp.buf.signature_help, 'Signature Help')
-  end,
 })
 
 return H

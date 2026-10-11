@@ -6,9 +6,17 @@ local M = {}
 local servers = require('lsp.servers')
 local vim_deepcopy = vim.deepcopy
 local vim_list_extend = vim.list_extend
-local vim_lsp_config = vim.lsp.config
 local type_check = type
 local table_insert = table.insert
+
+local vim_api = vim.api
+local vim_lsp = vim.lsp
+local vim_lsp_config = vim_lsp.config
+local vim_lsp_buf = vim_lsp.buf
+local vim_lsp_buf_sign = vim_lsp.buf.signature_help
+local vim_diagnostic = vim.diagnostic
+local vim_diagnostic_severity = vim_diagnostic.severity
+local icon = I.lsp
 
 --- Type check hoisted
 local function is_tbl(spec)
@@ -190,6 +198,79 @@ function M.get_mason_tools()
 
   vim_list_extend(tools, servers.tools)
   return dedupe(tools)
+end
+
+function M.lsp_config()
+  vim_lsp.enable(M.enabled_servers)
+
+  vim_api.nvim_create_autocmd('LspAttach', {
+    group = vim_api.nvim_create_augroup('LspKepmap', {}),
+    callback = function(args)
+      local bufnr = args.buf
+      local client = vim_lsp.get_client_by_id(args.data.client_id)
+
+      if client and client:supports_method('textDocument/inlayHint') then
+        vim.lsp.inlay_hint.enable(
+          not vim_lsp.inlay_hint.is_enabled({ bufnr = args.buf }),
+          { bufnr = args.buf }
+        )
+        if not client then return end
+      end
+
+      local map = function(mode, lhs, rhs, desc)
+        vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+      end
+
+      map('n', 'gd', vim_lsp_buf.definition, 'Goto Definition')
+      map('n', 'gr', vim_lsp_buf.references, 'Goto References')
+      map('n', 'gI', vim_lsp_buf.implementation, 'Goto Implementation')
+      map('n', '<leader>D', vim_lsp_buf.type_definition, 'Type Definition')
+      map('n', '<leader>ds', vim_lsp_buf.document_symbol, 'Document Symbols')
+      map('n', '<leader>ws', vim_lsp_buf.workspace_symbol, 'Workspace Symbols')
+      map('n', '<leader>cr', vim_lsp_buf.rename, 'Rename symbol')
+      map({ 'n', 'x' }, '<leader>ca', vim_lsp_buf.code_action, 'Code Action')
+      map('n', 'K', vim_lsp_buf.hover, 'LSP Hover')
+      map('n', 'gK', vim_lsp_buf_sign, 'Signature Help')
+      map('i', '<C-k>', vim_lsp_buf_sign, 'Signature Help')
+      map('n', '<leader>pl', '<cmd>che vim.lsp<cr>', '[Panel] LSP Info')
+
+      vim.diagnostic.config({
+        virtual_text = false, --leave this with false when you using this plugin
+        underline = true,
+        update_in_insert = false,
+        severity_sort = true,
+        float = {
+          border = 'rounded',
+        },
+        signs = {
+          text = {
+            [vim_diagnostic_severity.ERROR] = icon.error,
+            [vim_diagnostic_severity.WARN] = icon.warn,
+            [vim_diagnostic_severity.HINT] = icon.hint,
+            [vim_diagnostic_severity.INFO] = icon.info,
+          },
+        },
+      })
+      local diagnostic_goto = function(next, severity)
+        return function()
+          vim_diagnostic.jump({
+            count = (next and 1 or -1) * vim.v.count1,
+            severity = severity and vim_diagnostic_severity[severity] or nil,
+            on_jump = function()
+              vim_diagnostic.open_float()
+            end,
+          })
+        end
+      end
+      map('n', '<leader>cl', vim_diagnostic.open_float, 'Line Diagnostics')
+      map('n', ']d', diagnostic_goto(true), 'Next Diagnostic')
+      map('n', '[d', diagnostic_goto(false), 'Prev Diagnostic')
+      map('n', ']e', diagnostic_goto(true, 'ERROR'), 'Next Error')
+      map('n', '[e', diagnostic_goto(false, 'ERROR'), 'Prev Error')
+      map('n', ']w', diagnostic_goto(true, 'WARN'), 'Next Warning')
+      map('n', '[w', diagnostic_goto(false, 'WARN'), 'Prev Warning')
+    end,
+  })
 end
 
 return M
