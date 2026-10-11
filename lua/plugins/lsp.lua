@@ -3,6 +3,7 @@ local H = {}
 -- calls the second init in this config
 local lsp_manager = require('lsp.init')
 lsp_manager.setup()
+vim.lsp.enable(lsp_manager.enabled_servers)
 
 -- Generate conform config from unified registry (lazy - call at setup time)
 local function get_conform_config()
@@ -48,10 +49,6 @@ require('resonance').load({
   {
     'https://github.com/neovim/nvim-lspconfig',
     event = { 'BufReadPre', 'BufNewFile' },
-    setup = function()
-      -- using the lsp or tools that listed inside the init that located inside "lsp" directory
-      vim.lsp.enable(lsp_manager.enabled_servers)
-    end
   },
 
   {
