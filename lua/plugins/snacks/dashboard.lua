@@ -1,7 +1,7 @@
 return {
   enabled = true,
   preset = {
-    header = require('plugins.snacks_config.logo_names').StellarVim_default,
+    header = require('plugins.snacks.logo_names').StellarVim_default,
     keys = {
       { icon = '󰱼 ', key = 'f', desc = 'Find File', action = ":lua Snacks.dashboard.pick('files')" },
       { icon = '󰝒 ', key = 'n', desc = 'New File', action = ':ene | startinsert' },
@@ -16,7 +16,7 @@ return {
   },
   sections = {
     { section = 'header' },
-    { section = 'keys',  gap = 1, padding = 1 },
+    { section = 'keys', gap = 1, padding = 1 },
     function()
       local stats = require('resonance').stats()
       local ms = string.format('%.2f ms', stats.startuptime)

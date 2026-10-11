@@ -203,6 +203,7 @@ git commit -m "feat(session): add auto-save on focus lost"
 - Early returns, flat conditionals
 - Comments only for *why*, not *what*
 - `vim.uv` / `vim.system` over `vim.fn` in hot paths
+
 ### LuaJIT/C API Performance Rules
 
 - **Prefer `vim.uv` sync APIs** (`fs_stat`, `fs_read`, `fs_write`) over async callbacks for small I/O — avoids callback/closure allocation.
@@ -211,6 +212,7 @@ git commit -m "feat(session): add auto-save on focus lost"
 - **Use byte operations** (`str:byte(i) == N`, `bit.band`) over string sub/compare — no intermediate string allocation.
 - **Numeric `for i = 1, #tbl` loops** over `ipairs`/`pairs` — avoids iterator function call overhead; JIT compiles to tight loop.
 - **Hoist C-API functions to local** at module scope (bypasses metatable lookups in hot paths):
+
   ```lua
   local api = vim.api
   local nvim_buf_is_loaded = api.nvim_buf_is_loaded
@@ -220,17 +222,21 @@ git commit -m "feat(session): add auto-save on focus lost"
   local str_sub = string.sub
   local math_max = math.max
   ```
+
 - **SoA (Struct of Arrays) over AoS** for cache-friendly access in hot loops:
+
   ```lua
   -- Good: parallel arrays
   local match_rows, match_cols = {}, {}
   -- Bad: array of tables
   local matches = { {row=1, col=2}, ... }
   ```
+
 - **Avoid allocations in hot paths**: reuse tables, use `table.clear()`, pre-allocate when size known.
 - **`pcall`/`xpcall` are expensive** — don't wrap every C-API call; only where failure is expected/handled.
 - **`vim.schedule`/`vim.schedule_wrap`** for deferring to event loop (avoids blocking UI).
 - **`local x = M.x`** for module self-references in methods (avoids table lookup per call).
+
 ### vim.async (Neovim 0.13+) — Structured Concurrency
 
 Available in nightly/0.13+. Use for Lua coroutine-based async workflows instead of callback chains.
@@ -251,6 +257,7 @@ Available in nightly/0.13+. Use for Lua coroutine-based async workflows instead 
 **Task methods:** `wait()`, `pwait()`, `close()`, `detach()`, `on_complete()`, `status()`, `completed()`, `raise_on_error()`, `traceback()`.
 
 **Key semantics:**
+
 - Tasks form a tree (child tasks attached to parent, parent waits for children)
 - Cooperative cancellation via checkpoints (`await`, `sleep`, `checkpoint`)
 - `detach()` for fire-and-forget background work
@@ -300,7 +307,7 @@ local utils = require('libs.utils')
 
 ### Modify Snacks Picker Config
 
-1. Edit `lua/plugins/snacks_config/picker.lua` or `lua/plugins/snacks.lua`
+1. Edit `lua/plugins/snacks/picker.lua`
 2. Power-aware: check `require('libs.power').is_ac()` for conditional features
 
 ### Update Knowledge Base

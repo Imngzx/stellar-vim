@@ -1,13 +1,13 @@
 local M = {}
 
-local default = require('plugins.snacks_config.logos.neovim_default')
-local stellarvim = require('plugins.snacks_config.logos.stellarvim_default')
-local minato_aqua = require('plugins.snacks_config.logos.minato_aqua')
-local pekora = require('plugins.snacks_config.logos.pekora')
-local ayanami = require('plugins.snacks_config.logos.ayanami_rei')
-local doom = require('plugins.snacks_config.logos.doom')
-local nerv = require('plugins.snacks_config.logos.nerv')
-local miku = require('plugins.snacks_config.logos.miku')
+local default = require('plugins.snacks.logos.neovim_default')
+local stellarvim = require('plugins.snacks.logos.stellarvim_default')
+local minato_aqua = require('plugins.snacks.logos.minato_aqua')
+local pekora = require('plugins.snacks.logos.pekora')
+local ayanami = require('plugins.snacks.logos.ayanami_rei')
+local doom = require('plugins.snacks.logos.doom')
+local nerv = require('plugins.snacks.logos.nerv')
+local miku = require('plugins.snacks.logos.miku')
 
 -- Stellar:Vim defaults
 M.StellarVim_default = stellarvim.logo

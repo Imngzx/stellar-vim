@@ -64,12 +64,12 @@ Snacks.setup({
     refresh = 150,
   },
 
-  dashboard = require('plugins.snacks_config.dashboard'),
-  picker = require('plugins.snacks_config.picker'),
+  dashboard = require('plugins.snacks.dashboard'),
+  picker = require('plugins.snacks.picker'),
 })
 
 -- 3. 读取分离出去的按键配置
-local key = require('plugins.snacks_config.keys')
+local key = require('plugins.snacks.keys')
 
 local keymap_set = vim.keymap.set
 
@@ -108,7 +108,7 @@ require('resonance').load({
     _G.dd = function(...) Snacks.debug.inspect(...) end
 
     -- NOTE: can enable this if you want snacks notifier shows lsp progress
-    -- require('plugins.snacks_config.lsp_progress')
+    -- require('plugins.snacks.lsp_progress')
 
     if utils.is_compatible_version('0.11') then
       ---@diagnostic disable-next-line: duplicate-set-field
