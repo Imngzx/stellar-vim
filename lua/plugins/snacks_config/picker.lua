@@ -5,7 +5,7 @@ return {
   matcher = {
     cwd_bonus = true, -- 当前目录加权。更倾向于当前路径下的文件
     frecency = true, -- 开启记忆加权。打开次数越多越靠前。
-    sort_empty = true, --  首次打开时预览器就显示排序后的结果
+    sort_empty = false, --  首次打开时预览器就显示排序后的结果
   },
   hidden = true,
   prompt = ' ',
@@ -178,8 +178,10 @@ return {
               local is_dir = input:sub(-1) == '/'
               local target_dir = is_dir and path or vim.fs.dirname(path)
               local stat = vim.uv.fs_stat(target_dir)
-              if not stat or stat.type ~= 'directory' then pcall(vim.fs.mkdir, target_dir,
-                  { parents = true }) end
+              if not stat or stat.type ~= 'directory' then
+                pcall(vim.fs.mkdir, target_dir,
+                  { parents = true })
+              end
               if is_dir then
                 picker:update()
               else
