@@ -1,5 +1,5 @@
 ---@module 'lsp.init'
---- LSP manager: server registration, formatter config, Mason tools
+--- LSP manager: server registration, formatter config, linter config, Mason tools
 
 local M = {}
 
@@ -49,6 +49,38 @@ end
 local dedupe = make_dedupe()
 
 
+--- Generic helper: build {ft = {names}} from a registry
+---@param registry table
+---@param name_getter fun(key, spec): string|nil  -- returns name to insert, or nil to skip
+---@param ft_getter fun(key, spec): string[]|nil  -- returns filetypes array, or nil to skip
+---@return table<string, string[]>
+local function build_by_ft(registry, name_getter, ft_getter)
+  local result = {}
+
+  for key, spec in next, registry do
+    local name = name_getter(key, spec)
+    local ft_list = ft_getter(key, spec)
+    if name and ft_list then
+      for j = 1, #ft_list do
+        local ft = ft_list[j]
+        local list = result[ft]
+        if not list then
+          list = {}
+          result[ft] = list
+        end
+        table_insert(list, name)
+      end
+    end
+  end
+
+  for ft, list in next, result do
+    result[ft] = dedupe(list)
+  end
+
+  return result
+end
+
+
 --- Extract config module name (nil for simple string specs and formatter-only rows)
 ---@param spec string|table|boolean
 ---@return string|nil
@@ -58,6 +90,7 @@ local function get_config_module(spec)
   end
   return spec[1]
 end
+
 
 --- Extract Mason package name from spec
 ---@param name string
@@ -132,39 +165,33 @@ end
 --- Generate conform.nvim formatter config from registry
 ---@return table<string, string[]> formatters_by_ft
 function M.get_conform_config()
-  local fmt = {}
-
-  -- Direct hash traversal via next (zero allocations, LuaJIT optimized)
-  for name, spec in next, servers.servers do
-    if is_tbl(spec) then
-      local ft_list
-      local formatter_name = spec.formatter and spec.formatter.name or
-        (spec.formatter_only and spec.name)
-      if spec.formatter_only then
-        ft_list = spec.ft
-      elseif spec.formatter then
-        ft_list = spec.formatter.ft or { name }
-      end
-
-      if ft_list then
-        for j = 1, #ft_list do
-          local ft = ft_list[j]
-          local list = fmt[ft]
-          if not list then
-            list = {}
-            fmt[ft] = list
-          end
-          table_insert(list, formatter_name)
-        end
-      end
+  return build_by_ft(servers.servers,
+    -- name_getter
+    function(_, spec)
+      if not is_tbl(spec) then return nil end
+      if spec.formatter_only then return spec.name end
+      if spec.formatter then return spec.formatter.name end
+      return nil
+    end,
+    -- ft_getter
+    function(_, spec)
+      if not is_tbl(spec) then return nil end
+      if spec.formatter_only then return spec.ft end
+      if spec.formatter then return spec.formatter.ft end
+      return nil
     end
-  end
+  )
+end
 
-  for ft, list in next, fmt do
-    fmt[ft] = dedupe(list)
-  end
-
-  return fmt
+--- Generate nvim-lint linter config from M.linters registry
+---@return table<string, string[]> linters_by_ft
+function M.get_lint_config()
+  return build_by_ft(servers.linters,
+    -- name_getter
+    function(name, _) return name end,
+    -- ft_getter
+    function(_, spec) return spec.ft end
+  )
 end
 
 --- Generate Mason tools list from registry
@@ -193,6 +220,13 @@ function M.get_mason_tools()
           table_insert(tools, mason_pkg)
         end
       end
+    end
+  end
+
+  -- Linters from M.linters registry
+  for _, linter_spec in next, servers.linters do
+    if linter_spec.mason then
+      table_insert(tools, linter_spec.mason)
     end
   end
 

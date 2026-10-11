@@ -79,10 +79,8 @@ require('resonance').load({
     setup = function()
       local lint = require('lint')
 
-      lint.linters_by_ft = {
-        html = { 'htmlhint' },
-        cmake = { 'cmakelint' },
-      }
+      -- Use centralized linter config from registry
+      lint.linters_by_ft = lsp_manager.get_lint_config()
 
       vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
         group = vim.api.nvim_create_augroup('DIY_Linting', { clear = true }),

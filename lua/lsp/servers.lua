@@ -176,10 +176,15 @@ M.servers = {
 M.tools = {
   'codelldb', -- C/C++/Rust debugger
   'debugpy', -- Python debugger
-  'htmlhint', -- HTML linter
   'shellcheck', -- Shell linter (used by bashls)
   'mpls', -- Markdown preview LSP
   -- 'vue-language-server', -- Vue LSP (commented)
+}
+
+-- Linters: name -> { ft = {...}, mason? }
+-- Used for nvim-lint linters_by_ft and Mason auto-install
+M.linters = {
+  htmlhint = { ft = { 'html' }, mason = 'htmlhint' },
 }
 
 return M
