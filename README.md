@@ -20,7 +20,7 @@ Use this on Linux for best experience ฅ₍^•⩊ •マⳊ
 | ![Preview image](https://github.com/user-attachments/assets/75fd8e84-747e-4c48-93d1-0154aa0b94a7) | ![Preview image](https://github.com/user-attachments/assets/6c84841c-fb4f-4a1d-a34d-85528bec0cb5) |
 | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 
-| ![Discord Presence](https://github.com/user-attachments/assets/2f496144-e675-4558-8bd6-bbc80e9e025f) | ![Preview image](https://github.com/user-attachments/assets/e2f60735-c291-4ea2-beb5-633bf3137679) |
+| ![Discord Presence](https://github.com/user-attachments/assets/2f496144-e675-4558-8bd6-bbc80e9e025f) | ![Simple LSP Configs](https://github.com/user-attachments/assets/8c509a6d-988b-47a7-9643-e6fc60e96573) |
 | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 
 ## Features
