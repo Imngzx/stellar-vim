@@ -44,7 +44,11 @@ M.servers = {
 
   -- ============ Complex servers (require config modules or formatters) ============
   -- [toml]
-  taplo = { false, mason = true, formatter = { name = 'taplo', mason = false, ft = { 'toml' } } },
+  taplo = {
+    false,
+    mason = true,
+    formatter = { name = 'taplo', mason = false, ft = { 'toml' } }
+  },
 
   -- [bash, sh]
   bashls = {
@@ -99,9 +103,10 @@ M.servers = {
   ['luau-lsp'] = { 'luau', mason = 'luau-lsp' },
 
   -- [lua]
-  ['lua-language-server'] = {
+  lua_ls = {
     'lua',
     mason = true,
+    mason_name = 'lua-language-server',
     config_key = 'lua_ls',
     -- uses lua-ls built-in formatter, no external formatter
   },
@@ -123,7 +128,12 @@ M.servers = {
     config_key = 'rumdl',
     formatter = { name = 'rumdl', mason = false, ft = { 'markdown' } },
   },
-  ['markdown-oxide'] = { 'markdown', mason = true, config_key = 'markdown_oxide' },
+  md_oxide = {
+    'markdown',
+    mason = true,
+    mason_name = 'markdown-oxide',
+    config_key = 'markdown_oxide'
+  },
 
   -- vue (commented)
   -- vtsls = { 'vue', mason = 'vue-language-server', config_key = 'vtsls', formatter = { name = 'prettier', mason = 'prettier', ft = { 'vue', 'typescript', 'javascript' } } },
