@@ -1,7 +1,7 @@
 local api = vim.api
 local async = vim.async
 local conditions = require('heirline.conditions')
-local colors = require('plugins.heirline_config.colors')
+local colors = require('plugins.heirline.colors')
 local _lsp_args = { bufnr = 0 }
 local nvim_get_current_buf = api.nvim_get_current_buf
 local nvim_command = api.nvim_command

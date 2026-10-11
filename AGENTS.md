@@ -301,8 +301,8 @@ local utils = require('libs.utils')
 
 ### Modify Heirline Statusline
 
-1. Edit `lua/plugins/heirline_config/statusline.lua` (components)
-2. Edit `lua/plugins/heirline_config/colors.lua` (color palette)
+1. Edit `lua/plugins/heirline/statusline.lua` (components)
+2. Edit `lua/plugins/heirline/colors.lua` (color palette)
 3. Test: `nvim --headless -u NONE -c "luafile ~/.config/nvim/init.lua" -c "doautocmd User VeryLazy" -c "lua vim.cmd('redrawstatus'); vim.cmd('redrawtabline'); vim.cmd('colorscheme catppuccin')" -c "qall"`
 
 ### Modify Snacks Picker Config

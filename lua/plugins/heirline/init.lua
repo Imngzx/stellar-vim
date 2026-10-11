@@ -5,7 +5,7 @@ require('resonance').load({
     config = function()
       local heirline = require('heirline')
       local utils = require('heirline.utils')
-      local colors = require('plugins.heirline_config.colors')
+      local colors = require('plugins.heirline.colors')
 
       heirline.load_colors(colors.setup_colors())
 
@@ -20,9 +20,9 @@ require('resonance').load({
         end
       })
 
-      local StatusLine = require('plugins.heirline_config.statusline')
-      local TabLine = require('plugins.heirline_config.tabline')
-      local WinBar = require('plugins.heirline_config.winbar')
+      local StatusLine = require('plugins.heirline.statusline')
+      local TabLine = require('plugins.heirline.tabline')
+      local WinBar = require('plugins.heirline.winbar')
 
       heirline.setup({
         statusline = StatusLine,
