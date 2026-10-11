@@ -6,6 +6,21 @@ local _lsp_args = { bufnr = 0 }
 local nvim_get_current_buf = api.nvim_get_current_buf
 local nvim_command = api.nvim_command
 
+-- Cached mode updated only on ModeChanged
+local cached_mode = vim.fn.mode(1)
+vim.api.nvim_create_autocmd('ModeChanged', {
+  callback = function() cached_mode = vim.fn.mode(1) end,
+})
+
+-- Pre-computed mode -> color map
+local mode_color_map = setmetatable({}, {
+  __index = function(t, k)
+    local c = colors.get_mode_color(k)
+    t[k] = c
+    return c
+  end
+})
+
 local lsp_name_cache = {}
 local lsp_cache_group = vim.api.nvim_create_augroup('HeirlineLspNameCache', { clear = true })
 vim.api.nvim_create_autocmd({ 'LspAttach', 'LspDetach' }, {
@@ -43,10 +58,10 @@ end
 
 -- 1. Vi Mode
 local ViMode = {
-  update = true,
+  update = { 'ModeChanged' },
   init = function(self)
-    self.mode = vim.fn.mode(1)
-    self.mode_color = colors.get_mode_color(self.mode)
+    self.mode = cached_mode
+    self.mode_color = mode_color_map[self.mode]
   end,
   static = { mode_names = colors.mode_names },
   {
@@ -152,7 +167,7 @@ local Venv = {
   hl = { fg = 'venv_name', bg = 'bg' },
 }
 
--- 6. Location And Time
+-- 6. Location And Time (optimized clock)
 local function get_time_str()
   local hour = tonumber(os.date('%H'))
   local ampm = hour < 12 and 'AM' or 'PM'
@@ -167,7 +182,14 @@ local function setup_time_updater()
       cached_time = get_time_str()
       local current_seconds = tonumber(os.date('%S'))
       async.sleep((60 - current_seconds) * 1000)
-      nvim_command('redrawstatus')
+      vim.schedule(function()
+        local stl = require('heirline').statusline
+        if stl and stl.__redraw then
+          stl.__redraw()
+        else
+          nvim_command('redrawstatus')
+        end
+      end)
     end
   end)
 end
@@ -175,8 +197,8 @@ setup_time_updater()
 
 local LocationAndTime = {
   init = function(self)
-    self.mode = vim.fn.mode(1)
-    self.mode_color = colors.get_mode_color(self.mode)
+    self.mode = cached_mode
+    self.mode_color = mode_color_map[self.mode]
   end,
   { provider = '', hl = { fg = 'section_bg', bg = 'bg' } },
   { provider = '  %l:%c ', hl = function(self) return { fg = self.mode_color, bg = 'section_bg' } end },
