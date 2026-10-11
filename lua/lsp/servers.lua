@@ -85,7 +85,7 @@ M.servers = {
     mason_name = 'neocmakelsp',
     formatter = {
       name = 'cmake_format',
-      mason = true,
+      mason = 'cmakelang',
       ft = { 'cmake' }
     }
 
@@ -174,7 +174,6 @@ M.servers = {
     name = 'prettierd',
   },
   shfmt = { formatter_only = true, ft = { 'sh', 'bash' }, mason = 'shfmt', name = 'shfmt' },
-  cmakelang = { formatter_only = true, ft = { 'cmake' }, mason = 'cmakelang', name = 'cmakelang' },
   jq = { formatter_only = true, ft = { 'json' }, mason = 'jq', name = 'jq' },
 }
 
