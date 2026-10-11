@@ -7,34 +7,45 @@ local servers = require('lsp.servers')
 local vim_deepcopy = vim.deepcopy
 local vim_list_extend = vim.list_extend
 local vim_lsp_config = vim.lsp.config
-local pairs_iter = pairs
 local type_check = type
 local table_insert = table.insert
+
+--- Type check hoisted
+local function is_tbl(spec)
+  return type_check(spec) == 'table'
+end
 
 M.enabled_servers = {}
 M.mason_tools = {}
 
---- First-seen order. Callers rely on that order for enable and install lists.
----@param list any[]
+--- Dedupe with reused seen table (closure)
 ---@return any[]
-local function dedupe(list)
+local function make_dedupe()
   local seen = {}
-  local unique = {}
-  for i = 1, #list do
-    local item = list[i]
-    if not seen[item] then
-      seen[item] = true
-      table_insert(unique, item)
+  ---@param list any[]
+  return function(list)
+    for k in next, seen do seen[k] = nil end
+    local unique = {}
+    local idx = 1
+    for i = 1, #list do
+      local item = list[i]
+      if not seen[item] then
+        seen[item] = true
+        unique[idx] = item
+        idx = idx + 1
+      end
     end
+    return unique
   end
-  return unique
 end
+local dedupe = make_dedupe()
+
 
 --- Extract config module name (nil for simple string specs and formatter-only rows)
 ---@param spec string|table|boolean
 ---@return string|nil
 local function get_config_module(spec)
-  if type_check(spec) ~= 'table' or spec.formatter_only then
+  if not is_tbl(spec) or spec.formatter_only then
     return nil
   end
   return spec[1]
@@ -45,7 +56,7 @@ end
 ---@param spec string|table|boolean
 ---@return string|nil
 local function get_mason_pkg(name, spec)
-  if type_check(spec) ~= 'table' then
+  if not is_tbl(spec) then
     return spec == true and name or spec
   end
   if spec.formatter_only then
@@ -58,7 +69,7 @@ end
 ---@param spec string|table|boolean
 ---@return boolean
 local function is_mason_enabled(spec)
-  if type_check(spec) ~= 'table' then
+  if not is_tbl(spec) then
     return true
   end
   return spec.mason ~= false
@@ -69,7 +80,7 @@ end
 ---@param spec string|table|boolean
 ---@return string
 local function get_config_key(name, spec)
-  if type_check(spec) ~= 'table' then
+  if not is_tbl(spec) then
     return name
   end
   return spec.config_key or name
@@ -101,13 +112,12 @@ local function register_server(name, spec)
 end
 
 function M.setup()
-  for name, spec in pairs_iter(servers.servers) do
-    local skip = type_check(spec) == 'table' and spec.formatter_only
-    if not skip then
+  -- Direct hash traversal via next (zero allocations, LuaJIT optimized)
+  for name, spec in next, servers.servers do
+    if not (is_tbl(spec) and spec.formatter_only) then
       register_server(name, spec)
     end
   end
-
   vim_list_extend(M.mason_tools, servers.tools)
 end
 
@@ -116,10 +126,10 @@ end
 function M.get_conform_config()
   local fmt = {}
 
-  for name, spec in pairs_iter(servers.servers) do
-    if type_check(spec) == 'table' then
+  -- Direct hash traversal via next (zero allocations, LuaJIT optimized)
+  for name, spec in next, servers.servers do
+    if is_tbl(spec) then
       local ft_list
-      -- formatter.name wins; a missing ft list falls back to the server key.
       local formatter_name = spec.formatter and spec.formatter.name or
         (spec.formatter_only and spec.name)
       if spec.formatter_only then
@@ -129,8 +139,8 @@ function M.get_conform_config()
       end
 
       if ft_list then
-        for i = 1, #ft_list do
-          local ft = ft_list[i]
+        for j = 1, #ft_list do
+          local ft = ft_list[j]
           local list = fmt[ft]
           if not list then
             list = {}
@@ -142,7 +152,7 @@ function M.get_conform_config()
     end
   end
 
-  for ft, list in pairs_iter(fmt) do
+  for ft, list in next, fmt do
     fmt[ft] = dedupe(list)
   end
 
@@ -154,8 +164,9 @@ end
 function M.get_mason_tools()
   local tools = {}
 
-  for name, spec in pairs_iter(servers.servers) do
-    if type_check(spec) == 'table' and spec.formatter_only then
+  -- Direct hash traversal via next (zero allocations, LuaJIT optimized)
+  for name, spec in next, servers.servers do
+    if is_tbl(spec) and spec.formatter_only then
       if is_mason_enabled(spec) and spec.mason then
         table_insert(tools, spec.mason)
       end
@@ -167,7 +178,7 @@ function M.get_mason_tools()
         end
       end
 
-      local formatter = type_check(spec) == 'table' and spec.formatter or nil
+      local formatter = is_tbl(spec) and spec.formatter or nil
       if formatter and formatter.mason and formatter.mason ~= false then
         local mason_pkg = formatter.mason == true and (formatter.name or name) or formatter.mason
         if mason_pkg then
@@ -182,4 +193,3 @@ function M.get_mason_tools()
 end
 
 return M
-
