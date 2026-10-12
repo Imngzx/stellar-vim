@@ -138,7 +138,6 @@ local function register_server(name, spec)
   end
 
   if not config_module then
-    vim_lsp_config(name, {})
     return
   end
 
