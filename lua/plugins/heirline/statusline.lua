@@ -7,9 +7,12 @@ local nvim_get_current_buf = api.nvim_get_current_buf
 local nvim_command = api.nvim_command
 
 -- Cached mode updated only on ModeChanged
-local cached_mode = vim.fn.mode(1)
+local cached_mode = vim.api.nvim_get_mode().mode
 vim.api.nvim_create_autocmd('ModeChanged', {
-  callback = function() cached_mode = vim.fn.mode(1) end,
+  callback = function()
+    cached_mode = api.nvim_get_mode().mode
+    vim.schedule(function() nvim_command('redrawstatus') end)
+  end
 })
 
 -- Pre-computed mode -> color map
