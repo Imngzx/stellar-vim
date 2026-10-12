@@ -98,6 +98,9 @@ require('resonance').load({
     'https://github.com/Imngzx/ascetic.nvim',
     event = { 'BufReadPost', 'BufNewFile' },
     -- event = { 'User', pattern = 'VeryLazy' },
+    keys = {
+      { 'n', '<leader>ua', '<cmd>AsceticToggle<cr>', { desc = 'Toggle Ascetic' } },
+    },
     config = function()
       local Ascetic = require('ascetic')
 
@@ -114,7 +117,6 @@ require('resonance').load({
           return insults[key] or ('Stop pressing `%s`!'):format(key)
         end,
       })
-      vim.keymap.set('n', '<leader>ua', Ascetic.toggle, { desc = 'Toggle Ascetic' })
     end
   },
 
