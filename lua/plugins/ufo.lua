@@ -11,14 +11,11 @@ require('resonance').load({
   },
   config = function()
     local function set_fold_hl()
-      local ok, color_lib = pcall(require, 'custom.color-list')
-      if ok then
-        vim.api.nvim_set_hl(0, 'FoldText', {
-          fg = color_lib.colors.toxic_matcha.hex,
-          italic = true,
-          bold = true
-        })
-      end
+      vim.api.nvim_set_hl(0, 'FoldText', {
+        fg = require('custom.color-list').colors.toxic_matcha.hex,
+        italic = true,
+        bold = true
+      })
     end
 
     vim.api.nvim_create_autocmd('ColorScheme', {
