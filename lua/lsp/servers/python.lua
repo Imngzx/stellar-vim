@@ -41,6 +41,9 @@ return {
     },
     capabilities = {
       offsetEncoding = { 'utf-16' },
+      general = {
+        positionEncodings = { 'utf-16' },
+      },
     },
   },
 
@@ -51,6 +54,9 @@ return {
     cmd = { 'ty', 'server' },
     capabilities = {
       offsetEncoding = { 'utf-16' },
+      general = {
+        positionEncodings = { 'utf-16' },
+      },
     },
   },
 
