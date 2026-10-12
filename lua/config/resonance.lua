@@ -82,7 +82,6 @@ vim.api.nvim_create_autocmd('User', {
     safe_setup('custom.pairs', require('custom.pairs').setup)
     safe_setup('custom.surround', require('custom.surround').setup)
     safe_load('custom.word-jump')
-    safe_load('plugins.flash')
 
     -- UI
     safe_load('plugins.heirline')
