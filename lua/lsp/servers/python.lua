@@ -1,14 +1,20 @@
 ---@type vim.lsp.Config
 
+
+-- Enforce UTF-16 offset encoding as the primary option
+vim.lsp.config('*', {
+  capabilities = {
+    offsetEncoding = { 'utf-16' },
+    general = {
+      positionEncodings = { 'utf-16' },
+    },
+  },
+})
+
 return {
   ruff = {
     filetypes = { 'python' },
     root_markers = { 'pyproject.toml', 'ruff.toml', '.ruff.toml', '.git' },
-    capabilities = {
-      general = {
-        positionEncodings = { 'utf-16' },
-      },
-    },
     cmd_env = { RUFF_TRACE = 'messages' },
     init_options = {
       settings = {
@@ -39,12 +45,6 @@ return {
         },
       },
     },
-    capabilities = {
-      offsetEncoding = { 'utf-16' },
-      general = {
-        positionEncodings = { 'utf-16' },
-      },
-    },
   },
 
   ty = {
@@ -52,12 +52,6 @@ return {
     filetypes = { 'python' },
     root_markers = { 'ty.toml', 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', '.git' },
     cmd = { 'ty', 'server' },
-    capabilities = {
-      offsetEncoding = { 'utf-16' },
-      general = {
-        positionEncodings = { 'utf-16' },
-      },
-    },
   },
 
   pyrefly = {
