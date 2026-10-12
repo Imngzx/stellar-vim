@@ -54,6 +54,7 @@ opt.breakindent = true -- maintain indent on wrap
 -- Others
 opt.winminwidth = 5 -- prevent tiny splits
 opt.undofile = true
+if require('libs.utils').is_windows() then opt.shadafile = 'NONE' end
 o.sessionoptions = 'buffers,curdir,tabpages,winsize,help,skiprtp,folds'
 opt.jumpoptions = 'view' -- restore view after jump
 opt.virtualedit = 'block' -- allow cursor past EOL in block mode
