@@ -102,8 +102,8 @@ vim.api.nvim_create_autocmd('User', {
     safe_load('plugins.jisho')
     safe_load('plugins.AI')
     safe_load('plugins.atone')
+    safe_setup('custom.language-switcher', require('custom.language-switcher').setup)
     if not require('libs.utils').is_windows() and not require('libs.utils').is_wsl() then
-      safe_setup('custom.language-switcher', require('custom.language-switcher').setup)
       safe_load('plugins.telegram')
     end
     safe_load('config.neovide')
