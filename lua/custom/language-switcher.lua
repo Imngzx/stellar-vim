@@ -64,90 +64,78 @@ local IME_AVAILABLE = false
 local user32, imm32
 
 if util.is_windows() then
-  -- Pre-declare all FFI definitions at module load
-  pcall(function()
+  local ok, err = pcall(function()
     ffi.cdef [[
       typedef unsigned long DWORD;
       typedef void* HANDLE;
       typedef HANDLE HWND;
+      typedef HANDLE HKL;
+      typedef HANDLE HIMC;
       typedef unsigned int UINT;
       typedef uintptr_t WPARAM;
       typedef intptr_t LPARAM;
+      typedef intptr_t LRESULT;
       typedef int BOOL;
-      typedef long LONG;
 
       HWND GetForegroundWindow(void);
-      DWORD GetWindowThreadProcessId(HWND hWnd, DWORD* lpdwProcessId);
-      HKL GetKeyboardLayout(DWORD idThread);
+      HWND ImmGetDefaultIMEWnd(HWND hWnd);
+      LRESULT SendMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
       BOOL PostMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
     ]]
 
-    -- Load DLLs
     user32 = ffi.load('user32')
     imm32 = ffi.load('imm32')
-
-    -- Verify functions exist
-    if user32.GetForegroundWindow and user32.GetWindowThreadProcessId and user32.GetKeyboardLayout and user32.PostMessageW then
-      IME_AVAILABLE = true
-    end
   end)
+
+  if ok and user32 and imm32 then
+    IME_AVAILABLE = true
+  else
+    vim.notify('IME module FFI failed to load: ' .. tostring(err), vim.log.levels.WARN)
+  end
 end
 
 local WM_INPUTLANGCHANGEREQUEST = 0x0050
 local ENGLISH_US_LAYOUT_ID = 0x04090409
 
---- Get IME open status for a window
+local WM_IME_CONTROL = 0x0283
+local IMC_GETOPENSTATUS = 0x0005
+local IMC_SETOPENSTATUS = 0x0006
+
 ---@param hWnd HWND
 ---@return boolean|nil
 local function get_ime_status(hWnd)
   if not IME_AVAILABLE or hWnd == nil or hWnd == ffi.NULL then return nil end
-
-  -- Use ImmGetOpenStatus via imm32
-  if imm32.ImmGetOpenStatus then
-    local hIMC = imm32.ImmGetContext(hWnd)
-    if hIMC ~= ffi.NULL then
-      local status = imm32.ImmGetOpenStatus(hIMC)
-      imm32.ImmReleaseContext(hWnd, hIMC)
-      return status ~= 0
-    end
+  local ime_hWnd = imm32.ImmGetDefaultIMEWnd(hWnd)
+  if ime_hWnd ~= ffi.NULL then
+    local status = user32.SendMessageW(ime_hWnd, WM_IME_CONTROL, IMC_GETOPENSTATUS, 0)
+    return status ~= 0
   end
   return nil
 end
 
---- Set IME open status for a window
 ---@param hWnd HWND
 ---@param open boolean
 ---@return boolean
 local function set_ime_status(hWnd, open)
   if not IME_AVAILABLE or hWnd == nil or hWnd == ffi.NULL then return false end
-
-  if imm32.ImmSetOpenStatus then
-    local hIMC = imm32.ImmGetContext(hWnd)
-    if hIMC ~= ffi.NULL then
-      local ok = imm32.ImmSetOpenStatus(hIMC, open and 1 or 0)
-      imm32.ImmReleaseContext(hWnd, hIMC)
-      return ok ~= 0
-    end
+  local ime_hWnd = imm32.ImmGetDefaultIMEWnd(hWnd)
+  if ime_hWnd ~= ffi.NULL then
+    user32.SendMessageW(ime_hWnd, WM_IME_CONTROL, IMC_SETOPENSTATUS, open and 1 or 0)
+    return true
   end
   return false
 end
 
---- Force switch to English (US) keyboard layout
 function M.force_switch_to_english()
   if not IME_AVAILABLE then return end
 
   local hWnd = user32.GetForegroundWindow()
   if hWnd == nil or hWnd == ffi.NULL then return end
 
-  -- 1. Turn off IME
   set_ime_status(hWnd, false)
-
-  -- 2. Switch to English layout via PostMessageW
-  -- WM_INPUTLANGCHANGEREQUEST with HKL for US English
   user32.PostMessageW(hWnd, WM_INPUTLANGCHANGEREQUEST, 0, ENGLISH_US_LAYOUT_ID)
 end
 
---- Auto-switch IME on mode change (Insert <-> Normal)
 function M.auto_switch_ime()
   if not IME_AVAILABLE then return end
 
@@ -158,10 +146,8 @@ function M.auto_switch_ime()
     callback = function()
       local hWnd = user32.GetForegroundWindow()
       if hWnd ~= nil and hWnd ~= ffi.NULL then
-        -- Save IME state per buffer
         local status = get_ime_status(hWnd)
         vim.b.saved_ime_status = status
-        -- Turn off IME
         set_ime_status(hWnd, false)
       end
     end,
