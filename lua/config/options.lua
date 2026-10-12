@@ -65,6 +65,7 @@ opt.cmdheight = 0
 opt.fileformat = 'unix'
 opt.ruler = false
 opt.confirm = true -- confirm before quitting unsaved changes
+o.autoread = true
 
 -- Case
 opt.ignorecase = true -- case-insensitive by default
