@@ -146,12 +146,15 @@ So I use fzf-lua instead of snacks during power-saver mode.
 - lazygit
 - pandoc for markdown rendering in browser `<leader>cz`
 - fcitx5 on **Linux**
+- im-select for **WSL**
 - tdlib, npm, kitty||ghostty on **Linux** and **MacOS**, for [**ChuYanLon/telegram.nvim**](https://github.com/ChuYanLon/telegram.nvim)
 - tectonic on **Linux** and **MacOS**, optional for latex rendering
 - vim-startuptime, optional
 - kitty||ghostty on **Linux** and **MacOS**, for image support
 
-### **How to install tdlib? (On Linux)**
+### How To Install System Dependencies?
+
+#### **How to install tdlib? (On Linux)**
 
 ```fish
 
@@ -167,6 +170,38 @@ So I use fzf-lua instead of snacks during power-saver mode.
           -DCMAKE_CXX_FLAGS="-O2 -g0" \
           ..
   cmake --build . --target install -j$(nproc)
+
+```
+
+#### How to install im-select?
+
+1. Open powershell, then:
+
+```sh
+# If you're a normal user:
+~
+❯ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+  Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+
+# or
+
+# If you're administrator, use this workaround:
+~
+❯ irm get.scoop.sh -outfile 'install.ps1'
+  .\install.ps1 -RunAsAdmin [-OtherParameters ...]
+
+
+# then restart terminal
+ 
+##################################
+
+~
+❯ scoop update
+  scoop install git 
+  scoop bucket add im-select https://github.com/daipeihust/im-select
+  
+  # 2. Install the im-select package
+  scoop install im-select
 
 ```
 
