@@ -11,8 +11,12 @@ local create_autocmd = api.nvim_create_autocmd
 local ffi = require('ffi')
 local util = require('libs.utils')
 
+-- OS Detection
+local is_wsl = vim.uv.os_uname().release:lower():find('microsoft') ~= nil
+local is_windows = util.is_windows() and not is_wsl
+
 -- ============================================================
--- Linux: fcitx5-remote
+-- 1. Linux: fcitx5-remote
 -- ============================================================
 local FCITX5_REMOTE = executable('fcitx5-remote') == 1 and 'fcitx5-remote' or nil
 
@@ -58,12 +62,61 @@ function M.fcitx()
 end
 
 -- ============================================================
--- Windows: IME control via Imm32 / user32
+-- 2. WSL: im-select.exe (WSL Interop)
+-- ============================================================
+-- Update this path to where scoop installed im-select.exe
+local IM_SELECT_EXE = '/mnt/c/Users/Administrator/scoop/apps/im-select/current/im-select.exe'
+
+function M.wsl_ime()
+  if executable(IM_SELECT_EXE) ~= 1 then
+    vim.notify('im-select.exe not found in WSL. IME auto-switch disabled.', vim.log.levels.WARN)
+    return
+  end
+
+  local aug = create_augroup('DIY_WslIME', { clear = true })
+  local WSL_CMD_GET = { IM_SELECT_EXE }
+  local WSL_CMD_EN = { IM_SELECT_EXE, '1033' } -- 1033 is the layout ID for English (US)
+
+  create_autocmd('InsertLeave', {
+    group = aug,
+    callback = function()
+      system(WSL_CMD_GET, { text = true }, function(obj)
+        if obj.code == 0 and obj.stdout then
+          schedule(function()
+            vim.b.saved_im = trim(obj.stdout)
+          end)
+        end
+      end)
+      -- Force switch to English
+      system(WSL_CMD_EN)
+    end,
+  })
+
+  create_autocmd('InsertEnter', {
+    group = aug,
+    callback = function()
+      local target = vim.b.saved_im
+      if target and target ~= '1033' then
+        system({ IM_SELECT_EXE, target })
+      end
+    end,
+  })
+
+  create_autocmd({ 'VimEnter', 'FocusGained', 'CmdlineLeave' }, {
+    group = aug,
+    callback = function()
+      system(WSL_CMD_EN)
+    end,
+  })
+end
+
+-- ============================================================
+-- 3. Native Windows: IME control via Imm32 / user32
 -- ============================================================
 local IME_AVAILABLE = false
 local user32, imm32
 
-if util.is_windows() then
+if is_windows then
   local ok, err = pcall(function()
     ffi.cdef [[
       typedef unsigned long DWORD;
@@ -181,8 +234,11 @@ end
 -- Setup: dispatch based on platform
 -- ============================================================
 M.setup = function()
-  if util.is_windows() then
-    -- Native Windows or WSL: use Windows IME APIs
+  if is_wsl then
+    -- WSL environment: Must use WSL Interop (.exe call)
+    M.wsl_ime()
+  elseif is_windows then
+    -- Native Windows environment: use FFI APIs
     if IME_AVAILABLE then
       M.auto_switch_ime()
     end
