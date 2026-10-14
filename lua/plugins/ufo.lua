@@ -67,16 +67,32 @@ require('resonance').load({
       open_fold_hl_timeout = 150,
       fold_virt_text_handler = handler,
 
-      provider_selector = function(bufnr, buftype)
-        if buftype == 'nofile' or buftype == 'terminal' or buftype == 'prompt' then
-          return ''
-        end
-
+      provider_selector = function(bufnr, filetype, buftype)
+        -- Skip folding for big files (snacks.nvim)
         if vim.b[bufnr].snacks_bigfile then
           return ''
         end
 
-        return { 'treesitter', 'indent' }
+        local function handleFallbackException(bnr, err, providerName)
+          if type(err) == 'string' and err:match 'UfoFallbackException' then
+            return require('ufo').getFolds(bnr, providerName)
+          else
+            return require('promise').reject(err)
+          end
+        end
+
+        -- only use indent until a file is opened
+        return (filetype == '' or buftype == 'nofile') and 'indent'
+          or function(bnr)
+            return require('ufo')
+              .getFolds(bnr, 'lsp')
+              :catch(function(err)
+                return handleFallbackException(bnr, err, 'treesitter')
+              end)
+              :catch(function(err)
+                return handleFallbackException(bnr, err, 'indent')
+              end)
+          end
       end,
 
       preview = {

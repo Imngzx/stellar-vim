@@ -84,12 +84,12 @@ opt.formatoptions = 'jcroqlnt' -- keep comments, wrap text, autoformat when poss
 opt.inccommand = 'nosplit' -- live preview for :substitute
 opt.wildmode = 'longest:full,full' -- enhanced command completion
 
--- [Fold]
+vim.o.foldcolumn = '1'
 opt.foldlevel = 99
 opt.foldlevelstart = 99
 opt.foldenable = true
-opt.foldmethod = 'expr'
-opt.foldexpr = vim.treesitter.foldexpr
+vim.o.foldmethod = 'expr'
+vim.o.foldexpr = 'v:lua.require"ufo".foldexpr()'
 
 -- Clipboard
 require('config.clipboard')
