@@ -1,8 +1,8 @@
 # Neovim Configuration — AI Development Guidelines
 
-> **Purpose**: Step-by-step reference for AI assistants working on this Neovim configuration.  
-> **Audience**: Any AI agent editing `~/.config/nvim/`.  
-> **Last Updated**: 2026-10-03
+> **Purpose**: Step-by-step reference for AI assistants working on this Neovim configuration.
+> **Audience**: Any AI agent editing `~/.config/nvim/`.
+> **Last Updated**: 2026-10-14
 
 ---
 
@@ -170,6 +170,28 @@ nvim --headless -u NONE -c "luafile ~/.config/nvim/init.lua" -c "qall"  # must c
 nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua dofile(vim.env.MYVIMRC)" -c "qall"
 ```
 
+### Step 4.5: Run Smoke Test (Mandatory for Config Changes)
+
+```bash
+# Full smoke test - verifies plugins, modules, LSP, session, git, UI
+nvim --headless -c "luafile ~/.config/nvim/tests/smoke.lua" -c "qall"
+# Exit code 0 = all pass, non-zero = failure with details
+
+# What the smoke test covers:
+# 1. Core config load (init.lua + custom.startup + config.resonance)
+# 2. resonance.nvim API available
+# 3. VeryLazy trigger fires
+# 4. All 57 plugins verified (rtp for eager, vim.pack.get for lazy)
+# 5. All 32 custom modules load
+# 6. LSP servers registered (18+)
+# 7. Session save/load works
+# 8. Workspace picker works
+# 9. Git integration works
+# 10. Heirline, snacks, bpm.nvim available
+# 11. Transparent toggle, todo, coderunner work
+# 12. Config reload works
+```
+
 ### Step 5: Commit
 
 ```bash
@@ -213,57 +235,33 @@ git commit -m "feat(session): add auto-save on focus lost"
 - **Numeric `for i = 1, #tbl` loops** over `ipairs`/`pairs` — avoids iterator function call overhead; JIT compiles to tight loop.
 - **Hoist C-API functions to local** at module scope (bypasses metatable lookups in hot paths):
 
-  ```lua
-  local api = vim.api
-  local nvim_buf_is_loaded = api.nvim_buf_is_loaded
-  local nvim_buf_get_name = api.nvim_buf_get_name
-  local uv_fs_stat = vim.uv.fs_stat
-  local str_byte = string.byte
-  local str_sub = string.sub
-  local math_max = math.max
-  ```
+```lua
+local api = vim.api
+local nvim_buf_is_loaded = api.nvim_buf_is_loaded
+local nvim_buf_get_name = api.nvim_buf_get_name
+local uv_fs_stat = vim.uv.fs_stat
+local str_byte = string.byte
+local str_sub = string.sub
+local math_max = math.max
+```
 
 - **SoA (Struct of Arrays) over AoS** for cache-friendly access in hot loops:
 
-  ```lua
-  -- Good: parallel arrays
-  local match_rows, match_cols = {}, {}
-  -- Bad: array of tables
-  local matches = { {row=1, col=2}, ... }
-  ```
+```lua
+-- Good: parallel arrays
+local match_rows, match_cols = {}, {}
+-- Bad: array of tables
+local matches = { {row=1, col=2}, ... }
+```
 
 - **Avoid allocations in hot paths**: reuse tables, use `table.clear()`, pre-allocate when size known.
 - **`pcall`/`xpcall` are expensive** — don't wrap every C-API call; only where failure is expected/handled.
 - **`vim.schedule`/`vim.schedule_wrap`** for deferring to event loop (avoids blocking UI).
 - **`local x = M.x`** for module self-references in methods (avoids table lookup per call).
 
-### vim.async (Neovim 0.13+) — Structured Concurrency
+### vim.async Reference
 
-Available in nightly/0.13+. Use for Lua coroutine-based async workflows instead of callback chains.
-
-| Function | Purpose |
-|----------|---------|
-| `vim.async.run(fn, ...)` | Create task (top-level or child), returns `Task` |
-| `vim.async.await(awaitable)` | Suspend until task/callback completes; raises errors |
-| `vim.async.pawait(awaitable)` | Protected await → returns `ok, ...` |
-| `vim.async.sleep(ms)` | Async sleep without blocking event loop |
-| `vim.async.timeout(ms, task)` | Await task with deadline |
-| `vim.async.iter(tasks)` | Iterator yielding completed tasks in finish order |
-| `vim.async.semaphore(n)` | Limit concurrent operations |
-| `vim.async.wrap(argc, fn)` | Convert callback-style fn to async fn |
-| `vim.async.checkpoint()` | Process pending children/cancellation |
-| `vim.async.is_closing()` | Check if current task was closed |
-
-**Task methods:** `wait()`, `pwait()`, `close()`, `detach()`, `on_complete()`, `status()`, `completed()`, `raise_on_error()`, `traceback()`.
-
-**Key semantics:**
-
-- Tasks form a tree (child tasks attached to parent, parent waits for children)
-- Cooperative cancellation via checkpoints (`await`, `sleep`, `checkpoint`)
-- `detach()` for fire-and-forget background work
-- From sync code: `task:wait()` pumps event loop; inside task: prefer `await(task)`
-
-**Note:** Your config uses `vim.system` (subprocess spawning) — different API. `vim.async` is for Lua coroutine-based async.
+See `note/knowledge/vim.async.md` for full API documentation, patterns, and config usage.
 
 ### Cross-Module Communication
 
@@ -315,52 +313,47 @@ local utils = require('libs.utils')
 ```bash
 # After modifying a custom module, update its docs
 # Example: coderunner.lua → note/knowledge/coderunner.md
+```
 
 ### Add New LSP Server
 
 1. Create server config at `lua/lsp/servers/<name>.lua`:
-   ```lua
-   ---@module 'lspconfig'
-   return {
-     mason = true/false,           -- auto-install via Mason
-     cmd = { 'binary', 'args' },   -- use full path for Mason bins:
-                                   -- vim.fn.stdpath('data')..'/mason/bin/<binary>'
-     filetypes = { 'ft1', 'ft2' },
-     root_markers = { '.git', 'config.file' },
-     settings = { ... },           -- server-specific settings
-   }
-   ```
+```lua
+---@module 'lspconfig'
+return {
+  mason = true/false,           -- auto-install via Mason
+  cmd = { 'binary', 'args' },   -- use full path for Mason bins:
+                                -- vim.fn.stdpath('data')..'/mason/bin/<binary>'
+  filetypes = { 'ft1', 'ft2' },
+  root_markers = { '.git', 'config.file' },
+  settings = { ... },           -- server-specific settings
+}
+```
 
 2. Register in `lua/lsp/init.lua`:
    - Add to `custom_servers` metatable `__index`:
-
-     ```lua
-     if k == '<server_name>' then return require('lsp.servers.<name>') end
-     ```
-
+```lua
+if k == '<server_name>' then return require('lsp.servers.<name>') end
+```
    - Add to `custom_server_keys` list:
-
-     ```lua
-     '<server_name>',
-     ```
+```lua
+'<server_name>',
+```
 
 3. Test:
-
-   ```bash
-   nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua require('custom.startup')" -c "lua require('config.resonance')" -c "lua require('lsp.init').setup()" -c "lua vim.lsp.enable(require('lsp.init').enabled_servers)" -c "edit test.<ft>" -c "lua vim.wait(2000)" -c "lua print(vim.inspect(vim.lsp.get_clients({name='<server_name>'})))" -c "qall"
-   ```
+```bash
+nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua require('custom.startup')" -c "lua require('config.resonance')" -c "lua require('lsp.init').setup()" -c "lua vim.lsp.enable(require('lsp.init').enabled_servers)" -c "edit test.<ft>" -c "lua vim.wait(2000)" -c "lua print(vim.inspect(vim.lsp.get_clients({name='<server_name>'})))" -c "qall"
+```
 
 ### Add Mason-only Tool (formatter/linter/debugger)
 
 Add to `M.mason_tools` in `lua/lsp/init.lua`:
-
 ```lua
 M.mason_tools = {
   -- existing tools...
   'tool-name',  -- matches Mason package name
 }
 ```
-
 Then press `<leader>pm` to open Mason and auto-install.
 
 ### Key Gotchas for LSP
@@ -547,7 +540,8 @@ lsp(action="references", file="~/.config/nvim/lua/custom/session.lua", line=69, 
 | `git.lua` | Git root detection for heirline |
 | `icons.lua` | Icon definitions |
 | `spell.lua` | Spell check utilities |
+| `bpm.lua` | Centralized bpm.nvim access |
 
 ---
 
-*Generated 2026-08-16. Follows resonance.nvim AI_GUIDELINES.md pattern.*
+*Generated 2026-10-14. Follows resonance.nvim AI_GUIDELINES.md pattern.*
