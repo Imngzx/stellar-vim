@@ -52,12 +52,15 @@ Created via `vim.async.run()`. Methods:
 ## Key Semantics
 
 ### Task Tree
+
 - Tasks form a tree: child tasks attached to parent
 - Parent waits for children at checkpoints
 - Child created while parent running → attached, runs at parent's next checkpoint
 
 ### Checkpoints (Where Task Can Pause)
+
 Inside a task, these are checkpoints:
+
 - `vim.async.await(...)`
 - `vim.async.pawait(...)`
 - `vim.async.checkpoint()`
@@ -65,12 +68,14 @@ Inside a task, these are checkpoints:
 - Successful return from task function (final checkpoint)
 
 ### Cooperative Cancellation
+
 - `task:close()` marks task as closing
 - Task observes at next checkpoint
 - If suspended on closable operation (timer, child), that operation closed first
 - Use `vim.async.is_closing()` in loops for cleanup
 
 ### Detached Tasks
+
 - `task:detach()` → fire-and-forget background work
 - Becomes top-level; original parent no longer waits/closes
 - Errors don't propagate automatically → use `task:on_complete()` or `task:raise_on_error()`
@@ -80,6 +85,7 @@ Inside a task, these are checkpoints:
 ## Usage Patterns
 
 ### Basic Async Work
+
 ```lua
 local async = vim.async
 
@@ -91,6 +97,7 @@ end)
 ```
 
 ### Await Callback-Style API
+
 ```lua
 local async = vim.async
 
@@ -102,6 +109,7 @@ end)
 ```
 
 ### Await with Closable Handle (Cancellation Support)
+
 ```lua
 local async = vim.async
 
@@ -114,6 +122,7 @@ end)
 ```
 
 ### Protected Await (Recoverable Failures)
+
 ```lua
 local async = vim.async
 
@@ -125,6 +134,7 @@ end)
 ```
 
 ### Semaphore for Concurrency Control
+
 ```lua
 local async = vim.async
 
@@ -150,6 +160,7 @@ end)
 ```
 
 ### Timeout
+
 ```lua
 local async = vim.async
 
@@ -161,6 +172,7 @@ end)
 ```
 
 ### Wrap Callback APIs Reusably
+
 ```lua
 local async = vim.async
 local fs_stat = async.wrap(2, vim.uv.fs_stat)  -- callback at arg 2
@@ -172,6 +184,7 @@ end)
 ```
 
 ### From Sync Code: Wait for Task
+
 ```lua
 local task = vim.async.run(function()
   vim.async.sleep(100)
@@ -208,6 +221,7 @@ print(task:wait())  -- blocks, pumps event loop
 ## In This Config
 
 **`lua/libs/power.lua`** uses `vim.async` for power state polling:
+
 ```lua
 local async = vim.async
 local fs_open = async.wrap(4, uv.fs_open)

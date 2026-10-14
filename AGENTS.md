@@ -318,6 +318,7 @@ local utils = require('libs.utils')
 ### Add New LSP Server
 
 1. Create server config at `lua/lsp/servers/<name>.lua`:
+
 ```lua
 ---@module 'lspconfig'
 return {
@@ -332,15 +333,19 @@ return {
 
 2. Register in `lua/lsp/init.lua`:
    - Add to `custom_servers` metatable `__index`:
+
 ```lua
 if k == '<server_name>' then return require('lsp.servers.<name>') end
 ```
-   - Add to `custom_server_keys` list:
+
+- Add to `custom_server_keys` list:
+
 ```lua
 '<server_name>',
 ```
 
 3. Test:
+
 ```bash
 nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua require('custom.startup')" -c "lua require('config.resonance')" -c "lua require('lsp.init').setup()" -c "lua vim.lsp.enable(require('lsp.init').enabled_servers)" -c "edit test.<ft>" -c "lua vim.wait(2000)" -c "lua print(vim.inspect(vim.lsp.get_clients({name='<server_name>'})))" -c "qall"
 ```
@@ -348,12 +353,14 @@ nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua require('custom.sta
 ### Add Mason-only Tool (formatter/linter/debugger)
 
 Add to `M.mason_tools` in `lua/lsp/init.lua`:
+
 ```lua
 M.mason_tools = {
   -- existing tools...
   'tool-name',  -- matches Mason package name
 }
 ```
+
 Then press `<leader>pm` to open Mason and auto-install.
 
 ### Key Gotchas for LSP
