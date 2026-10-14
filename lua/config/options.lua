@@ -91,9 +91,6 @@ opt.foldenable = true
 vim.o.foldmethod = 'expr'
 vim.o.foldexpr = 'v:lua.require"ufo".foldexpr()'
 
--- Clipboard
-require('config.clipboard')
-
 -- Check spelling
 opt.spell = false
 opt.spellsuggest = 'best,5' -- show only first best 5
