@@ -57,7 +57,9 @@ nvim --headless -c "lua local t=vim.uv.hrtime(); require('custom.startup'); prin
 require('custom.startup')
 
 -- 2. Core editor options
-require('config')
+require('config.options')
+require('config.keymaps')
+require('config.autocmds')
 
 -- 3. Plugin manager bootstrap + all plugin configs
 require('config.resonance')
@@ -152,6 +154,21 @@ for i in {1..10}; do nvim --headless -u NONE -c "luafile ~/.config/nvim/init.lua
 - Edit files in **config root** (`~/.config/nvim/`)
 - Test immediately with headless Neovim
 - For plugin changes: edit `lua/plugins/*.lua` or `lua/plugins/<plugin_name>/`
+
+### Step 3.5: Read Plugin Documentation (Critical)
+
+After installing or configuring a plugin, **read its README/markdown docs** in the plugin source:
+
+```bash
+# Plugin source is at ~/.local/share/nvim/site/pack/core/opt/<plugin-name>/
+cat ~/.local/share/nvim/site/pack/core/opt/nvim-ufo/README.md
+cat ~/.local/share/nvim/site/pack/core/opt/nvim-ufo/doc/example.lua
+
+# Or use nvim to browse
+nvim ~/.local/share/nvim/site/pack/core/opt/nvim-ufo/README.md
+```
+
+**Why:** Plugins often have critical config requirements not obvious from code alone (e.g., nvim-ufo requires `foldmethod=manual` internally, so user config must NOT set `foldmethod`/`foldexpr`).
 
 ### Step 4: Verify
 
@@ -341,7 +358,6 @@ prettier = { formatter_only = true, ft = { 'javascript', 'html', 'css' }, mason 
 | `formatter` | table | Conform.nvim formatter spec (see below) |
 
 **Formatter sub-spec:**
-
 ```lua
 formatter = {
   name = 'clang_format',    -- conform.nvim formatter name (required)
@@ -353,7 +369,6 @@ formatter = {
 **To add a server:** Edit `lua/lsp/servers.lua`, add entry to `M.servers` table. No other registration needed.
 
 **To add a Mason-only tool (formatter/linter/debugger):** Add to `M.tools` in `lua/lsp/servers.lua`:
-
 ```lua
 M.tools = {
   'codelldb',    -- C/C++/Rust debugger
@@ -365,7 +380,6 @@ M.tools = {
 ```
 
 **To add a linter (nvim-lint):** Add to `M.linters` in `lua/lsp/servers.lua`:
-
 ```lua
 M.linters = {
   htmlhint = { ft = { 'html' }, mason = 'htmlhint' },
@@ -374,7 +388,6 @@ M.linters = {
 ```
 
 **Test new server:**
-
 ```bash
 nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua require('custom.startup')" -c "lua require('config.resonance')" -c "lua require('lsp.init').setup()" -c "lua vim.lsp.enable(require('lsp.init').enabled_servers)" -c "edit test.<ft>" -c "lua vim.wait(2000)" -c "lua print(vim.inspect(vim.lsp.get_clients({name='<server_name>'})))" -c "qall"
 ```
