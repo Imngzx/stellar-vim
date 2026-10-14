@@ -31,7 +31,7 @@
 | `python3` | System `python3` | `scripts.py` utility runner |
 | `fzf` | System `fzf` | Fuzzy finder (used in picker configs) |
 | `fd` | System `fd` | Fast file finder (used in picker configs) |
-| `lua-language-server` | `/usr/bin/lua-language-server` (pacman) | LSP diagnostics: `lua-language-server --check=FILE` |
+| `lua-language-server` | Mason (`~/.local/share/nvim/mason/bin/lua-language-server`) | LSP diagnostics: `lua-language-server --check=FILE` |
 
 ### Benchmark Command Template
 
