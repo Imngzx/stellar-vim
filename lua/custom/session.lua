@@ -63,7 +63,7 @@ local function get_session_name()
   end
 
   local name = root:gsub('[/:]', '%%') .. branch
-  return session_dir .. name .. '.vim'
+  return fs.joinpath(session_dir, name .. '.vim')
 end
 
 function M.save()
@@ -122,7 +122,7 @@ function M.load(last)
         if not name then break end
 
         if type == 'file' and name:sub(-4) == '.vim' then
-          local path = session_dir .. name
+          local path = fs.joinpath(session_dir, name)
           local stat = fs_stat(path)
           if stat and stat.mtime.sec > max_time then
             max_time = stat.mtime.sec
