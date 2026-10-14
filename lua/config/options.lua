@@ -88,8 +88,8 @@ vim.o.foldcolumn = '1'
 opt.foldlevel = 99
 opt.foldlevelstart = 99
 opt.foldenable = true
-vim.o.foldmethod = 'expr'
-vim.o.foldexpr = 'v:lua.require"ufo".foldexpr()'
+-- vim.o.foldmethod = 'expr'
+-- vim.o.foldexpr = 'v:lua.require"ufo".foldexpr()'
 
 -- Check spelling
 opt.spell = false
