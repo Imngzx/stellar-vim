@@ -16,39 +16,40 @@ local is_wsl = vim.uv.os_uname().release:lower():find('microsoft') ~= nil
 local is_windows = util.is_windows() and not is_wsl
 
 -- ============================================================
--- 1. Linux: fcitx5-remote
+-- Shared CLI IME Auto-Switching Logic (used by WSL & Linux)
 -- ============================================================
-local FCITX5_REMOTE = executable('fcitx5-remote') == 1 and 'fcitx5-remote' or nil
+---@class CliImeOpts
+---@field name string Augroup name
+---@field cmd_get table Command to get current status
+---@field cmd_off table Command to turn off/switch to English
+---@field get_cmd_on fun(target: string|nil): table|nil Returns the command to restore status
+---@field sync_off_on_enter boolean Whether to run off command synchronously on enter/focus
 
-local CMD_GET = { FCITX5_REMOTE }
-local CMD_OFF = { FCITX5_REMOTE, '-c' }
-local CMD_ON = { FCITX5_REMOTE, '-o' }
-
-function M.fcitx()
-  if not FCITX5_REMOTE then return end
-
-  local aug = create_augroup('DIY_Fcitx5', { clear = true })
+---@param opts CliImeOpts
+local function setup_cli_ime(opts)
+  local aug = create_augroup(opts.name, { clear = true })
 
   create_autocmd('InsertLeave', {
     group = aug,
     callback = function()
-      system(CMD_GET, { text = true }, function(obj)
+      system(opts.cmd_get, { text = true }, function(obj)
         if obj.code == 0 and obj.stdout then
           schedule(function()
             vim.b.saved_im = trim(obj.stdout)
           end)
         end
       end)
-      system(CMD_OFF)
+      -- Force switch to English/Off
+      system(opts.cmd_off)
     end,
   })
 
   create_autocmd('InsertEnter', {
     group = aug,
     callback = function()
-      local target = vim.b.saved_im
-      if target == '2' then
-        system(CMD_ON)
+      local cmd = opts.get_cmd_on(vim.b.saved_im)
+      if cmd then
+        system(cmd)
       end
     end,
   })
@@ -56,8 +57,31 @@ function M.fcitx()
   create_autocmd({ 'VimEnter', 'FocusGained', 'CmdlineLeave' }, {
     group = aug,
     callback = function()
-      system(CMD_OFF, { text = true }):wait()
+      if opts.sync_off_on_enter then
+        system(opts.cmd_off, { text = true }):wait()
+      else
+        system(opts.cmd_off)
+      end
     end,
+  })
+end
+
+-- ============================================================
+-- 1. Linux: fcitx5-remote
+-- ============================================================
+local FCITX5_REMOTE = executable('fcitx5-remote') == 1 and 'fcitx5-remote' or nil
+
+function M.fcitx()
+  if not FCITX5_REMOTE then return end
+  local cmd_off = { FCITX5_REMOTE, '-c' }
+  local cmd_on = { FCITX5_REMOTE, '-o' }
+
+  setup_cli_ime({
+    name = 'DIY_Fcitx5',
+    cmd_get = { FCITX5_REMOTE },
+    cmd_off = cmd_off,
+    get_cmd_on = function(target) return target == '2' and cmd_on or nil end,
+    sync_off_on_enter = true, -- original fcitx logic waited synchronously
   })
 end
 
@@ -73,40 +97,14 @@ function M.wsl_ime()
     return
   end
 
-  local aug = create_augroup('DIY_WslIME', { clear = true })
-  local WSL_CMD_GET = { IM_SELECT_EXE }
-  local WSL_CMD_EN = { IM_SELECT_EXE, '1033' } -- 1033 is the layout ID for English (US)
-
-  create_autocmd('InsertLeave', {
-    group = aug,
-    callback = function()
-      system(WSL_CMD_GET, { text = true }, function(obj)
-        if obj.code == 0 and obj.stdout then
-          schedule(function()
-            vim.b.saved_im = trim(obj.stdout)
-          end)
-        end
-      end)
-      -- Force switch to English
-      system(WSL_CMD_EN)
+  setup_cli_ime({
+    name = 'DIY_WslIME',
+    cmd_get = { IM_SELECT_EXE },
+    cmd_off = { IM_SELECT_EXE, '1033' }, -- 1033 is the layout ID for English (US)
+    get_cmd_on = function(target)
+      return (target and target ~= '1033') and { IM_SELECT_EXE, target } or nil
     end,
-  })
-
-  create_autocmd('InsertEnter', {
-    group = aug,
-    callback = function()
-      local target = vim.b.saved_im
-      if target and target ~= '1033' then
-        system({ IM_SELECT_EXE, target })
-      end
-    end,
-  })
-
-  create_autocmd({ 'VimEnter', 'FocusGained', 'CmdlineLeave' }, {
-    group = aug,
-    callback = function()
-      system(WSL_CMD_EN)
-    end,
+    sync_off_on_enter = false,
   })
 end
 
