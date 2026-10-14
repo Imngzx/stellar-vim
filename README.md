@@ -197,10 +197,10 @@ So I use fzf-lua instead of snacks during power-saver mode.
 ##################################
 
 ~
-❯ scoop update
-  scoop install git 
+❯ scoop install git 
   scoop bucket add im-select https://github.com/daipeihust/im-select
-  
+  scoop update
+
   # 2. Install the im-select package
   scoop install im-select
 
