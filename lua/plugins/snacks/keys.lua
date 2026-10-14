@@ -1,5 +1,6 @@
 local is_ac = require('libs.power').is_ac()
 local Snacks = require('snacks')
+local zettel = require('custom.zettel')
 local bpm = require('libs.bpm')
 
 local keys = {}

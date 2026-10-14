@@ -93,7 +93,7 @@ map('n', '<leader>pt', function()
   cmd('startinsert')
 end, { desc = '[Panel] Open Smart Terminal' })
 
-map('n', 'mdd', function() vim.cmd("delm!") end, { expr = true, desc = 'Delete all markers' })
+map('n', 'mdd', function() vim.cmd('delm!') end, { expr = true, desc = 'Delete all markers' })
 
 -- Search (Better n/N behavior)
 map('n', 'n', "'Nn'[v:searchforward].'zv'", { expr = true, desc = 'Next search result' })
@@ -106,6 +106,7 @@ map('o', 'N', "'nN'[v:searchforward]", { expr = true, desc = 'Prev search result
 -- ==========================================
 -- 🏢 [ Workspace / Tabs (Powered by BPM) ]
 -- ==========================================
+map('n', '<leader><tab>n', '<cmd>tabnew<cr>', { desc = 'New Workspace' })
 map('n', '<leader><tab>N', function()
   vim.ui.input({ prompt = 'Workspace Name: ' }, function(name)
     if not name then return end
