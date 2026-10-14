@@ -2,23 +2,33 @@
 --- Run: nvim --headless -c "luafile ~/.config/nvim/tests/smoke.lua" -c "qall"
 --- Exit code 0 = pass, non-zero = fail
 
+local io_stderr = io.stderr
+local io_stdout = io.stdout
+local os_exit = os.exit
+local pcall = pcall
+local tostring = tostring
+local assert = assert
+local string_format = string.format
+local vim_inspect = vim.inspect
+local vim_wait = vim.wait
+local vim_cmd = vim.cmd
+local vim_pack_get = vim.pack.get
+local vim_api_list_rtp = vim.api.nvim_list_runtime_paths
+local table_concat = table.concat
+local table_insert = table.insert
+local string_find = string.find
+
 local function fail(msg)
-  io.stderr:write('[FAIL] ' .. msg .. '\n')
-  os.exit(1)
+  io_stderr:write('[FAIL] ' .. msg .. '\n')
+  os_exit(1)
 end
 
 local function pass(msg)
-  io.stdout:write('[PASS] ' .. msg .. '\n')
+  io_stdout:write('[PASS] ' .. msg .. '\n')
 end
 
 local function assert_truthy(val, msg)
   if not val then fail(msg) end
-end
-
-local function assert_equal(actual, expected, msg)
-  if actual ~= expected then
-    fail(string.format('%s: expected %s, got %s', msg, vim.inspect(expected), vim.inspect(actual)))
-  end
 end
 
 -- ============================================================
@@ -46,7 +56,7 @@ pass('resonance.nvim API available')
 -- ============================================================
 pass('Triggering VeryLazy...')
 resonance.trigger_verylazy()
-vim.wait(100) -- allow async loads to complete
+vim_wait(100) -- allow async loads to complete
 pass('VeryLazy triggered')
 
 -- ============================================================
@@ -99,6 +109,8 @@ local required_plugins = {
   'budoux.lua',
 }
 
+-- Plugins that are lazy-loaded via event/cmd/keys/ft triggers
+-- These won't be in rtp until their trigger fires
 local lazy_plugins = {
   'heirline.nvim',
   'bpm.nvim',
@@ -144,17 +156,22 @@ local lazy_plugins = {
 }
 
 -- Open a buffer to trigger BufReadPost events
-vim.cmd('enew')
+vim_cmd('enew')
 
-for _, plugin in ipairs(required_plugins) do
+for i = 1, #required_plugins do
+  local plugin = required_plugins[i]
   local is_lazy = false
-  for _, lp in ipairs(lazy_plugins) do
-    if plugin == lp then is_lazy = true break end
+  for j = 1, #lazy_plugins do
+    if plugin == lazy_plugins[j] then
+      is_lazy = true
+      break
+    end
   end
 
   local found = false
-  for _, path in ipairs(vim.api.nvim_list_runtime_paths()) do
-    if path:find(plugin, 1, true) then
+  local rtp = vim_api_list_rtp()
+  for k = 1, #rtp do
+    if string_find(rtp[k], plugin, 1, true) then
       found = true
       break
     end
@@ -163,8 +180,9 @@ for _, plugin in ipairs(required_plugins) do
   if is_lazy then
     -- For lazy plugins, just verify they're installed (via vim.pack.get)
     local installed = false
-    local packs = vim.pack.get()
-    for _, pack in ipairs(packs) do
+    local packs = vim_pack_get()
+    for m = 1, #packs do
+      local pack = packs[m]
       if pack.spec and pack.spec.name == plugin then
         installed = true
         break
@@ -218,7 +236,8 @@ local custom_modules = {
   'lsp.servers',
 }
 
-for _, mod in ipairs(custom_modules) do
+for i = 1, #custom_modules do
+  local mod = custom_modules[i]
   local ok, mod_obj = pcall(require, mod)
   assert_truthy(ok, 'Failed to require ' .. mod .. ': ' .. tostring(mod_obj))
   assert_truthy(mod_obj, 'Module returned nil: ' .. mod)
@@ -232,7 +251,7 @@ pass('Checking LSP servers...')
 local lsp_init = require('lsp.init')
 lsp_init.setup()
 assert_truthy(#lsp_init.enabled_servers > 0, 'No LSP servers enabled')
-pass('LSP servers: ' .. table.concat(lsp_init.enabled_servers, ', '))
+pass('LSP servers: ' .. table_concat(lsp_init.enabled_servers, ', '))
 
 -- ============================================================
 -- 7. Test session save/load
@@ -267,12 +286,16 @@ blame.setup({
 })
 pass('Git integration works')
 
+-- ============================================================
+-- 10. Test heirline statusline
+-- ============================================================
 pass('Checking heirline...')
 -- heirline.nvim is lazy-loaded via BufReadPost/BufNewFile
 -- Verify it's installed instead of requiring (would fail if not triggered)
 local heirline_installed = false
-local packs = vim.pack.get()
-for _, pack in ipairs(packs) do
+local packs = vim_pack_get()
+for i = 1, #packs do
+  local pack = packs[i]
   if pack.spec and pack.spec.name == 'heirline.nvim' then
     heirline_installed = true
     break
@@ -292,12 +315,15 @@ assert_truthy(snacks.git, 'snacks.git not available')
 pass('snacks.nvim core modules available')
 
 -- ============================================================
+-- 12. Test bpm.nvim (tabline/workspace)
+-- ============================================================
 pass('Checking bpm.nvim...')
 -- bpm.nvim is lazy-loaded via BufReadPost/BufNewFile
 -- Verify it's installed instead of requiring (would fail if not triggered)
 local bpm_installed = false
-local packs = vim.pack.get()
-for _, pack in ipairs(packs) do
+packs = vim_pack_get()
+for i = 1, #packs do
+  local pack = packs[i]
   if pack.spec and pack.spec.name == 'bpm.nvim' then
     bpm_installed = true
     break
@@ -342,5 +368,5 @@ pass('Config reload works')
 -- ============================================================
 -- ALL TESTS PASSED
 -- ============================================================
-io.stdout:write('\n[SUCCESS] All smoke tests passed!\n')
-os.exit(0)
+io_stdout:write('\n[SUCCESS] All smoke tests passed!\n')
+os_exit(0)
