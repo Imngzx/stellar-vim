@@ -12,6 +12,7 @@ capabilities = vim.tbl_deep_extend('force', capabilities, {
 
 return {
   ruff = {
+    cmd = { 'ruff', 'server' },
     filetypes = { 'python' },
     root_markers = { 'pyproject.toml', 'ruff.toml', '.ruff.toml', '.git' },
     capabilities = capabilities,
@@ -50,9 +51,9 @@ return {
 
   ty = {
     -- NOTE: uv tool install ty
+    cmd = { 'ty', 'server' },
     filetypes = { 'python' },
     root_markers = { 'ty.toml', 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', '.git' },
-    cmd = { 'ty', 'server' },
     capabilities = capabilities,
   },
 
