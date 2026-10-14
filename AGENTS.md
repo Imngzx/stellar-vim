@@ -57,9 +57,7 @@ nvim --headless -c "lua local t=vim.uv.hrtime(); require('custom.startup'); prin
 require('custom.startup')
 
 -- 2. Core editor options
-require('config.options')
-require('config.keymaps')
-require('config.autocmds')
+require('config')
 
 -- 3. Plugin manager bootstrap + all plugin configs
 require('config.resonance')
@@ -124,14 +122,13 @@ read ~/.config/nvim/lua/custom/startup.lua
 read ~/.config/nvim/lua/config/resonance.lua
 
 # Read key custom modules
-read ~/.config/nvim/lua/custom/session.lua
-read ~/.config/nvim/lua/custom/coderunner.lua
-read ~/.config/nvim/lua/custom/workspace.lua
+read ~/.config/nvim/lua/custom/*
 
 # Read plugin configs
-read ~/.config/nvim/lua/plugins/heirline.lua
-read ~/.config/nvim/lua/plugins/snacks.lua
-read ~/.config/nvim/lua/plugins/lsp.lua
+read ~/.config/nvim/lua/plugins/*
+read ~/.config/nvim/lua/lsp/init.lua
+read ~/.config/nvim/lua/lsp/servers.lua
+read ~/.config/nvim/lua/lsp/servers/*.lua
 ```
 
 ### Step 2: Test Current Behavior
@@ -154,7 +151,7 @@ for i in {1..10}; do nvim --headless -u NONE -c "luafile ~/.config/nvim/init.lua
 
 - Edit files in **config root** (`~/.config/nvim/`)
 - Test immediately with headless Neovim
-- For plugin changes: edit `lua/plugins/*.lua` or `lua/plugins/*/config/*.lua`
+- For plugin changes: edit `lua/plugins/*.lua` or `lua/plugins/<plugin_name>/`
 
 ### Step 4: Verify
 
