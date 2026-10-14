@@ -317,57 +317,73 @@ local utils = require('libs.utils')
 
 ### Add New LSP Server
 
-1. Create server config at `lua/lsp/servers/<name>.lua`:
+Current architecture uses a **unified registry** in `lua/lsp/servers.lua` — single source of truth for LSP configs, formatters, and Mason packages.
+
+**Server spec format (in `lua/lsp/servers.lua`):**
 
 ```lua
----@module 'lspconfig'
-return {
-  mason = true/false,           -- auto-install via Mason
-  cmd = { 'binary', 'args' },   -- use full path for Mason bins:
-                                -- vim.fn.stdpath('data')..'/mason/bin/<binary>'
-  filetypes = { 'ft1', 'ft2' },
-  root_markers = { '.git', 'config.file' },
-  settings = { ... },           -- server-specific settings
+-- Simple (string): name = mason_package_name
+jsonls = 'json-lsp',
+
+-- Complex (table): name = { config_module, mason?, mason_name?, config_key?, formatter? }
+clangd = { 'c-language', mason = false, formatter = { name = 'clang_format', mason = false, ft = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' } } },
+ruff = { 'python', mason = true, config_key = 'ruff', formatter = { name = 'ruff_format', mason = false, ft = { 'python' } } },
+['lua-language-server'] = { 'lua', mason = true, config_key = 'lua_ls' },
+taplo = { false, mason = true, formatter = { name = 'taplo', mason = false, ft = { 'toml' } } },
+
+-- Formatter-only (no LSP server):
+prettier = { formatter_only = true, ft = { 'javascript', 'html', 'css' }, mason = 'prettier', name = 'prettier' },
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `[1]` | string | Config module under `lsp.servers.*` (e.g., `'c-language'` → `lsp.servers.c-language`) |
+| `mason` | boolean | Auto-install via Mason (default: `true`) |
+| `mason_name` | string | Mason package name if different from server name |
+| `config_key` | string | Override server name for `vim.lsp.config()` |
+| `formatter` | table | Conform.nvim formatter spec (see below) |
+
+**Formatter sub-spec:**
+```lua
+formatter = {
+  name = 'clang_format',    -- conform.nvim formatter name (required)
+  mason = 'clang-format',   -- false (bundled), true (same name), or string (Mason package)
+  ft = { 'c', 'cpp' }       -- filetypes (required)
 }
 ```
 
-2. Register in `lua/lsp/init.lua`:
-   - Add to `custom_servers` metatable `__index`:
+**To add a server:** Edit `lua/lsp/servers.lua`, add entry to `M.servers` table. No other registration needed.
 
+**To add a Mason-only tool (formatter/linter/debugger):** Add to `M.tools` in `lua/lsp/servers.lua`:
 ```lua
-if k == '<server_name>' then return require('lsp.servers.<name>') end
+M.tools = {
+  'codelldb',    -- C/C++/Rust debugger
+  'debugpy',     -- Python debugger
+  'shellcheck',  -- Shell linter
+  'mpls',        -- Markdown preview LSP
+  'new-tool',    -- add here
+}
 ```
 
-- Add to `custom_server_keys` list:
-
+**To add a linter (nvim-lint):** Add to `M.linters` in `lua/lsp/servers.lua`:
 ```lua
-'<server_name>',
+M.linters = {
+  htmlhint = { ft = { 'html' }, mason = 'htmlhint' },
+  new_linter = { ft = { 'ft' }, mason = 'package-name' },
+}
 ```
 
-3. Test:
-
+**Test new server:**
 ```bash
 nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua require('custom.startup')" -c "lua require('config.resonance')" -c "lua require('lsp.init').setup()" -c "lua vim.lsp.enable(require('lsp.init').enabled_servers)" -c "edit test.<ft>" -c "lua vim.wait(2000)" -c "lua print(vim.inspect(vim.lsp.get_clients({name='<server_name>'})))" -c "qall"
 ```
-
-### Add Mason-only Tool (formatter/linter/debugger)
-
-Add to `M.mason_tools` in `lua/lsp/init.lua`:
-
-```lua
-M.mason_tools = {
-  -- existing tools...
-  'tool-name',  -- matches Mason package name
-}
-```
-
-Then press `<leader>pm` to open Mason and auto-install.
 
 ### Key Gotchas for LSP
 
 - **Use absolute path** for Mason binaries: `vim.fn.stdpath('data') .. '/mason/bin/<binary>'`
 - **`--stdio` flag** often needed for LSP servers installed via Mason
 - **Filetype must match** — check `vim.filetype.match({filename='test.xxx'})`
+- **Single registry** — all servers, formatters, linters, tools in `lua/lsp/servers.lua`; `lsp/init.lua` reads directly from it
 
 ---
 
