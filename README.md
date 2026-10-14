@@ -49,7 +49,7 @@ Made LSP configuration and installation more effortless by making it declarative
 
 ### Remarkable Plugin
 
-![Preview image](https://github.com/user-attachments/assets/da83149d-5d66-4e8b-9f30-24ada28abf25)
+![Preview image](https://github.com/user-attachments/assets/12148776-0d18-4a3f-b893-427aaca43333)
 
 This plugin called [jisho.nvim](https://github.com/Imngzx/jisho.nvim). This can be triggered by pressing `<leader>tj`. It's main purpose is to **use** [jisho's API](https://jisho.org) inside NeoVim, and give access to users for searching words in Japanese or English.
 
