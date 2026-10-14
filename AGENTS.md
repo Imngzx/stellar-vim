@@ -344,6 +344,7 @@ prettier = { formatter_only = true, ft = { 'javascript', 'html', 'css' }, mason 
 | `formatter` | table | Conform.nvim formatter spec (see below) |
 
 **Formatter sub-spec:**
+
 ```lua
 formatter = {
   name = 'clang_format',    -- conform.nvim formatter name (required)
@@ -355,6 +356,7 @@ formatter = {
 **To add a server:** Edit `lua/lsp/servers.lua`, add entry to `M.servers` table. No other registration needed.
 
 **To add a Mason-only tool (formatter/linter/debugger):** Add to `M.tools` in `lua/lsp/servers.lua`:
+
 ```lua
 M.tools = {
   'codelldb',    -- C/C++/Rust debugger
@@ -366,6 +368,7 @@ M.tools = {
 ```
 
 **To add a linter (nvim-lint):** Add to `M.linters` in `lua/lsp/servers.lua`:
+
 ```lua
 M.linters = {
   htmlhint = { ft = { 'html' }, mason = 'htmlhint' },
@@ -374,6 +377,7 @@ M.linters = {
 ```
 
 **Test new server:**
+
 ```bash
 nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua require('custom.startup')" -c "lua require('config.resonance')" -c "lua require('lsp.init').setup()" -c "lua vim.lsp.enable(require('lsp.init').enabled_servers)" -c "edit test.<ft>" -c "lua vim.wait(2000)" -c "lua print(vim.inspect(vim.lsp.get_clients({name='<server_name>'})))" -c "qall"
 ```
