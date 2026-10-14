@@ -135,22 +135,23 @@ So I use fzf-lua instead of snacks during power-saver mode.
 
 ### Making sure you've **installed**
 
-- [NeoVim-nightly 0.13 latest commit](https://github.com/neovim/neovim/releases/nightly)
-- git
-- tree-sitter-cli
-- python
-- GCC
-- ripgrep
-- fd
-- yazi
-- lazygit
-- pandoc for markdown rendering in browser `<leader>cz`
-- fcitx5 on **Linux**
-- im-select for **WSL**
-- tdlib, npm, kitty||ghostty on **Linux** and **MacOS**, for [**ChuYanLon/telegram.nvim**](https://github.com/ChuYanLon/telegram.nvim)
-- tectonic on **Linux** and **MacOS**, optional for latex rendering
-- vim-startuptime, optional
-- kitty||ghostty on **Linux** and **MacOS**, for image support
+- [NeoVim-nightly 0.13 latest commit](https://github.com/neovim/neovim/releases/nightly) (can be installed via bob)
+- `git`
+- `tree-sitter-cli`
+- `gcc`
+- `wl-clipboard` on **Linux**
+- `ripgrep`
+- `fd`
+- `yazi`
+- `lazygit`
+- `python`
+- `pandoc` for markdown rendering in browser `<leader>cz`
+- `fcitx5` on **Linux**
+- `im-select` for **WSL**
+- `tdlib`, `npm`, `kitty`||`ghostty` on **Linux** and **MacOS**, for [**ChuYanLon/telegram.nvim**](https://github.com/ChuYanLon/telegram.nvim)
+- `tectonic` on **Linux** and **MacOS**, optional for latex rendering
+- `vim-startuptime,` optional
+- `kitty`||`ghostty` on **Linux** and **MacOS**, for image support
 
 ### How To Install System Dependencies?
 
