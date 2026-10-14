@@ -1,6 +1,6 @@
 local map = vim.keymap.set
 local cmd = vim.cmd
-
+local bpm = require('libs.bpm')
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -106,14 +106,12 @@ map('o', 'N', "'nN'[v:searchforward]", { expr = true, desc = 'Prev search result
 -- ==========================================
 -- 🏢 [ Workspace / Tabs (Powered by BPM) ]
 -- ==========================================
-map('n', '<leader><tab>n', '<cmd>tabnew<cr>', { desc = 'New Workspace' })
 map('n', '<leader><tab>N', function()
   vim.ui.input({ prompt = 'Workspace Name: ' }, function(name)
     if not name then return end
     vim.api.nvim_command('tabnew')
     if name ~= '' then
-      local ok, bpm = pcall(require, 'bpm')
-      if ok then bpm.rename_tab(vim.api.nvim_get_current_tabpage(), name) end
+      if bpm.is_available() then bpm.call('rename_tab', vim.api.nvim_get_current_tabpage(), name) end
     else
       vim.notify('Warn: Workspace name not assigned, opening an anonymous buffer',
         vim.log.levels.WARN)
@@ -124,8 +122,7 @@ map('n', '<leader><tab>d', '<cmd>tabclose<cr>', { desc = 'Close Workspace' })
 map('n', '<leader><tab>r', function()
   vim.ui.input({ prompt = 'Workspace Name: ' }, function(name)
     if not name or name == '' then return end
-    local ok, bpm = pcall(require, 'bpm')
-    if ok then bpm.rename_tab(vim.api.nvim_get_current_tabpage(), name) end
+    if bpm.is_available() then bpm.call('rename_tab', vim.api.nvim_get_current_tabpage(), name) end
   end)
 end, { desc = 'Rename Workspace' })
 

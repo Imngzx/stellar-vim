@@ -41,12 +41,11 @@ end
 
 function M.picker()
   local api = vim.api
+  local bpm = require('libs.bpm')
   local nvim_win_get_buf = api.nvim_win_get_buf
   local nvim_buf_get_name = api.nvim_buf_get_name
   local nvim_tabpage_get_win = api.nvim_tabpage_get_win
-  local nvim_get_option_value = api.nvim_get_option_value
 
-  local ok, bpm = pcall(require, 'bpm')
   local cur_tab = api.nvim_get_current_tabpage()
   local tabs = api.nvim_list_tabpages()
   local is_ac = require('libs.power').is_ac()
@@ -55,22 +54,23 @@ function M.picker()
 
   for i = 1, #tabs do
     local tab = tabs[i]
-    local name = ok and bpm.resolve_tabname(tab) or ('Tab ' .. tab)
+    local name = bpm.call('resolve_tabname', tab) or ('Tab ' .. tab)
 
     local buf_count = 0
-    if ok and bpm.get_attached_buf then
-      local attached_bufs = bpm.get_attached_buf(tab)
+    if bpm.call('get_attached_buf', tab) then
+      local attached_bufs = bpm.call('get_attached_buf', tab)
       buf_count = attached_bufs and #attached_bufs or 0
     else
       local unique_bufs = {}
       local wins = api.nvim_tabpage_list_wins(tab)
       for w = 1, #wins do
         local b = nvim_win_get_buf(wins[w])
-        if not unique_bufs[b] and nvim_get_option_value('buflisted', { buf = b }) then
+        if b ~= -1 and api.nvim_buf_is_loaded(b) then
           unique_bufs[b] = true
-          buf_count = buf_count + 1
         end
       end
+      buf_count = 0
+      for _ in pairs(unique_bufs) do buf_count = buf_count + 1 end
     end
 
     local focused_win = nvim_tabpage_get_win(tab)

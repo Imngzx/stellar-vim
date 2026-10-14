@@ -4,7 +4,7 @@ local api = vim.api
 local fn = vim.fn
 local uv = vim.uv
 local fs = vim.fs
-
+local bpm = require('libs.bpm')
 local nvim_list_bufs = api.nvim_list_bufs
 local nvim_buf_is_loaded = api.nvim_buf_is_loaded
 local nvim_buf_get_name = api.nvim_buf_get_name
@@ -91,8 +91,7 @@ function M.save()
   vim.cmd('silent! cclose')
   vim.cmd('silent! lclose')
 
-  local bpm_ok, bpm = pcall(require, 'bpm')
-  local bpm_data = bpm_ok and bpm.to_json() or nil
+  local bpm_data = bpm.call('to_json')
 
   local session_name = get_session_name()
 
@@ -148,11 +147,8 @@ function M.load(last)
 
     vim.cmd('silent! source ' .. fn.fnameescape(target_file))
 
-    local bpm_ok, bpm = pcall(require, 'bpm')
-    if bpm_ok then
-      local json_path = target_file:gsub('%.vim$', '.json')
-      local stat = fs_stat(json_path)
-
+    if bpm.is_available() then
+      local bpm_mod = bpm.get()
       if stat then
         local fd = fs_open(json_path, 'r', 438)
         if fd then
@@ -160,7 +156,7 @@ function M.load(last)
           fs_close(fd)
 
           if data and data ~= '' then
-            bpm.from_json(data)
+            bpm_mod.from_json(data)
 
             local after_bufs = nvim_list_bufs()
             for i = 1, #after_bufs do

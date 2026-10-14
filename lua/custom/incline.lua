@@ -19,7 +19,7 @@ local nvim_buf_set_extmark = api.nvim_buf_set_extmark
 local nvim_set_hl = api.nvim_set_hl
 local nvim_create_buf = api.nvim_create_buf
 local nvim_open_win = api.nvim_open_win
-local nvim_win_close = api.nvim_win_close
+local bpm = require('libs.bpm')
 local nvim_buf_delete = api.nvim_buf_delete
 local nvim_create_namespace = api.nvim_create_namespace
 local nvim_create_augroup = api.nvim_create_augroup
@@ -79,8 +79,7 @@ local function update_incline()
     local buf_path = nvim_buf_get_name(buf_id)
     local filename = '[No Name]'
     if buf_path ~= '' then
-      local bpm_ok, bpm = pcall(require, 'bpm')
-      filename = bpm_ok and bpm.resolve_bufname(buf_id) or vim.fs.basename(buf_path)
+      filename = bpm.call('resolve_bufname', buf_id) or vim.fs.basename(buf_path)
       if require('libs.utils').is_windows() then
         filename = vim.fs.basename(buf_path)
       end

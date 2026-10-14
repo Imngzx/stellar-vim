@@ -29,12 +29,8 @@ local function get_opt_fast(name, bufnr)
   return api.nvim_get_option_value(name, _opt_args)
 end
 
-local _bpm, _snacks
-local function get_bpm()
-  if not _bpm then pcall(function() _bpm = require('bpm') end) end
-  return _bpm
-end
-
+local bpm = require('libs.bpm')
+local _snacks
 local function get_snacks()
   if not _snacks then pcall(function() _snacks = require('snacks') end) end
   return _snacks
@@ -66,8 +62,7 @@ local _state_pool = {}
 -- ⚙️ 3. 数据驱动层 (SoA 架构思想)
 -- =========================================================
 local function get_bufs()
-  local bpm = get_bpm()
-  if bpm then return bpm.get_attached_buf(0) end
+  if bpm.is_available() then return bpm.call('get_attached_buf', 0) end
 
   clear_table(_buf_pool)
   local all_bufs = list_bufs()
@@ -90,9 +85,8 @@ local function get_buf_state(bufnr)
   end
 
   local name
-  local bpm = get_bpm()
-  if bpm then
-    name = bpm.resolve_bufname(bufnr)
+  if bpm.is_available() then
+    name = bpm.call('resolve_bufname', bufnr)
     if require('libs.utils').is_windows() then name = fs_basename(buf_get_name(bufnr)) end
   else
     name = fs_basename(buf_get_name(bufnr))
@@ -147,8 +141,7 @@ local TablineFileNameBlock = {
   on_click = {
     callback = function(_, minwid, _, button)
       if button == 'm' or button == 'r' then
-        local bpm = get_bpm()
-        if bpm then bpm.detach(minwid) else get_snacks().bufdelete(minwid, { wipe = true }) end
+        if bpm.is_available() then bpm.call('detach', minwid) else get_snacks().bufdelete(minwid, { wipe = true }) end
       else
         set_current_buf(minwid)
       end
@@ -197,8 +190,7 @@ local TablineFileNameBlock = {
     end,
     on_click = {
       callback = function(_, minwid)
-        local bpm = get_bpm()
-        if bpm then bpm.detach(minwid) else get_snacks().bufdelete(minwid, { wipe = true }) end
+        if bpm.is_available() then bpm.call('detach', minwid) else get_snacks().bufdelete(minwid, { wipe = true }) end
       end,
       minwid = function(self) return self.bufnr end,
       name = 'heirline_tabline_close_btn',
@@ -217,8 +209,7 @@ local TablineBufferBlock = {
 -- =========================================================
 local Tabpage = {
   provider = function(self)
-    local bpm = get_bpm()
-    local name = bpm and bpm.resolve_tabname(self.tabpage) or tostring(self.tabnr)
+    local name = bpm.call('resolve_tabname', self.tabpage) or tostring(self.tabnr)
     return '%' .. self.tabnr .. 'T  ' .. name .. '  %T'
   end,
   hl = function(self)
@@ -243,11 +234,10 @@ local TabPages = {
 -- =========================================================
 local function get_right_padding()
   local tabs = list_tabpages()
-  local bpm = get_bpm()
   local w = 0
   for i = 1, #tabs do
     local tab = tabs[i]
-    local name = bpm and bpm.resolve_tabname(tab) or tostring(i)
+    local name = bpm.call('resolve_tabname', tab) or tostring(i)
     w = w + nvim_strwidth(name) + 4
   end
   return w + 5 -- 关闭按钮(3) + 防边缘换行安全区(2)

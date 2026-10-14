@@ -1,6 +1,6 @@
 local is_ac = require('libs.power').is_ac()
 local Snacks = require('snacks')
-local zettel = require('custom.zettel')
+local bpm = require('libs.bpm')
 
 local keys = {}
 
@@ -110,21 +110,19 @@ bind({
   {
     '<leader>bd',
     function()
-      local ok, bpm = pcall(require, 'bpm')
-      if ok then bpm.detach() else Snacks.bufdelete(0, { wipe = true }) end
+      if bpm.is_available() then bpm.call('detach') else Snacks.bufdelete(0, { wipe = true }) end
     end,
     desc = 'Detach / Wipeout buffer'
   },
   {
     '<leader>bo',
     function()
-      local ok, bpm = pcall(require, 'bpm')
-      if ok then
+      if bpm.is_available() then
         local current_buf = vim.api.nvim_get_current_buf()
-        local tab_bufs = bpm.get_attached_buf(0)
+        local tab_bufs = bpm.call('get_attached_buf', 0)
         for i = 1, #tab_bufs do
           local buf = tab_bufs[i]
-          if buf ~= current_buf then bpm.detach(buf) end
+          if buf ~= current_buf then bpm.call('detach', buf) end
         end
       else
         Snacks.bufdelete.other({ wipe = true })
@@ -135,10 +133,8 @@ bind({
   {
     '<leader>bD',
     function()
-      local ok, bpm = pcall(require, 'bpm')
-      if ok then bpm.evict() else Snacks.bufdelete(0, { wipe = true }) end
+      if bpm.is_available() then bpm.call('evict') else Snacks.bufdelete(0, { wipe = true }) end
     end,
-    desc = 'Evict buffer from ALL Workspaces'
   },
 })
 
