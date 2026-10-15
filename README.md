@@ -27,7 +27,7 @@ Use this on **Linux** for best experience ฅ₍^•⩊ •マⳊ
 
 ### Summarization
 
-- **Fast.** Less than **30ms** to start, **tested on i7-7700hq.**
+- **Speed.** Less than **30ms** to start, **tested on i7-7700hq.**
 - **Simple.** Less plugins, more features.
 - **Modern.** Pure `lua` config.
 - **Modular.** Easy for maintenance.
@@ -91,6 +91,9 @@ So I use fzf-lua instead of snacks during power-saver mode.
   - [x] [**Resonance.nvim**](https://github.com/Imngzx/resonance.nvim)
   - [x] [jisho.nvim](https://github.com/Imngzx/jisho.nvim)
   - [x] [ascetic.nvim](https://github.com/Imngzx/ascetic.nvim)
+
+- List of self modded plugins:
+  - [x] [showkeys](https://github.com/Imngzx/showkeys)
 
 > [!TIP]
 > Can test launch speed with:
@@ -243,12 +246,11 @@ python3 scripts.py uninstall --force --force  # FULL UNINSTALL (double --force f
 ## Project Structure
 
 - `init.lua`: entry point
-- `lua/config`: basic settings
-- `lua/custom`: custom tools & features, gems happens here
-- `lua/libs`: shared libraries
-- `lua/lsp/init.lua`: simple lsp configurations
+- `lua/config/`: basic settings
+- `lua/custom/`: custom tools & features, gems happens here
+- `lua/libs/`: shared libraries
 - `lua/lsp/servers.lua` & `lua/lsp/servers/*.lua`: LSP installation & configuration for separate languages
-- `lua/plugins`: plugin configurations
+- `lua/plugins/`: plugin configurations
 - `lua/plugins/<plugin_name>/`: plugin configurations (**BIG**)
 
 ## Contributions
