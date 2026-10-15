@@ -9,11 +9,13 @@
 ## Overview
 
 Cross-platform IME manager (~250 lines) with platform-specific backends:
+
 - **Linux**: `fcitx5-remote` CLI
 - **WSL**: `im-select.exe` via WSL interop
 - **Windows**: Win32 API via `ffi` (Imm32/user32)
 
 Automatically switches to English (US) layout on:
+
 - `InsertLeave` (exit insert mode)
 - `BufLeave` (leave buffer)
 - `FocusLost` (leave Neovim)
@@ -114,7 +116,7 @@ end
 ## WSL: im-select.exe (WSL Interop)
 
 ```lua
-local IM_SELECT_EXE = '/mnt/c/Users/Administrator/scoop/apps/im-select/current/im-select.exe'
+local IM_SELECT_EXE = '/mnt/c/Users/*/scoop/apps/im-select/current/im-select.exe'
 
 function M.wsl_ime()
   if executable(IM_SELECT_EXE) ~= 1 then return end
@@ -247,7 +249,7 @@ end
 
 ```lua
 -- Update im-select path for your system
-local IM_SELECT_EXE = '/mnt/c/Users/Administrator/scoop/apps/im-select/current/im-select.exe'
+local IM_SELECT_EXE = '/mnt/c/Users/*/scoop/apps/im-select/current/im-select.exe'
 
 -- Or override fcitx5-remote if not in PATH
 local FCITX5_REMOTE = '/usr/bin/fcitx5-remote'
