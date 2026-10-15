@@ -1,9 +1,14 @@
+_G.I = require('libs.icons')
+
+local vim_g = vim.g
+local loader = vim.loader
+
 -- Bytecode cache
-if vim.loader then
-  vim.loader.enable()
+if loader then
+  loader.enable()
 end
 
-_G.I = require('libs.icons')
+vim_g.markdown_recommended_style = 0
 
 local disabled_built_ins = {
   'fzf',
@@ -19,7 +24,7 @@ local disabled_built_ins = {
   'tohtml',
 }
 for i = 1, #disabled_built_ins do
-  vim.g['loaded_' .. disabled_built_ins[i]] = 1
+  vim_g['loaded_' .. disabled_built_ins[i]] = 1
 end
 
 require('custom.ui2').setup()
