@@ -4,13 +4,21 @@ local fn = vim.fn
 vim.schedule(function()
   if vim.uv.os_uname().release:lower():find('microsoft') then
     local win32yank_paths = {
+      'win32yank.exe',
       '/mnt/c/Program Files/Neovim/bin/win32yank.exe',
-      '/mnt/c/Users/Administrator/scoop/apps/neovim-nightly/current/bin/win32yank.exe',
     }
+
+    -- Use glob to dynamically find the scoop installation across any Windows username
+    local scoop_matches = fn.glob(
+      '/mnt/c/Users/*/scoop/apps/neovim-nightly/current/bin/win32yank.exe', true, true)
+
+    for i = 1, #scoop_matches do
+      win32yank_paths[#win32yank_paths + 1] = scoop_matches[i]
+    end
 
     local win32yank = nil
 
-    -- Using a highly performant standard numeric loop
+
     for i = 1, #win32yank_paths do
       local path = win32yank_paths[i]
       if fn.executable(path) == 1 then

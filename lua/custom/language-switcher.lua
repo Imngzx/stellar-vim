@@ -88,11 +88,21 @@ end
 -- ============================================================
 -- 2. WSL: im-select.exe (WSL Interop)
 -- ============================================================
--- Update this path to where scoop installed im-select.exe
-local IM_SELECT_EXE = '/mnt/c/Users/Administrator/scoop/apps/im-select/current/im-select.exe'
+local IM_SELECT_EXE = nil
+
+if is_wsl then
+  if executable('im-select.exe') == 1 then
+    IM_SELECT_EXE = 'im-select.exe'
+  else
+    local matches = fn.glob('/mnt/c/Users/*/scoop/apps/im-select/current/im-select.exe', true, true)
+    if matches and #matches > 0 then
+      IM_SELECT_EXE = matches[1]
+    end
+  end
+end
 
 function M.wsl_ime()
-  if executable(IM_SELECT_EXE) ~= 1 then
+  if not IM_SELECT_EXE or executable(IM_SELECT_EXE) ~= 1 then
     vim.notify('im-select.exe not found in WSL. IME auto-switch disabled.', vim.log.levels.WARN)
     return
   end
