@@ -35,8 +35,8 @@ Use this on **Linux** for best experience ฅ₍^•⩊ •マⳊ
 - **Powerful.** Full functionality to code, supports cjk.
 - **Beautiful.** Author really puts effort on it's UI.
 - **Minimalist.** Less plugins but more features.
-- **Performance.** Heavy optimizations are involved.
 - **Intelligence.** Code completion knew what to suggest next
+- **Performance.** Heavy optimizations are involved.
 
 ### Remarkable Recent Improvements
 
