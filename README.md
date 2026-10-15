@@ -226,6 +226,20 @@ After steps above, please `<Leader>pm` or `:Mason` to open Mason panel, it'll ha
 
 Then please having fun!
 
+### Config Managing
+
+As you can see there's a python script in this config, this is still experimental but I hope it helps.
+
+```bash
+
+# do these on your own risk, feel free to make issue and pr
+python3 scripts.py update                     # Git pull --rebase --autostash
+python3 scripts.py clean --force              # Remove plugins (site/pack/core)
+python3 scripts.py both --force               # Update + clean
+python3 scripts.py uninstall --force --force  # FULL UNINSTALL (double --force for safety)
+
+```
+
 ## Project Structure
 
 - `init.lua`: entry point
