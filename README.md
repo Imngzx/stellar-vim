@@ -232,7 +232,7 @@ As you can see there's a python script in this config, this is still experimenta
 
 ```bash
 
-# do these on your own risk, feel free to make issue and pr
+# use these at your own risk, feel free to make issues and pr
 python3 scripts.py update                     # Git pull --rebase --autostash
 python3 scripts.py clean --force              # Remove plugins (site/pack/core)
 python3 scripts.py both --force               # Update + clean
