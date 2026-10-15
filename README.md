@@ -28,14 +28,15 @@ Use this on **Linux** for best experience ฅ₍^•⩊ •マⳊ
 ### Summarization
 
 - **Speed.** Less than **30ms** to start, **tested on i7-7700hq.**
-- **Simple.** Less plugins, more features.
-- **Modern.** Pure `lua` config.
+- **Simple.** LSP configuration design is very human
+- **Modern.** **Only** runs on `nightly 0.13` version.
 - **Modular.** Easy for maintenance.
-- **Unstable.** Stable config will ruins dev experience.
-- **Powerful.** Near full functionality to code, supports cjk.
+- **Unstable.** _Stable configuration_ will **RUINS** the dev experience.
+- **Powerful.** Full functionality to code, supports cjk.
 - **Beautiful.** Author really puts effort on it's UI.
-- **Minimalist.** Plugins(DIY) with snacks integration.
-- **Performance.** FFI, luaJIT syntax, C-API and etc are involved.
+- **Minimalist.** Less plugins but more features.
+- **Performance.** Heavy optimizations are involved.
+- **Intelligence.** Code completion knew what to suggest next
 
 ### Remarkable Recent Improvements
 
