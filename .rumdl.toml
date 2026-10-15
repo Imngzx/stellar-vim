@@ -1,0 +1,21 @@
+[MD073]
+# Enable the rule (opt-in, disabled by default)
+enabled = true
+
+# Minimum heading level to include (default: 2)
+min-level = 2
+
+# Maximum heading level to include (default: 4)
+max-level = 4
+
+# Whether TOC order must match document order (default: true)
+enforce-order = true
+
+# Spaces per indentation level (default: from MD007, or 2)
+indent = 2
+
+[MD025]
+# Disable front matter title checking - treat front matter and body separately
+front-matter-title = ""
+# Allow multiple H1s separated by --- thematic breaks
+allow-document-sections = true
