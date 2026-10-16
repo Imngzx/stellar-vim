@@ -27,7 +27,7 @@ M.git = {
   modified = '',
   renamed = '',
   unmerged = '',
-  untracked = '?',
+  untracked = '󰊠',
 }
 
 return M
