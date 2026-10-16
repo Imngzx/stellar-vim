@@ -30,7 +30,7 @@ return {
         width = 0.8,
         height = 0.9,
         border = 'rounded',
-        backdrop = false,
+        backdrop = 60,
         box = 'vertical',
         { win = 'input', border = 'rounded', height = 1, title = '{title} {live} {flags}', title_pos = 'left' },
         { win = 'list', border = 'rounded', height = 8 },
