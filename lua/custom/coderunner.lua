@@ -61,7 +61,8 @@ local function get_c_mode()
     _c_mode_cache = {
       'cd $dir &&',
       'mkdir -p out &&',
-      'clang -Wall -Wextra -g -fsanitize=address,undefined' .. C_EXTRA_FLAGS .. ' -o out/$fileNameWithoutExt $fileName -lm &&',
+      'clang -Wall -Wextra -g -fsanitize=address,undefined' ..
+      C_EXTRA_FLAGS .. ' -o out/$fileNameWithoutExt $fileName -lm &&',
       './out/$fileNameWithoutExt',
     }
   end
@@ -76,7 +77,8 @@ local function get_cpp_mode()
     _cpp_mode_cache = {
       'cd $dir &&',
       'mkdir -p out &&',
-      'g++ -std=c++23 -Wall -Wextra -O2' .. CPP_EXTRA_FLAGS .. ' -o out/$fileNameWithoutExt $fileName &&',
+      'g++ -std=c++23 -Wall -Wextra -O2' ..
+      CPP_EXTRA_FLAGS .. ' -o out/$fileNameWithoutExt $fileName &&',
       './out/$fileNameWithoutExt',
     }
   else
@@ -84,7 +86,8 @@ local function get_cpp_mode()
     _cpp_mode_cache = {
       'cd $dir &&',
       'mkdir -p out &&',
-      'clang++ -std=c++23 -Wall -Wextra -g -fsanitize=address,undefined' .. CPP_EXTRA_FLAGS .. ' -o out/$fileNameWithoutExt $fileName -lm &&',
+      'clang++ -std=c++23 -Wall -Wextra -g -fsanitize=address,undefined' ..
+      CPP_EXTRA_FLAGS .. ' -o out/$fileNameWithoutExt $fileName -lm &&',
       './out/$fileNameWithoutExt',
     }
   end
@@ -108,6 +111,7 @@ local function get_filetype_cmds()
       rust = { 'cd $dir; rustc $fileName; .\\$fileNameWithoutExt.exe' },
       typescript = { 'deno run $fileName' },
       zig = { 'cd $dir &&', 'zig build run' },
+      go = { 'go run $fileName' },
     }
   else
     _filetype_cmds_cache = {
@@ -118,6 +122,7 @@ local function get_filetype_cmds()
       rust = { 'cd $dir &&', 'rustc $fileName &&', './$fileNameWithoutExt' },
       typescript = { 'deno run $fileName' },
       zig = { 'cd $dir &&', 'zig build run' },
+      go = { 'go run $fileName' },
     }
   end
 
@@ -293,7 +298,8 @@ local function build_pause_cmd()
       return ' & pause'
     end
   else
-    return ' ; echo ""; bash -c \'read -n 1 -s -r -p "Press any key to continue..."\' 2>/dev/null || read -p "Press ENTER to continue..."'
+    return
+    ' ; echo ""; bash -c \'read -n 1 -s -r -p "Press any key to continue..."\' 2>/dev/null || read -p "Press ENTER to continue..."'
   end
 end
 
@@ -383,6 +389,7 @@ function M.build_project_command()
   if uv_fs_stat(cwd .. '/Makefile') then return 'make' end
   if uv_fs_stat(cwd .. '/build.zig') then return 'zig build run' end
   if uv_fs_stat(cwd .. '/package.json') then return 'npm start' end
+  if uv_fs_stat(cwd .. '/go.mod') then return 'go run .' end
 
   nvim_notify('No project config found (Makefile/Cargo.toml/etc.)', vim.log.levels.WARN)
 end
@@ -402,3 +409,4 @@ function M.setup()
 end
 
 return M
+

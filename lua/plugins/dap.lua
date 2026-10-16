@@ -5,6 +5,7 @@ require('resonance').load({
     'https://github.com/rcarriga/nvim-dap-ui',
     'https://github.com/theHamsta/nvim-dap-virtual-text',
     'https://github.com/mfussenegger/nvim-dap-python',
+    'https://github.com/leoluz/nvim-dap-go',
   },
   dependencies = { 'https://github.com/nvim-neotest/nvim-nio' },
   keys = {
@@ -54,6 +55,7 @@ require('resonance').load({
     dapui.setup()
     require('nvim-dap-virtual-text').setup({})
     require('dap-python').setup('python3', {})
+    require('dap-go').setup({})
 
     local dap = require('dap')
 
@@ -109,5 +111,6 @@ require('resonance').load({
 
     dap.configurations.c = dap.configurations.cpp
     dap.configurations.rust = dap.configurations.cpp
+    -- Go uses nvim-dap-go adapter (configured via dap-go.setup)
   end
 })

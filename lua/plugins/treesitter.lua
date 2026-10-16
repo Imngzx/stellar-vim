@@ -3,6 +3,7 @@ local parsers = {
   'bash', 'json', 'yaml', 'toml', 'rust', 'zig', 'javascript', 'typescript', 'vue',
   'latex', 'html', 'regex', 'css', 'gitcommit', 'fish', 'kdl', 'powershell', 'luau', 'nix', 'just',
   'meson', 'scss', 'svelte', 'tsx', 'typst',
+  'go', 'gomod', 'gowork', 'gosum',
 }
 
 local function setup_compiler()

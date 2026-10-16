@@ -91,6 +91,13 @@ M.servers = {
 
   },
 
+  -- [go]
+  gopls = {
+    'golang',
+    mason = true,
+    formatter = { name = 'gofumpt', mason = 'gofumpt', ft = { 'go' } },
+  },
+
   -- [zig]
   zls = {
     'zig',
@@ -175,6 +182,7 @@ M.servers = {
   },
   shfmt = { formatter_only = true, ft = { 'sh', 'bash' }, mason = 'shfmt', name = 'shfmt' },
   jq = { formatter_only = true, ft = { 'json' }, mason = 'jq', name = 'jq' },
+  goimports = { formatter_only = true, ft = { 'go' }, mason = 'goimports', name = 'goimports' },
 }
 
 -- Non-LSP tools installed via Mason (debuggers, linters, etc. - no formatter entry)
@@ -183,6 +191,9 @@ M.tools = {
   'debugpy', -- Python debugger
   'shellcheck', -- Shell linter (used by bashls)
   'mpls', -- Markdown preview LSP
+  'gomodifytags', -- Go struct tag modifier
+  'impl', -- Go interface implementation generator
+  'delve', -- Go debugger
   -- 'vue-language-server', -- Vue LSP (commented)
 }
 
@@ -190,6 +201,7 @@ M.tools = {
 -- Used for nvim-lint linters_by_ft and Mason auto-install
 M.linters = {
   htmlhint = { ft = { 'html' }, mason = 'htmlhint' },
+  golangcilint = { ft = { 'go' }, mason = 'golangci-lint' },
 }
 
 return M
