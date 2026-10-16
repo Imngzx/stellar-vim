@@ -74,6 +74,10 @@
       "rev": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
       "src": "https://github.com/folke/lazydev.nvim"
     },
+    "markdown-preview2.nvim": {
+      "rev": "6e95a19f627f0b4b51655aea14829fce1d860ae9",
+      "src": "https://github.com/aurora0x27/markdown-preview2.nvim"
+    },
     "mason.nvim": {
       "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",
       "src": "https://github.com/mason-org/mason.nvim"
