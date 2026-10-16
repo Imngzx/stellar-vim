@@ -9,6 +9,7 @@
 ## Overview
 
 Dynamic cheatsheet (~280 lines) featuring:
+
 - **Auto-discovery** — Scans all keymaps from `nvim_get_keymap()` and `nvim_buf_get_keymap()`
 - **Smart categorization** — Regex-based grouping (LSP, Git, UI, etc.)
 - **Live highlighting** — Extmark-based key/lhs/rhs/desc coloring

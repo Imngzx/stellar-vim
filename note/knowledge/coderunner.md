@@ -1,13 +1,16 @@
 # coderunner.lua Configuration and Core Logic
 
 ## Configuration Switches
+
 - `C_BUILD_TYPE`: 1=Release (GCC -O2), 2=Debug (Clang -g -fsanitize)
 - `CPP_BUILD_TYPE`: 1=Release (G++ -O2), 2=Debug (Clang++ -g -fsanitize)
 
 ## OS Detection
+
 - Detects Windows vs Unix systems for platform-specific configurations
 
 ## Core Functions
+
 - `get_c_mode()` / `get_cpp_mode()`: Returns compiler flags based on build type
 - `shellescape()`: Escapes values for shell commands
 - `normalize_path()`: Standardizes path formatting
@@ -20,12 +23,15 @@
 - `build_project_command()`: Constructs project build command
 
 ## Key Mappings
+
 - `<leader>rp` : Runs project via `M.run_project()`
 
 ## Terminal Management
+
 - Manages terminal lifecycle with `active_term` handling and cleanup
 
 ## Project Detection
+
 - Checks for Cargo.toml or Makefile to determine project type
 
 ```lua

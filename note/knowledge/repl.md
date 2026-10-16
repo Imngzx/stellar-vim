@@ -9,6 +9,7 @@
 ## Overview
 
 Minimal REPL (~170 lines) featuring:
+
 - **Per-session environment** — Isolated `_G` per evaluation session
 - **Visual/Normal mode** — Eval or exec selected code
 - **Persistent context** — Variables persist across evaluations

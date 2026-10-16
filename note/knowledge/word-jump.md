@@ -9,6 +9,7 @@
 ## Overview
 
 Minimal Flash.nvim alternative built for:
+
 - **Zero GC in hot path** — cached labels, cached C-API, byte operations
 - **Hierarchical labels** — Single char → Double letter → Digit+letter (962 max)
 - **Zero external deps** — Pure Lua + Neovim API
@@ -17,7 +18,7 @@ Minimal Flash.nvim alternative built for:
 
 ## Label Hierarchy (962 max)
 
-```
+```text
 1-26:       a, b, c, ... z                    (single lowercase)
 27-702:     aA, aB, ... zZ                   (lower + upper = 26*26)
 703-962:    1a, 1b, ... 9z, 0a, ... 0z       (digit + lower = 10*26)

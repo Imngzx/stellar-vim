@@ -9,6 +9,7 @@
 ## Overview
 
 Minimal LSP progress UI (~340 lines) replacing fidget.nvim:
+
 - **SoA Architecture** — Parallel arrays, zero allocations in hot path
 - **Spinner Animation** — 10-frame braille spinner at 60fps
 - **Multi-client Support** — Tracks multiple LSP clients simultaneously
@@ -32,6 +33,7 @@ local t_count = 0        -- Active task count
 ```
 
 **Benefits:**
+
 - **Zero allocations** in hot path (animation loop)
 - **Cache-friendly** — Sequential memory access
 - **O(1) operations** — Token lookup via `t_idx`
@@ -205,6 +207,7 @@ end
 ## Token Management
 
 ### Add Task (`begin`)
+
 ```lua
 local function add_task(token, client, title, message, percentage)
   if t_idx[token] then return end  -- Already exists
@@ -226,6 +229,7 @@ end
 ```
 
 ### Update Task (`report`)
+
 ```lua
 local function update_task(token, message, percentage)
   local idx = t_idx[token]
@@ -238,6 +242,7 @@ end
 ```
 
 ### Finish Task (`end`)
+
 ```lua
 local function finish_task(token, message)
   local idx = t_idx[token]
@@ -256,6 +261,7 @@ end
 ```
 
 ### Remove Task
+
 ```lua
 local function remove_task(token)
   local idx = t_idx[token]

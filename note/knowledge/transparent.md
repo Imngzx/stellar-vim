@@ -9,6 +9,7 @@
 ## Overview
 
 Feature-complete transparency manager (~220 lines) with:
+
 - **Persistent state** — Async cache to `~/.local/state/nvim/transparent_state`
 - **Highlight group management** — Clears `bg` from configurable groups
 - **Autocmd integration** — Re-applies on `ColorScheme`, `VimEnter`, `WinEnter`
@@ -56,6 +57,7 @@ local config = {
 ## Cache Persistence (Async)
 
 ### Read Cache
+
 ```lua
 local function cache_read()
   local task = async.run(function()
@@ -71,6 +73,7 @@ end
 ```
 
 ### Write Cache
+
 ```lua
 local function cache_write()
   return async.run(function()
@@ -91,6 +94,7 @@ end
 ## Highlight Management
 
 ### Clear Background
+
 ```lua
 local function clear_group(group)
   local list = type(group) == 'string' and { group } or group
@@ -108,6 +112,7 @@ end
 ```
 
 ### Restore Background
+
 ```lua
 -- In M.disable():
 for group, hl in pairs(ORIGINAL_HL_CACHE) do
@@ -168,7 +173,7 @@ if config.auto_enable then M.enable() end
 
 ## State Flow
 
-```
+```text
 M.enable() → vim.g.bg_transparent = true → cache_write() → M.clear() → cache original HLs → set bg=NONE
     ↓
 M.disable() → vim.g.bg_transparent = false → cache_write() → restore original HLs → redraw

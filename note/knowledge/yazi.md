@@ -9,6 +9,7 @@
 ## Overview
 
 Lightweight Yazi.nvim alternative (~50 lines) using:
+
 - **Snacks.nvim float window** — Consistent UI with other pickers
 - **Yazi chooser file** — Native Yazi multi-select via `--chooser-file`
 - **Non-blocking** — `vim.fn.jobstart` with async exit callback
@@ -96,7 +97,7 @@ end
 5. **On exit** — Read chooser file, open files:
    - First file → `:edit`
    - Additional files → `:badd`
-4. **Cleanup** — Close window, remove temp file
+6. **Cleanup** — Close window, remove temp file
 
 ---
 

@@ -9,6 +9,7 @@
 ## Overview
 
 Minimal auto-pairs (~140 lines) featuring:
+
 - **Zero GC in hot path** — cached byte constants, byte-based checks
 - **Smart backspace** — Deletes pair if cursor between matching pair
 - **Auto-indent on CR** — Expands `{<CR>}` to `{<CR>  <CR>}`
@@ -111,6 +112,7 @@ end
 ```
 
 **Behaviors:**
+
 | Context | Input | Result |
 |---------|-------|--------|
 | `""` (cursor between) | `"` | Skip right |
@@ -140,6 +142,7 @@ end
 ```
 
 **Behaviors:**
+
 | Context | Backspace | Result |
 |---------|-----------|--------|
 | `(|)` (cursor between) | `<BS>` | Deletes both |

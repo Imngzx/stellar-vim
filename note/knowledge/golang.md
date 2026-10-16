@@ -107,7 +107,7 @@ settings = {
 go = { 'go run $fileName' }
 ```
 
-Key: `<leader>rr` (via `M.run()`)
+Keys: `<leader>rc` / `<leader>rf` (via `M.run()`), `<F5>` / `<C-F5>`
 
 ### Project
 
@@ -156,10 +156,11 @@ Added to `lua/plugins/treesitter.lua`:
 | `<leader>cr` | Rename | LSP |
 | `K` | Hover | LSP |
 | `<leader>cf` | Format (goimports + gofumpt) | conform.nvim |
-| `<leader>rr` | Run file | coderunner |
+| `<leader>rc` / `<leader>rf` / `<F5>` / `<C-F5>` | Run file | coderunner |
 | `<leader>rp` | Run project | coderunner |
 | `<leader>dc` | Debug | DAP |
 | `<leader>du` | Toggle DAP UI | DAP |
+| `<leader>rr` (visual) | Exec selected code | REPL |
 
 ## Adding Go-specific Features
 

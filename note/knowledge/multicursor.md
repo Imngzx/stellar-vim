@@ -9,6 +9,7 @@
 ## Overview
 
 Thin wrapper (~140 lines) around `vim._core.mcursor` providing:
+
 - **Word/all-matches cursors** — `mcA` / `mcw`
 - **Visual multicursor** — `mcV`
 - **Numbered cursors** — `mcN` / `mcP` (padded)
@@ -167,6 +168,7 @@ end
 | Minimal API surface | Only exposes useful keymaps |
 | `vim._core.mcursor` | Official internal API (stable in 0.13+) |
 | No external deps | Zero dependencies |
+
 - `vim._core.mcursor` is internal — subject to change (low risk in 0.13+)
 - No undo integration for multicursor operations
 - No column-block editing (line-based only)

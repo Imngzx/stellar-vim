@@ -9,6 +9,7 @@
 ## Overview
 
 Minimal surround.nvim alternative (~200 lines) featuring:
+
 - **Zero GC in hot path** — cached byte values, byte-based navigation
 - **Bracket-aware pairs** — `()[]{}` auto-handle nesting
 - **VS Code-style visual auto-wrap** — Type `s` in visual mode to wrap selection
@@ -30,6 +31,7 @@ local surrounds = {
 ```
 
 Each pair cached with:
+
 - `l_byte` / `r_byte` — First byte for O(1) comparison
 - `is_bracket` — `true` for `()[]{}<>`, `false` for quotes
 
@@ -117,7 +119,7 @@ end)
 |-----------|--------|
 | Cursor position | `api.nvim_win_get_cursor()` → 1-indexed → convert to 0-indexed |
 | Character insertion | `api.nvim_buf_set_text()` with byte offsets |
-| Deletion | `api.nvim_buf_set_text()` with empty table `{}`
+| Deletion | `api.nvim_buf_set_text()` with empty table `{}` |
 | Byte offsets | `str_byte()` + `get_utf8_len()` for multi-byte chars |
 
 ---
