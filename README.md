@@ -154,6 +154,7 @@ So I use fzf-lua instead of snacks during power-saver mode.
 - `im-select` for **WSL**
 - `tdlib`, `npm`, `kitty`||`ghostty` on **Linux** and **MacOS**, for [**ChuYanLon/telegram.nvim**](https://github.com/ChuYanLon/telegram.nvim)
 - `tectonic` on **Linux** and **MacOS**, optional for latex rendering
+- `clice` as LSP for C and CPP
 - `vim-startuptime,` optional
 - `kitty`||`ghostty` on **Linux** and **MacOS**, for image support
 
@@ -207,6 +208,55 @@ So I use fzf-lua instead of snacks during power-saver mode.
 
   # 2. Install the im-select package
   scoop install im-select
+
+```
+
+#### How To Install clice? (for education usage)
+
+```sh
+~
+❯ cd ~/.local/bin/
+
+# get the installation link for clice in the github release page
+~/.local/bin
+❯ curl -L -o ~/.local/bin/clice.tar.gz https://github.com/clice-io/clice/releases/download/v0.1.2026101607/clice-0.1.2026101607.x86_64-unknown-linux-gnu.tar.gz
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0
+100 24.50M 100 24.50M   0      0 35.22M      0                              0
+
+
+# it's gonna be sooo many dialogues later, dun worry
+
+~/.local/bin
+❯ sudo mv clice/bin/clice /usr/local/bin/clice
+[sudo] password for alice:
+
+
+# verify installation
+~/.local/bin
+❯ clice
+A C++ development toolkit built on LLVM/Clang
+
+Subcommands:
+  serve       Start LSP server
+  query       Ask the persisted index about the workspace
+  refactor    Rewrite the workspace's sources through the persisted index
+  index       Index a workspace ahead of time
+  lint        Lint C++ source files
+  format      Format C++ source files
+  inspect     Run a feature on a source file and print raw results as JSON
+  scan        Scan the project's include and module dependencies
+  analyze     Analyze the indexed workspace for refactoring
+  modularize  Wrap a partition's libraries as modules over their headers, rewrite its program modules into module units, or merge the wrappings of several build configurations
+
+# verify installation
+~/.local/bin
+❯ which clice
+/usr/local/bin/clice
+
+~/.local/bin
+❯ rm -rf  clice/ clice.tar.gz
 
 ```
 

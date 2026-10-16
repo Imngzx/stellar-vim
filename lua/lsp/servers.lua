@@ -70,11 +70,20 @@ M.servers = {
   },
 
   -- [c, c++]
-  clangd = {
-    'c-language',
+  -- clangd = {
+  --   'c-language',
+  --   mason = false,
+  --   formatter = {
+  --     name = 'clang_format',
+  --     mason = false,
+  --     ft = { 'c', 'c.doxygen', 'cpp', 'cpp.doxygen', 'objc', 'objcpp', 'cuda' }
+  --   },
+  -- },
+  clice = {
+    false,
     mason = false,
     formatter = {
-      name = 'clang_format',
+      name = 'clang-format',
       mason = false,
       ft = { 'c', 'c.doxygen', 'cpp', 'cpp.doxygen', 'objc', 'objcpp', 'cuda' }
     },
