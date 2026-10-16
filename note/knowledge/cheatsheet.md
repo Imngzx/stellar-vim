@@ -225,11 +225,3 @@ api.nvim_create_autocmd('VimResized', {
 | Extmark highlights | Per-character, no syntax overhead |
 | Resize-only rebuild | Balance freshness vs performance |
 | Buffer-local keymaps | Includes ftplugin/buffer-specific maps |
-
----
-
-## Related Files
-
-- `lua/config/keymaps.lua` — Primary keymap source
-- `lua/plugins/snacks/picker.lua` — Picker config
-- `lua/plugins/which-key.lua` — Alternative help
