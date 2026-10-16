@@ -102,6 +102,6 @@ vim.filetype.add({
     mdx = 'markdown.mdx',
     dox = 'c.doxygen',
     doxy = 'cpp.doxygen',
-    go = 'gotmpl'
+    gotmpl = 'gotmpl'
   }
 })
