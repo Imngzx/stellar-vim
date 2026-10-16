@@ -143,7 +143,7 @@ async.run(function()
   local tasks = {}
 
   for _, path in ipairs(paths) do
-    table_insert(tasks, async.run(function()
+    table.insert(tasks, async.run(function()
       return limit:with(function()
         return read_file(path)
       end)
