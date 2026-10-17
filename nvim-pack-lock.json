@@ -1,7 +1,7 @@
 {
   "plugins": {
     "ascetic.nvim": {
-      "rev": "0e39a31789c0ec8753aab6cffaf830e55a9858d7",
+      "rev": "6e570b3a9cb01c593564dfecedb27a86bef11af6",
       "src": "https://github.com/Imngzx/ascetic.nvim"
     },
     "atone.nvim": {
@@ -31,7 +31,7 @@
       "version": "'main'"
     },
     "codecompanion.nvim": {
-      "rev": "3dd1ef7fa8d6aeb27020023e40293bac588de714",
+      "rev": "799526fb35548c26e2dd74c3b282537bb8122a3b",
       "src": "https://github.com/olimorris/codecompanion.nvim"
     },
     "colorful-menu.nvim": {
@@ -106,6 +106,10 @@
       "rev": "cfa2d58f4537aca6ca83e2de1a0d9f1491121264",
       "src": "https://github.com/mfussenegger/nvim-dap"
     },
+    "nvim-dap-go": {
+      "rev": "b4421153ead5d726603b02743ea40cf26a51ed5f",
+      "src": "https://github.com/leoluz/nvim-dap-go"
+    },
     "nvim-dap-python": {
       "rev": "1808458eba2b18f178f990e01376941a42c7f93b",
       "src": "https://github.com/mfussenegger/nvim-dap-python"
@@ -135,7 +139,7 @@
       "src": "https://github.com/nvim-neotest/nvim-nio"
     },
     "nvim-treesitter": {
-      "rev": "ca581c3436fc2b236847f5b739ebc263739e5ca6",
+      "rev": "d4a9b23a383266bdb0bfb42d565f31e83f27be5e",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
@@ -164,11 +168,11 @@
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
-      "rev": "1bca77c9f545f25aef9c0f001827ea1a2d854526",
+      "rev": "c673fbb6e4e026d3872e41b2d6c097a43ae164ca",
       "src": "https://github.com/Imngzx/resonance.nvim"
     },
     "showkeys": {
-      "rev": "7ff0181c0959dc60caa50037e8c2165223c95b5f",
+      "rev": "ffd138f876dcb098fd1726ab4e85c2f7b4307c3c",
       "src": "https://github.com/Imngzx/showkeys"
     },
     "snacks.nvim": {
