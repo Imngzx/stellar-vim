@@ -59,7 +59,7 @@
       "src": "https://github.com/rafamadriz/friendly-snippets"
     },
     "fzf-lua": {
-      "rev": "9405672f62767695d5f20db171336f7f4911ce86",
+      "rev": "c67fadd9a24230417267e4f9068227e093c0be2b",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "heirline.nvim": {
@@ -164,7 +164,7 @@
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
-      "rev": "32008a9685019d6330b81756d8ac7494827acb45",
+      "rev": "1bca77c9f545f25aef9c0f001827ea1a2d854526",
       "src": "https://github.com/Imngzx/resonance.nvim"
     },
     "showkeys": {
