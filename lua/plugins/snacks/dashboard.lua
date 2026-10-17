@@ -1,7 +1,7 @@
 return {
   enabled = true,
   preset = {
-    header = require('plugins.snacks.logo_names').StellarVim_default,
+    header = require('plugins.snacks.logo_names').Moai,
     keys = {
       { icon = '󰱼 ', key = 'f', desc = 'Find File', action = ":lua Snacks.dashboard.pick('files')" },
       { icon = '󰝒 ', key = 'n', desc = 'New File', action = ':ene | startinsert' },

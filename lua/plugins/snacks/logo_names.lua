@@ -8,6 +8,7 @@ local ayanami = require('plugins.snacks.logos.ayanami_rei')
 local doom = require('plugins.snacks.logos.doom')
 local nerv = require('plugins.snacks.logos.nerv')
 local miku = require('plugins.snacks.logos.miku')
+local meme = require('plugins.snacks.logos.meme')
 
 -- Stellar:Vim defaults
 M.StellarVim_default = stellarvim.logo
@@ -54,5 +55,9 @@ M.Doom = doom.DooM
 M.Doom_graffiti = doom.MF_DooM_graffiti
 M.Doom_RIP = doom.MF_DooM_rip
 M.NERV = nerv.NERV
+
+-- Memes
+M.Moai = meme.Moai
+
 
 return M
