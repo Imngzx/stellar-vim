@@ -67,7 +67,7 @@
       "src": "https://github.com/rebelot/heirline.nvim"
     },
     "jisho.nvim": {
-      "rev": "6a48a511f2f700b8d8e9843fbaa16dbf6696421d",
+      "rev": "461222564d154c5e3fe45d3f19403934b4b81f44",
       "src": "https://github.com/Imngzx/jisho.nvim"
     },
     "lazydev.nvim": {
@@ -168,8 +168,9 @@
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
-      "rev": "c673fbb6e4e026d3872e41b2d6c097a43ae164ca",
-      "src": "https://github.com/Imngzx/resonance.nvim"
+      "rev": "4341e72049987491f2f7b88d1094399ab0f787e4",
+      "src": "https://github.com/Imngzx/resonance.nvim",
+      "version": "'main'"
     },
     "showkeys": {
       "rev": "ffd138f876dcb098fd1726ab4e85c2f7b4307c3c",
