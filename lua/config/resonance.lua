@@ -12,8 +12,6 @@ end
 
 vim.opt.rtp:prepend(pack_path)
 
-vim.cmd('packadd resonance.nvim')
-
 -- =====================================================================
 -- 🚀 Configuration
 -- =====================================================================
@@ -21,7 +19,7 @@ local resonance = require('resonance')
 resonance.load({
   'https://github.com/Imngzx/resonance.nvim',
   version = 'main',
-  event = { 'User', pattern = 'VeryLazy' },
+  event = 'VimEnter',
   keys = {
     { 'n', '<leader>pL', '<cmd>Resonance<cr>', { desc = '[Float] Resonance UI' } },
   },
