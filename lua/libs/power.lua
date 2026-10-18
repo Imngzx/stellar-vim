@@ -18,13 +18,21 @@ M.config = {
   default_to_ac = true,
 }
 
-local cache_path = fn.stdpath('state') .. '/power_state.cache'
 local _is_ac = M.config.default_to_ac
 local windows_ffi
 local windows_status
+local cache_path
+
+local function get_cache_path()
+  if not cache_path then
+    cache_path = fn.stdpath('state') .. '/power_state.cache'
+  end
+  return cache_path
+end
 
 local function read_cache_fast()
-  local fd = uv.fs_open(cache_path, 'r', 438)
+  local path = get_cache_path()
+  local fd = uv.fs_open(path, 'r', 438)
   if not fd then return end
 
   local data = uv.fs_read(fd, 2, 0)
