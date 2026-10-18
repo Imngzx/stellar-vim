@@ -73,7 +73,7 @@ vim.api.nvim_create_autocmd('User', {
     -- coding
     local fn, env = vim.fn, vim.env
     local mason_bin = vim.fs.joinpath(fn.stdpath('data'), 'mason', 'bin')
-    local is_windows = require('libs.utils').is_windows()
+    local is_windows = utils.is_windows()
     if is_windows then mason_bin = mason_bin:gsub('/', '\\') end
     if not env.PATH:find(mason_bin, 1, true) then
       local sep = is_windows and ';' or ':'
@@ -108,7 +108,7 @@ vim.api.nvim_create_autocmd('User', {
     safe_load('plugins.AI')
     safe_load('plugins.atone')
     safe_setup('custom.language-switcher', require('custom.language-switcher').setup)
-    if not require('libs.utils').is_windows() then
+    if not utils.is_windows() then
       safe_load('plugins.telegram')
     end
     safe_load('config.neovide')
