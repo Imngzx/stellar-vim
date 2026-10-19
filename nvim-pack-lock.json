@@ -83,7 +83,7 @@
       "src": "https://github.com/mason-org/mason.nvim"
     },
     "mini.diff": {
-      "rev": "ce542d15eacf068f81f5e516da7d486db808c559",
+      "rev": "f6b09d25b19c4cde18b0269556c76bfb8b6f631f",
       "src": "https://github.com/nvim-mini/mini.diff"
     },
     "mini.hipatterns": {
@@ -139,7 +139,7 @@
       "src": "https://github.com/nvim-neotest/nvim-nio"
     },
     "nvim-treesitter": {
-      "rev": "d3e4a28b63961ba972b0945d66c73b6eec969953",
+      "rev": "29212d826054bb2948fa9d3a99eca9bf6a050eb2",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
@@ -168,7 +168,7 @@
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
-      "rev": "b080dd54d11ec208b44ca776db025a5a96b79be6",
+      "rev": "6f5b0d3beabf380d854460f5aadda1de1bffde8a",
       "src": "https://github.com/Imngzx/resonance.nvim",
       "version": "'main'"
     },
