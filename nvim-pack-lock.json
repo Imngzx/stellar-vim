@@ -31,7 +31,7 @@
       "version": "'main'"
     },
     "codecompanion.nvim": {
-      "rev": "799526fb35548c26e2dd74c3b282537bb8122a3b",
+      "rev": "86118411be00f0451a59c5ef7972c437e979e1b7",
       "src": "https://github.com/olimorris/codecompanion.nvim"
     },
     "colorful-menu.nvim": {
@@ -139,7 +139,7 @@
       "src": "https://github.com/nvim-neotest/nvim-nio"
     },
     "nvim-treesitter": {
-      "rev": "d4a9b23a383266bdb0bfb42d565f31e83f27be5e",
+      "rev": "d3e4a28b63961ba972b0945d66c73b6eec969953",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
@@ -168,7 +168,7 @@
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
-      "rev": "9fb17a1bd4533d417c7aed1b805c8106ab5ecd48",
+      "rev": "b080dd54d11ec208b44ca776db025a5a96b79be6",
       "src": "https://github.com/Imngzx/resonance.nvim",
       "version": "'main'"
     },
