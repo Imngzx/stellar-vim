@@ -11,7 +11,7 @@ local user_command = vim.api.nvim_create_user_command
 -- local bg_sync_group = vim.api.nvim_create_augroup('TerminalBgSync', { clear = true })
 
 local function augroup(name)
-  return create_augroup('cameron_' .. name, { clear = true })
+  return create_augroup('stellar_' .. name, { clear = true })
 end
 
 -- no commenting on next line when o or O in normal mode
