@@ -1,7 +1,7 @@
 require('resonance').load({
   {
     'https://github.com/rebelot/heirline.nvim',
-    event = { 'BufReadPost', 'BufNewFile' },
+    event = { 'BufReadPost', 'BufNewFile', 'BufEnter' },
     config = function()
       local heirline = require('heirline')
       local utils = require('heirline.utils')
