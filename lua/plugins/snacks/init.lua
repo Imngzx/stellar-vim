@@ -71,7 +71,7 @@ Snacks.setup({
 -- 3. 读取分离出去的按键配置
 local key = require('plugins.snacks.keys')
 
-local keymap_set = vim.keymap.set
+local keymap_set = Snacks.keymap.set
 
 local set_keys = function(keys)
   for i = 1, #keys do
@@ -117,20 +117,20 @@ require('resonance').load({
       vim.print = _G.dd
     end
 
-    -- 切换器快捷键保留
-    Snacks.toggle.option('spell', { name = 'Spelling' }):map('<leader>us')
-    Snacks.toggle.option('wrap', { name = 'Wrap' }):map('<leader>uw')
-    Snacks.toggle.option('relativenumber', { name = 'Relative Number' }):map('<leader>uL')
-    Snacks.toggle.diagnostics():map('<leader>ud')
-    Snacks.toggle.line_number():map('<leader>ul')
-    Snacks.toggle.option('conceallevel',
+    local Toggle = Snacks.toggle
+    Toggle.option('spell', { name = 'Spelling' }):map('<leader>us')
+    Toggle.option('wrap', { name = 'Wrap' }):map('<leader>uw')
+    Toggle.option('relativenumber', { name = 'Relative Number' }):map('<leader>uL')
+    Toggle.diagnostics():map('<leader>ud')
+    Toggle.line_number():map('<leader>ul')
+    Toggle.option('conceallevel',
       { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 }):map('<leader>uc')
-    Snacks.toggle.treesitter():map('<leader>uT')
-    Snacks.toggle.option('background', { off = 'light', on = 'dark', name = 'Dark Background' }):map(
+    Toggle.treesitter():map('<leader>uT')
+    Toggle.option('background', { off = 'light', on = 'dark', name = 'Dark Background' }):map(
       '<leader>uB')
-    Snacks.toggle.inlay_hints():map('<leader>uh')
-    Snacks.toggle.indent():map('<leader>ug')
-    Snacks.toggle.dim():map('<leader>uD')
+    Toggle.inlay_hints():map('<leader>uh')
+    Toggle.indent():map('<leader>ug')
+    Toggle.dim():map('<leader>uD')
   end
 })
 
