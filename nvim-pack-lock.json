@@ -59,7 +59,7 @@
       "src": "https://github.com/rafamadriz/friendly-snippets"
     },
     "fzf-lua": {
-      "rev": "c67fadd9a24230417267e4f9068227e093c0be2b",
+      "rev": "a306c293b37bd7c8c1e8e1e6c0d7d3d9c3de3f21",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "heirline.nvim": {
@@ -83,19 +83,19 @@
       "src": "https://github.com/mason-org/mason.nvim"
     },
     "mini.diff": {
-      "rev": "f6b09d25b19c4cde18b0269556c76bfb8b6f631f",
+      "rev": "47ab8cf21c62cfd952008f2b9e79417c98173ec1",
       "src": "https://github.com/nvim-mini/mini.diff"
     },
     "mini.hipatterns": {
-      "rev": "8e18b4970f21be0db157104786d2be43058cdd44",
+      "rev": "247c0173579a29af60f25f00671a75c57090be9c",
       "src": "https://github.com/nvim-mini/mini.hipatterns"
     },
     "mini.icons": {
-      "rev": "f916635dc5ae2f479fbb9ab8184bb9444b62e86c",
+      "rev": "9e4c1645ce2b78afd6191b6be2c38bc0f998dd48",
       "src": "https://github.com/nvim-mini/mini.icons"
     },
     "neogit": {
-      "rev": "a6549816e62cec7037f1549d8f1659d45635370c",
+      "rev": "832a2db084ac25c2801fd73a3fab58f3c82ed2ec",
       "src": "https://github.com/NeogitOrg/neogit"
     },
     "neominimap.nvim": {
@@ -131,7 +131,7 @@
       "src": "https://github.com/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "45a3a444b710511c39abca3b60bb6e23a21e3de5",
+      "rev": "77b7432d4770d23b277d37923e5a08a442d8bb07",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-nio": {
