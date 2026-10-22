@@ -144,6 +144,7 @@ vim.api.nvim_create_autocmd('User', {
             pcall(api.nvim_exec_autocmds, 'BufReadPost', { buf = buf, modeline = false })
           else
             pcall(api.nvim_exec_autocmds, 'BufNewFile', { buf = buf, modeline = false })
+            pcall(api.nvim_exec_autocmds, 'BufEnter', { buf = buf, modeline = false })
           end
           pcall(api.nvim_exec_autocmds, 'FileType', { buf = buf, modeline = false })
         end
