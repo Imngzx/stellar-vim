@@ -1,10 +1,9 @@
 local row = 0.25
--- local neovide_detect = not vim.g.neovide
 
 require('resonance').load({
   'https://github.com/aurora0x27/popup.nvim',
 
-  event = { 'User', pattern = 'VeryLazy' },
+  lazy = true,
 
   config = function()
     require('popup').setup({

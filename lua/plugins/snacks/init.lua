@@ -101,7 +101,7 @@ end
 -- 4. 依托你精湛的按需加载引擎
 require('resonance').load({
   'https://github.com/folke/snacks.nvim',
-  event = { 'User', pattern = 'VeryLazy' },
+  lazy = true,
   config = function()
     set_keys(key)
 

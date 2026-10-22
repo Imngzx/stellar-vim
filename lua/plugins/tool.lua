@@ -2,7 +2,7 @@
 require('resonance').load({
   {
     'https://github.com/folke/which-key.nvim',
-    event = { 'User', pattern = 'VeryLazy' },
+    lazy = true,
     config = function()
       local wk = require('which-key')
 
@@ -97,7 +97,6 @@ require('resonance').load({
   {
     'https://github.com/Imngzx/ascetic.nvim',
     event = { 'BufReadPost', 'BufNewFile' },
-    -- event = { 'User', pattern = 'VeryLazy' },
     keys = {
       { 'n', '<leader>ua', '<cmd>AsceticToggle<cr>', { desc = 'Toggle Ascetic' } },
     },

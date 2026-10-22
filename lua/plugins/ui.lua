@@ -1,7 +1,7 @@
 require('resonance').load({
   {
     'https://github.com/nvim-mini/mini.icons',
-    event = { 'User', pattern = 'VeryLazy' },
+    lazy = true,
     config = function()
       local mini_icons = require('mini.icons')
 
