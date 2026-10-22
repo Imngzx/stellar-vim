@@ -43,6 +43,7 @@ end
 -- fzf during battery mode
 -- snacks during wall power mode
 require('libs.power').setup({ enable_auto_switch = true })
+
 if vim_g.neovide then
   require('config.neovide')
 end
