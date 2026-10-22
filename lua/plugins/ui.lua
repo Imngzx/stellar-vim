@@ -12,7 +12,9 @@ require('resonance').load({
 
   {
     'https://github.com/Imngzx/showkeys',
-    cmd = { 'ShowkeysToggle' },
+    keys = {
+      { 'n', '<leader>sK', '<cmd>ShowkeysToggle<cr>', { desc = 'Toggle ShowkeysToggle' } },
+    },
     config = function()
       require('showkeys').setup({
         position = 'bottom-center',

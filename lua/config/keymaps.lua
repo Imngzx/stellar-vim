@@ -136,9 +136,6 @@ end, { expr = true, desc = 'Escape and clear hlsearch' })
 -- Yazi integration
 map('n', '<leader>fy', function() require('custom.yazi').open() end, { desc = 'Find via Yazi' })
 
--- Showkeys toggle
-map('n', '<leader>sK', '<cmd>ShowkeysToggle<cr>', { desc = 'Toggle Showkeys' })
-
 -- Package update
 map('n', '<leader>pu', function() vim.pack.update() end, { desc = '[Panel] Update plugins' })
 
