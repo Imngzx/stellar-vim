@@ -2,6 +2,7 @@ require('resonance').load({
   'https://github.com/ChuYanLon/telegram.nvim',
 
   build = 'npm i',
+  cond = not require('libs.utils').is_windows(),
 
   cmd = { 'Tg', 'TgLogout', 'TgSend', 'TgPr' },
   keys = {

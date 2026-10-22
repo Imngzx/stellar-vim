@@ -106,9 +106,6 @@ vim.api.nvim_create_autocmd('User', {
     safe_load('plugins.AI')
     safe_load('plugins.atone')
     safe_setup('custom.language-switcher', require('custom.language-switcher').setup)
-    if not is_windows then
-      safe_load('plugins.telegram')
-    end
     safe_setup('custom.todo', require('custom.todo').setup)
     safe_load('custom.sudo')
 
@@ -126,6 +123,8 @@ vim.api.nvim_create_autocmd('User', {
       max_summary_length = 30,
       get_git_root = Snacks.git.get_root
     })
+
+    safe_load('plugins.telegram')
 
     vim.schedule(function()
       local api = vim.api
