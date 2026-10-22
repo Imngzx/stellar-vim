@@ -111,7 +111,6 @@ vim.api.nvim_create_autocmd('User', {
     if not is_windows then
       safe_load('plugins.telegram')
     end
-    safe_load('config.neovide')
     safe_setup('custom.todo', require('custom.todo').setup)
     safe_load('custom.sudo')
 
