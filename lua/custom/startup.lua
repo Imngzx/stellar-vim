@@ -43,6 +43,9 @@ end
 -- fzf during battery mode
 -- snacks during wall power mode
 require('libs.power').setup({ enable_auto_switch = true })
+if vim_g.neovide then
+  require('config.neovide')
+end
 
 -- NOTE: list of disabled plugin during battery mode
 -- Snacks.animate, partial Snacks.picker, Snacks.image
