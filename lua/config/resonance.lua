@@ -51,10 +51,8 @@ safe_load('plugins.ui')
 
 safe_load('plugins.tool')
 
--- misc
-if require('libs.power').is_ac() then
-  safe_load('plugins.discord')
-end
+-- idk why it wont load if it's inside the block ((
+safe_load('plugins.discord')
 
 -- NOTE: the reson I wrap my plugins with this block is because the mechanics of luajit
 -- although resonance.nvim will blocks luajit to require the plugin until resonance sends it to rtp

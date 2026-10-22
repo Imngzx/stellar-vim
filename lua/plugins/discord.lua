@@ -1,7 +1,8 @@
 require('resonance').load({
   'https://github.com/vyfor/cord.nvim',
 
-  event = { 'User', pattern = 'VeryLazy' },
+  cond = require('libs.power').is_ac(),
+  lazy = true,
 
   config = function()
     local icon = require('cord.api.icon').get
