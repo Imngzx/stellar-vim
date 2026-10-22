@@ -59,7 +59,7 @@
       "src": "https://github.com/rafamadriz/friendly-snippets"
     },
     "fzf-lua": {
-      "rev": "a306c293b37bd7c8c1e8e1e6c0d7d3d9c3de3f21",
+      "rev": "5dca84ef44f37b960a128a43d044ee348ff86fb4",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "heirline.nvim": {
@@ -75,7 +75,7 @@
       "src": "https://github.com/folke/lazydev.nvim"
     },
     "markdown-preview2.nvim": {
-      "rev": "6e95a19f627f0b4b51655aea14829fce1d860ae9",
+      "rev": "e9e1c7a4f4e646aa01649c4e3021ffde33b7a353",
       "src": "https://github.com/aurora0x27/markdown-preview2.nvim"
     },
     "mason.nvim": {
@@ -168,7 +168,7 @@
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
-      "rev": "6f5b0d3beabf380d854460f5aadda1de1bffde8a",
+      "rev": "a278d2898aeed8739a3e6396697430d997f48d0b",
       "src": "https://github.com/Imngzx/resonance.nvim",
       "version": "'main'"
     },
