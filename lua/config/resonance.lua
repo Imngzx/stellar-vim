@@ -20,7 +20,7 @@ local resonance = require('resonance')
 resonance.load({
   'https://github.com/Imngzx/resonance.nvim',
   version = 'main',
-  event = 'VimEnter',
+  lazy = false,
   keys = {
     { 'n', '<leader>pL', '<cmd>Resonance<cr>', { desc = '[Float] Resonance UI' } },
   },
