@@ -6,6 +6,7 @@ local fs = vim.fs
 local fn = vim.fn
 
 local utils = require('libs.utils')
+local TITLE = 'Stellar:Run'
 
 -- Hoist frequently used functions to locals (luajit optimization)
 local nvim_buf_get_name = api.nvim_buf_get_name
@@ -346,7 +347,7 @@ function M.build_run_command()
   local cmd_template = filetype_cmds[ft]
 
   if not cmd_template then
-    nvim_notify('No runner config for filetype: ' .. ft, vim.log.levels.WARN)
+    nvim_notify('No runner config for filetype: ' .. ft, vim.log.levels.WARN, { title = TITLE })
     return nil
   end
 
@@ -357,7 +358,7 @@ function M.build_run_command()
 
   local path = nvim_buf_get_name(0)
   if path == '' then
-    nvim_notify('Buffer has no associated file', vim.log.levels.WARN)
+    nvim_notify('Buffer has no associated file', vim.log.levels.WARN, { title = TITLE })
     return nil
   end
 
@@ -391,7 +392,8 @@ function M.build_project_command()
   if uv_fs_stat(cwd .. '/package.json') then return 'npm start' end
   if uv_fs_stat(cwd .. '/go.mod') then return 'go run .' end
 
-  nvim_notify('No project config found (Makefile/Cargo.toml/etc.)', vim.log.levels.WARN)
+  nvim_notify('No project config found (Makefile/Cargo.toml/etc.)', vim.log.levels.WARN,
+    { title = TITLE })
 end
 
 function M.run_project()
@@ -409,4 +411,3 @@ function M.setup()
 end
 
 return M
-

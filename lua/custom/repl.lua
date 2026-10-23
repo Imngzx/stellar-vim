@@ -1,5 +1,5 @@
 local M = {}
-local LOG_TITLE = 'VibeRepl'
+local LOG_TITLE = 'Repl'
 
 local api = vim.api
 local pcall, xpcall, load, type, select = pcall, xpcall, load, type, select

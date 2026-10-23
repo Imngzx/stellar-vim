@@ -6,7 +6,7 @@ local str_byte = string.byte
 local math_min = math.min
 
 local ESC_KEY = api.nvim_replace_termcodes('<Esc>', true, false, true)
-
+local TITLE = 'Stellar:Surround'
 
 local surrounds = {
   ['('] = { '(', ')' },
@@ -144,7 +144,10 @@ function M.delete()
   local char = get_char('Delete surround: ')
   if not char then return end
   local l_pos, r_pos = find_surround(char)
-  if not l_pos or not r_pos then return vim.notify('Surround not found', vim.log.levels.WARN) end
+  if not l_pos or not r_pos then
+    return vim.notify('Surround not found', vim.log.levels.WARN,
+      { title = TITLE })
+  end
 
   local row = api.nvim_win_get_cursor(0)[1] - 1
   local pair = surrounds[char] or { char, char }
@@ -160,7 +163,10 @@ function M.replace()
   if not new_char then return end
 
   local l_pos, r_pos = find_surround(old_char)
-  if not l_pos or not r_pos then return vim.notify('Surround not found', vim.log.levels.WARN) end
+  if not l_pos or not r_pos then
+    return vim.notify('Surround not found', vim.log.levels.WARN,
+      { title = TITLE })
+  end
 
   local row = api.nvim_win_get_cursor(0)[1] - 1
   local old_pair = surrounds[old_char] or { old_char, old_char }

@@ -2,7 +2,8 @@ local M = {}
 
 function M.open()
   if vim.fn.executable('yazi') == 0 then
-    vim.notify('Yazi is not installed or not in PATH!', vim.log.levels.ERROR)
+    vim.notify('Yazi is not installed or not in PATH!', vim.log.levels.ERROR,
+      { title = 'Stellar:Yazi' })
     return
   end
 

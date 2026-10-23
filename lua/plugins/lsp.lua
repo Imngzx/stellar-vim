@@ -28,7 +28,8 @@ require('resonance').load({
             if ok and not pkg:is_installed() then
               vim.schedule(function()
                 pkg:install()
-                vim.notify('[Mason] Auto installing ' .. pkg_name, vim.log.levels.INFO)
+                vim.notify('Auto installing ' .. pkg_name, vim.log.levels.INFO,
+                  { title = 'Stellar:Install' })
               end)
             end
           end

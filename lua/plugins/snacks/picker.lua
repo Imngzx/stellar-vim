@@ -194,8 +194,8 @@ return {
                   picker:close()
                   if not fd then
                     vim.notify(
-                      '\n[Explorer] Read-only directory.\nFile opened in memory. Sudo will be required on save.',
-                      vim.log.levels.WARN)
+                      '\nRead-only directory.\nFile opened in memory. Sudo will be required on save.',
+                      vim.log.levels.WARN, { title = 'Snacks Explorer' })
                   end
                 end)
               end

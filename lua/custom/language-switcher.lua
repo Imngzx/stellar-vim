@@ -103,7 +103,8 @@ end
 
 function M.wsl_ime()
   if not IM_SELECT_EXE or executable(IM_SELECT_EXE) ~= 1 then
-    vim.notify('im-select.exe not found in WSL. IME auto-switch disabled.', vim.log.levels.WARN)
+    vim.notify('im-select.exe not found in WSL. IME auto-switch disabled.', vim.log.levels.WARN,
+      { title = 'Language-Switcher' })
     return
   end
 
@@ -151,7 +152,8 @@ if is_windows then
   if ok and user32 and imm32 then
     IME_AVAILABLE = true
   else
-    vim.notify('IME module FFI failed to load: ' .. tostring(err), vim.log.levels.WARN)
+    vim.notify('IME module FFI failed to load: ' .. tostring(err), vim.log.levels.WARN,
+      { title = 'Language-Switcher' })
   end
 end
 

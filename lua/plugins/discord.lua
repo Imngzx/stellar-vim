@@ -92,7 +92,7 @@ require('resonance').load({
       -- HOOKS: Ready notification only
       hooks = {
         ready = function()
-          vim.notify('[[Stellar:Vim]]: presence connected ✨', vim.log.levels.INFO, { title = 'Cord' })
+          vim.notify('Discord presence connected ✨', vim.log.levels.INFO, { title = 'Stellar:Vim' })
         end,
       },
 

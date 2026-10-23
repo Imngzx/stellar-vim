@@ -1,5 +1,6 @@
 local M = {}
 
+local TITLE = 'Stellar:Workspace'
 function M.setup()
   local cwd = vim.uv.cwd()
   if not cwd then return end
@@ -22,8 +23,8 @@ function M.setup()
 
       if not chunk then
         vim.notify(
-          string.format('\n[Workspace] Syntax error in %s:\n%s', local_config, syntax_err),
-          vim.log.levels.ERROR
+          string.format('\nSyntax error in %s:\n%s', local_config, syntax_err),
+          vim.log.levels.ERROR, { title = TITLE }
         )
         return
       end
@@ -31,8 +32,8 @@ function M.setup()
       local ok, exec_err = xpcall(chunk, debug.traceback)
       if not ok then
         vim.notify(
-          string.format('\n[Workspace] Execution error in %s:\n%s', local_config, exec_err),
-          vim.log.levels.ERROR
+          string.format('\nExecution error in %s:\n%s', local_config, exec_err),
+          vim.log.levels.ERROR, { title = TITLE }
         )
       end
     end

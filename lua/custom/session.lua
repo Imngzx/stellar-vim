@@ -23,6 +23,7 @@ local fs_write = uv.fs_write
 local fs_close = uv.fs_close
 local fs_fstat = uv.fs_fstat
 local cwd = uv.cwd
+local TITLE = 'Stellar:Session'
 
 local session_dir = fs.normalize(fn.stdpath('state') .. '/sessions/')
 if not fs_stat(session_dir) then
@@ -172,9 +173,9 @@ function M.load(last)
     end
 
     vim.g.session_loaded = true
-    vim.notify('Session & Workspace Restored', vim.log.levels.INFO)
+    vim.notify('Session & Workspace Restored', vim.log.levels.INFO, { title = TITLE })
   else
-    vim.notify('No Session Found for current branch/dir', vim.log.levels.WARN)
+    vim.notify('No Session Found for current branch/dir', vim.log.levels.WARN, { title = TITLE })
   end
 end
 
@@ -188,7 +189,7 @@ function M.setup()
   nvim_create_user_command('RestoreLastSession', function() M.load(true) end, {})
   nvim_create_user_command('StopSession', function()
     vim.g.session_stopped = true
-    vim.notify('Session saving disabled for this instance', vim.log.levels.WARN)
+    vim.notify('Session saving disabled for this instance', vim.log.levels.WARN, { title = TITLE })
   end, {})
 end
 

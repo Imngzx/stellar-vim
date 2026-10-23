@@ -2,6 +2,7 @@
 if require('libs.utils').is_windows() then
   return
 end
+local SUDO_TITLE = 'Sudo'
 
 local aug = vim.api.nvim_create_augroup('sudo_save_simple', { clear = true })
 
@@ -33,7 +34,7 @@ local function do_sudo_save(buf, path)
 
     -- 取消或未输入
     if not pwd or pwd == '' then
-      vim.notify('\n[Sudo] Canceled.', vim.log.levels.WARN)
+      vim.notify('Canceled.', vim.log.levels.WARN, { title = SUDO_TITLE })
       return
     end
     -- 将密码和数据流合并，供 sudo -S 读取 (完美修复多出空行的 Bug)
@@ -48,9 +49,10 @@ local function do_sudo_save(buf, path)
   if obj.code == 0 then
     vim.bo[buf].modified = false
     vim.cmd('checktime ' .. buf)
-    vim.notify('\n[Sudo] Successfully saved: ' .. path, vim.log.levels.INFO)
+    vim.notify('Successfully saved: ' .. path, vim.log.levels.INFO, { title = SUDO_TITLE })
   else
-    vim.notify('\n[Sudo] Failed to save: ' .. (obj.stderr or ''), vim.log.levels.ERROR)
+    vim.notify('Failed to save: ' .. (obj.stderr or ''), vim.log.levels.ERROR,
+      { title = SUDO_TITLE })
   end
 end
 

@@ -2,6 +2,7 @@ local M = {}
 
 local api = vim.api
 local nvim_buf_get_name = api.nvim_buf_get_name
+local TITLE = 'Stellar:Git'
 
 M.config = {
   stage_action = nil,
@@ -28,20 +29,20 @@ end
 function M.toggle_stage()
   local bufname = nvim_buf_get_name(0)
   if bufname == '' then
-    vim.notify('Current buffer has no associated file', vim.log.levels.ERROR)
+    vim.notify('Current buffer has no associated file', vim.log.levels.ERROR, { title = TITLE })
     return
   end
 
   local git_root = M.config.get_git_root(bufname)
   if not git_root then
-    vim.notify('Not inside a Git repository', vim.log.levels.ERROR)
+    vim.notify('Not inside a Git repository', vim.log.levels.ERROR, { title = TITLE })
     return
   end
 
   local rel_path = vim.fs.relpath(git_root, bufname) or bufname
   local status = get_file_status(git_root, rel_path)
   if not status then
-    vim.notify('File is not tracked by Git', vim.log.levels.ERROR)
+    vim.notify('File is not tracked by Git', vim.log.levels.ERROR, { title = TITLE })
     return
   end
 
@@ -51,7 +52,8 @@ function M.toggle_stage()
     end,
     refresh = function()
       local action = status:sub(2, 2) == ' ' and 'unstaged' or 'staged'
-      vim.notify(string.format('File %s %s', rel_path, action), vim.log.levels.INFO)
+      vim.notify(string.format('File %s %s', rel_path, action), vim.log.levels.INFO,
+        { title = TITLE })
     end,
   }
 

@@ -3,6 +3,7 @@ local uv = vim.uv
 local clipboard = require('custom.md-paste.clipboard')
 
 local M = {}
+local TITLE = 'Stellar:Paste'
 
 local image_exts = {
   png = true,
@@ -111,13 +112,13 @@ function M.save(opts, info)
   local path, link_path = image_path(opts, name)
   local save = info.commands.save
   local command = type(save) == 'function'
-      and save(path)
+    and save(path)
     or save:format(escape_save_path(path))
 
   vim.system(clipboard.shell_command(command), { text = true }, function(result)
     vim.schedule(function()
       if result.code ~= 0 or vim.fn.filereadable(path) == 0 then
-        vim.notify('md-paste: failed to save image', vim.log.levels.ERROR)
+        vim.notify('failed to save image', vim.log.levels.ERROR, { title = TITLE })
         return
       end
 
@@ -149,9 +150,9 @@ function M.drop(opts, raw_path)
 
     if not ok then
       vim.notify(
-        'md-paste: failed to copy image\n'
+        'failed to copy image\n'
         .. tostring(err),
-        vim.log.levels.ERROR
+        vim.log.levels.ERROR, { title = TITLE }
       )
 
       -- The paste event was handled even though copying failed.

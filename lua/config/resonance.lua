@@ -5,7 +5,8 @@ local plugin_url = 'https://github.com/Imngzx/resonance.nvim'
 local pack_path = vim.fn.stdpath('data') .. '/site/pack/core/opt/resonance.nvim'
 
 if not vim.uv.fs_stat(pack_path) then
-  vim.notify('󱑽 Resonating (Downloading resonance.nvim)...', vim.log.levels.INFO)
+  vim.notify('󱑽 Resonating (Downloading resonance.nvim)...', vim.log.levels.INFO,
+    { title = 'Resonance.nvim' })
   vim.system({ 'git', 'clone', '--filter=blob:none', plugin_url, '--branch=main',
     pack_path }):wait()
 end

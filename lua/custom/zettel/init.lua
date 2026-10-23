@@ -116,7 +116,8 @@ function M.init_workspace()
       write_file(path .. '/Cards/Examples/example-usage.md', contents.EXAMPLE_USAGE_CONTENT)
       write_file(path .. '/.meta/user.md', contents.USER_META_CONTENT)
       write_file(path .. '/.meta/agent_rules.md', contents.AGENT_META_CONTENT)
-      vim.notify('[Zettel] Workspace initialized successfully at:\n' .. path, vim.log.levels.INFO)
+      vim.notify('Workspace initialized successfully at:\n' .. path, vim.log.levels.INFO,
+        { title = 'Stellar:Zettel' })
       vim.cmd('edit ' .. fn_fnameescape(path .. '/index.md'))
     end)
   end)
@@ -175,7 +176,8 @@ function M.new_inbox_note()
           local filepath = get_target_filepath(title, subfolder, is_daily)
           if is_daily and fs_stat(filepath) then
             vim.cmd('edit ' .. fn_fnameescape(filepath))
-            vim.notify('󰎚 Daily note already exists. Opened.', vim.log.levels.INFO)
+            vim.notify('󰎚 Daily note already exists. Opened.', vim.log.levels.INFO,
+              { title = 'Stellar:Zettel' })
             return
           end
           local lines = {
@@ -200,7 +202,7 @@ function M.backlinks()
   if not ok then return end
   local current_file = fn.expand('%:t:r')
   if current_file == '' then
-    vim.notify('No file to find backlinks for!', vim.log.levels.WARN)
+    vim.notify('No file to find backlinks for!', vim.log.levels.WARN, { title = 'Stellar:Zettel' })
     return
   end
   local search_pattern = '\\[\\[' .. current_file .. '\\]\\]'
@@ -218,8 +220,8 @@ function M.generate_graph(silent)
   local root = get_workspace_root()
   if fn_executable('rg') == 0 then
     if not silent then
-      vim.notify('[Zettel] "rg" (ripgrep) is required for graph view!',
-        vim.log.levels.ERROR)
+      vim.notify('"rg" (ripgrep) is required for graph view!',
+        vim.log.levels.ERROR, { title = 'Stellar:Zettel' })
     end
     return
   end
@@ -249,8 +251,8 @@ function M.generate_graph(silent)
     schedule(function()
       if obj.code ~= 0 and obj.code ~= 1 then
         if not silent then
-          vim.notify('[Zettel] Graph gen failed: ' .. (obj.stderr or 'error'),
-            vim.log.levels.ERROR)
+          vim.notify('Graph gen failed: ' .. (obj.stderr or 'error'),
+            vim.log.levels.ERROR, { title = 'Stellar:Zettel' })
         end
         return
       end
@@ -308,13 +310,14 @@ function M.generate_graph(silent)
                 '🌌 Zettel Graph generated! (' ..
                 node_cnt ..
                 ' nodes)\n⚡ Auto-update enabled: Hit F5 in browser after saving your notes!',
-                vim.log.levels.INFO)
+                vim.log.levels.INFO, { title = 'Stellar:Zettel' })
             end)
           end)
         else
           if not silent then
             schedule(function()
-              vim.notify('[Zettel] Failed to open graph HTML for writing', vim.log.levels.ERROR)
+              vim.notify('Failed to open graph HTML for writing', vim.log.levels.ERROR,
+                { title = 'Stellar:Zettel' })
             end)
           end
         end

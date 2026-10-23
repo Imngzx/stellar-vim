@@ -115,7 +115,7 @@ map('n', '<leader><tab>N', function()
       if bpm.is_available() then bpm.call('rename_tab', vim.api.nvim_get_current_tabpage(), name) end
     else
       vim.notify('Warn: Workspace name not assigned, opening an anonymous buffer',
-        vim.log.levels.WARN)
+        vim.log.levels.WARN, { title = 'BPM.nvim' })
     end
   end)
 end, { silent = true, desc = 'New Workspace with name' })

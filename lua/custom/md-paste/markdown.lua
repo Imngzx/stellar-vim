@@ -223,9 +223,9 @@ function M.paste_html(html)
   pandoc.html_to_markdown(html, function(markdown, pandoc_err)
     if not markdown then
       vim.notify(
-        'md-paste: pandoc conversion failed\n'
+        'pandoc conversion failed\n'
         .. tostring(pandoc_err),
-        vim.log.levels.ERROR
+        vim.log.levels.ERROR, { title = 'Stellar:Paste' }
       )
 
       return
@@ -233,7 +233,6 @@ function M.paste_html(html)
 
     insert_text(markdown)
   end)
-
 end
 
 return M
