@@ -38,7 +38,8 @@ return {
       local power_mode = is_ac and '[High Performance]' or '[Ascetic Mode]'
       local power_hl = is_ac and 'DiagnosticOk' or 'DiagnosticWarn'
       local version = vim.version()
-      local nvim_ver = string.format('NVIM v%d.%d.%d', version.major, version.minor, version.patch)
+      local nvim_ver = string.format('NVIM v%d.%d.%d.%s', version.major, version.minor, version
+        .patch, version.build)
       return {
         align = 'center',
         text = {
