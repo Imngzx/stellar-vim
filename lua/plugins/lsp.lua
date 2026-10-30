@@ -133,7 +133,6 @@ require('resonance').load({
     version = vim.version.range('1'),
     dependencies = {
       'https://github.com/rafamadriz/friendly-snippets',
-      'https://github.com/huijiro/blink-cmp-supermaven',
     },
     event = { 'InsertEnter', 'CmdlineEnter' },
     setup = function()
@@ -211,7 +210,6 @@ require('resonance').load({
                       path = '[Path]',
                       lazydev = '[LazyDev]',
                       telegram = '[Telegram]',
-                      supermaven = '[Supermaven]',
                     }
                     return menu_labels[ctx.source_name] or ('[' .. ctx.source_name .. ']')
                   end,
@@ -242,12 +240,12 @@ require('resonance').load({
         sources = {
           default = function()
             if vim.bo.filetype == 'lua' then
-              return { 'lazydev', 'lsp', 'supermaven', 'path', 'snippets', 'buffer' }
+              return { 'lazydev', 'lsp', 'path', 'snippets', 'buffer' }
             end
             if vim.bo.filetype == 'telegram' then
-              return { 'telegram', 'lsp', 'supermaven', 'snippets', 'path' }
+              return { 'telegram', 'lsp', 'snippets', 'path' }
             end
-            return { 'lsp', 'supermaven', 'path', 'snippets', 'buffer' }
+            return { 'lsp', 'path', 'snippets', 'buffer' }
           end,
           providers = {
             lazydev = {
@@ -262,11 +260,6 @@ require('resonance').load({
             },
             telegram = {
               module = 'telegram.blink'
-            },
-            supermaven = {
-              name = 'Supermaven',
-              module = 'blink-cmp-supermaven',
-              async = true,
             },
           },
         },

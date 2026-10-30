@@ -8,10 +8,6 @@
       "rev": "98afae6743f61b3d57c2de89c48237e77d3d05ba",
       "src": "https://github.com/XXiaoA/atone.nvim"
     },
-    "blink-cmp-supermaven": {
-      "rev": "635ce12e9e2d2a5a483728ac764d0bc5b57af23b",
-      "src": "https://github.com/huijiro/blink-cmp-supermaven"
-    },
     "blink.cmp": {
       "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
       "src": "https://github.com/Saghen/blink.cmp",
@@ -179,10 +175,6 @@
     "snacks.nvim": {
       "rev": "882c996cf28183f4d63640de0b4c02ec886d01f2",
       "src": "https://github.com/folke/snacks.nvim"
-    },
-    "supermaven-nvim": {
-      "rev": "07d20fce48a5629686aefb0a7cd4b25e33947d50",
-      "src": "https://github.com/supermaven-inc/supermaven-nvim"
     },
     "telegram.nvim": {
       "rev": "b712479436948dd0a426b642220651eb89492810",

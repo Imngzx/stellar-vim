@@ -166,33 +166,4 @@ require('resonance').load({
       }) -- end setup
     end
   },
-  {
-    'https://github.com/supermaven-inc/supermaven-nvim',
-    event = { 'InsertEnter' },
-    config = function()
-      -- Suppress the unconditional nvim-cmp warning notification from supermaven-nvim
-      local orig_notify = vim.notify
-      vim.notify = function(msg, level, opts)
-        if type(msg) == 'string' and msg:match('nvim%-cmp is not available') and opts and opts.title == 'Supermaven' then
-          return
-        end
-        return orig_notify(msg, level, opts)
-      end
-
-      require('supermaven-nvim').setup({
-        keymaps = {
-          accept_suggestion = '<Tab>', -- 核心：按 Tab 键一键采纳整个灰色虚影
-          clear_suggestion = '<C-]>', -- 不想要提示时，按 Ctrl+] 清除
-          accept_word = '<C-j>', -- 逐字/逐词采纳（类似 VS Code 的 Ctrl+右方向键）
-        },
-        ignore_filetypes = {}, -- 空表表示在所有文件中启用
-        color = {
-          suggestion_color = '#7a8491', -- 虚影文本的颜色（推荐使用较暗的灰色 HEX 码）
-        },
-        disable_inline_completion = true, -- blink.cmp handles ghost text
-        disable_keymaps = false,
-        log_level = 'off', -- suppress nvim-cmp not available warning
-      })
-    end
-  },
 })
