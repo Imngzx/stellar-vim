@@ -116,6 +116,7 @@ function M.init_workspace()
       write_file(path .. '/Cards/Examples/example-usage.md', contents.EXAMPLE_USAGE_CONTENT)
       write_file(path .. '/.meta/user.md', contents.USER_META_CONTENT)
       write_file(path .. '/.meta/agent_rules.md', contents.AGENT_META_CONTENT)
+      write_file(path .. '/AGENTS.md', contents.AGENTS_MD)
       vim.notify('Workspace initialized successfully at:\n' .. path, vim.log.levels.INFO,
         { title = 'Stellar:Zettel' })
       vim.cmd('edit ' .. fn_fnameescape(path .. '/index.md'))
