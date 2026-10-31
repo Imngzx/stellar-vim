@@ -145,6 +145,7 @@ So I use fzf-lua instead of snacks during power-saver mode.
 - `gcc`
 - `wl-clipboard` on **Linux**
 - `ripgrep`
+- `inotify-tools`
 - `fd`
 - `yazi`
 - `lazygit`
