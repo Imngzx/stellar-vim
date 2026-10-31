@@ -2,6 +2,9 @@
 --- Unified LSP server + formatter registry
 --- Single source of truth for: LSP configs, formatters, Mason packages
 
+local fn = vim.fn
+local have_exe = fn.executable
+
 local M = {}
 
 --[[
@@ -72,7 +75,7 @@ M.servers = {
   -- [c, c++]
   -- clangd = {
   --   'c-language',
-  --   mason = false,
+  --   mason = have_exe('clangd') == 0,
   --   formatter = {
   --     name = 'clang_format',
   --     mason = false,
@@ -110,7 +113,7 @@ M.servers = {
   -- [zig]
   zls = {
     'zig',
-    mason = true,
+    mason = have_exe('zls') == 0,
     mason_name = 'zls',
     formatter = {
       name = 'zigfmt',
@@ -122,7 +125,8 @@ M.servers = {
   -- [rust]
   rust_analyzer = {
     'rust',
-    mason = false,
+    mason = have_exe('rust-analyzer') == 0,
+    mason_name = 'rust-analyzer',
     formatter = { name = 'rustfmt', mason = false, ft = { 'rust' } },
   },
 
