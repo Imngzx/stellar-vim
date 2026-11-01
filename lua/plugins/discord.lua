@@ -83,10 +83,6 @@ require('resonance').load({
           label = 'View Config',
           url = 'https://github.com/Imngzx/stellar-vim',
         },
-        {
-          label = 'Stellar:Vim',
-          url = 'https://github.com/Imngzx/stellar-vim',
-        },
       },
 
       -- HOOKS: Ready notification only
