@@ -5,6 +5,8 @@ M.AGENTS_MD = [=[
 
 - This note system is managed by `git` and notes will be written by using `Neovim`.
 
+- Please use `fd` and `rg` for finding information from this system
+
 - This is a modified *zettelkasten system*.
 
 - Read `.meta/`.
