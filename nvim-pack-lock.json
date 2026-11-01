@@ -46,6 +46,10 @@
       "rev": "f190de76d2eca0380ddcb2425cd582d740699b55",
       "src": "https://github.com/hat0uma/csvview.nvim"
     },
+    "flash-any.nvim": {
+      "rev": "cf7a6a4f078db01cf092c2615b306e0770740f69",
+      "src": "https://github.com/dirichy/flash-any.nvim"
+    },
     "flash.nvim": {
       "rev": "5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a",
       "src": "https://github.com/folke/flash.nvim"
