@@ -226,6 +226,8 @@ So I use fzf-lua instead of snacks during power-saver mode.
   0      0   0      0   0      0      0      0                              0
 100 24.50M 100 24.50M   0      0 35.22M      0                              0
 
+~/.local/bin
+❯ tar -xvf clice-0.1.2026101607.x86_64-unknown-linux-gnu.tar.gz
 
 # it's gonna be sooo many dialogues later, dun worry
 
