@@ -139,7 +139,7 @@ map('n', '<leader>fy', function() require('custom.yazi').open() end, { desc = 'F
 -- Package update
 map('n', '<leader>pu', function() vim.pack.update() end, { desc = '[Panel] Update plugins' })
 
-map('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+map('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = '[terminal] Exit insert mode' })
 
 map('n', '<leader>ch', function() require('custom.cheatsheet').toggle() end,
   { desc = 'Toggle Cheatsheet' })
