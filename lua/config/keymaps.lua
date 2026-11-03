@@ -9,7 +9,7 @@ vim.g.maplocalleader = ' '
 map('n', '<leader>qq', '<cmd>qa<cr>', { desc = 'Quit all' })
 map('n', '<leader>qr', '<cmd>restart!<cr>', { desc = 'Restart' })
 map('n', '<leader>ww', '<cmd>w<cr>', { desc = 'Save file' })
-map('n', '<leader>wq', '<cmd>wq<cr>', { desc = 'Save and quit' })
+map('n', '<leader>wq', '<cmd>x<cr>', { desc = 'Save and quit' })
 
 -- [View]
 map('n', '<leader>us', '<cmd>setlocal spell! spell?<cr>', { desc = 'Toggle spelling' })
