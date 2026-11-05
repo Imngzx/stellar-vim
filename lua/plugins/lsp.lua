@@ -113,7 +113,15 @@ require('resonance').load({
       require('lazydev').setup({
         library = {
           'nvim-lspconfig',
-          vim.fn.stdpath('data') .. '/site/pack/core/opt/*',
+          'snacks.nvim',
+          'resonance.nvim',
+          'jisho.nvim',
+          'blink.cmp',
+          'heirline.nvim',
+          'conform.nvim',
+          'nvim-dap',
+          'nvim-treesitter',
+          'nvim-treesitter.config',
           vim.fn.stdpath('config') .. '/lua',
           {
             path = yazi_path,
