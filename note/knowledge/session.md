@@ -2,39 +2,51 @@
 
 ## Overview
 
-Manages Neovim session persistence with automatic saving and loading capabilities.
+Manages workspace-local Neovim state and git-branch-aware sessions.
 
-## Core Functions
+## Persistence Layout
 
-- `M.save()`: Saves the current session
-- `M.load()`: Loads a session (with optional `last` parameter)
-- `M.setup()`: Initializes session management with autocmd hook
+State is stored below `<workspace>/.cache/nvim/`:
 
-## Session Management
+| Path | Purpose |
+|---|---|
+| `sessions/` | Session files and bpm.nvim buffer-pool JSON |
+| `undo/` | Persistent undo history |
+| `shada/main.shada` | Marks, registers, and command history |
+| `swap/` | Swap files |
 
-- **Session Directory**: Stored in `state/sessions/` directory
-- **Git Integration**: Automatically detects Git branch for session naming
-- **Automatic Saving**: Hooks into `VimLeavePre` event to save on exit
-
-## Key Commands
-
-- `:SessionSave` – Manually save session
-- `:SessionLoad` – Load saved session
+`bpm.nvim` serializes tab names, per-tab buffer membership, and buffer ordering to an adjacent JSON file. It is restored after the Vim session.
 
 ## Configuration
 
-- Checks for existing session directory, creates if missing
-- Uses `snacks.git` for Git branch detection when available
-- Handles session file naming based on Git branch or default name
-
-## Example Usage
+Set `vim.g.session_persistence` before `User VeryLazy` to override defaults:
 
 ```lua
--- Save current session
-:SessionSave
-
--- Load last session
-:SessionLoad
+vim.g.session_persistence = {
+  dir = '.cache/nvim', -- workspace-relative
+  session = true,
+  undo = true,
+  shada = true,
+  swap = true,
+}
 ```
 
-This module provides robust session management for Neovim, ensuring workspace state persistence across sessions.
+All modes default to `true`. Set an individual mode to `false` to disable it. On Windows, an existing `shadafile=NONE` is preserved.
+
+## Core Functions
+
+- `M.save()`: Saves the current session and bpm.nvim state.
+- `M.load(last)`: Restores the current session; `last=true` chooses the newest workspace session.
+- `M.setup()`: Configures persistence once and registers automatic saving.
+
+## Commands
+
+- `:RestoreSession` – restore the session for the current branch/workspace.
+- `:RestoreLastSession` – restore the newest session in the workspace.
+- `:StopSession` – disable session saving for the current Neovim instance.
+
+## Lifecycle
+
+The module saves on `VimLeavePre`. It skips empty instances until a session has been restored.
+
+`M.save()` and `M.load()` initialize persistence when invoked before `User VeryLazy`, so the dashboard restore action is safe during startup.

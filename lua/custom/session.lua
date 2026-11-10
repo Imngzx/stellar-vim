@@ -25,9 +25,19 @@ local fs_fstat = uv.fs_fstat
 local cwd = uv.cwd
 local TITLE = 'Stellar:Session'
 
-local session_dir = fs.normalize(fn.stdpath('state') .. '/sessions/')
-if not fs_stat(session_dir) then
-  vim.fs.mkdir(session_dir, { parents = true })
+local DEFAULT_PERSISTENCE = {
+  dir = '.cache/nvim',
+  session = true,
+  undo = true,
+  shada = true,
+  swap = true,
+}
+
+local persistence
+local setup_persistence
+
+local function ensure_dir(path)
+  if not fs_stat(path) then vim.fs.mkdir(path, { parents = true }) end
 end
 
 local function get_git_branch(root)
@@ -52,22 +62,25 @@ local function get_git_branch(root)
   return data:sub(1, 7)
 end
 
-local function get_session_name()
-  local ok, snacks_git = pcall(require, 'snacks.git')
+local function get_workspace_root()
   local current_cwd = fs.normalize(cwd() or '')
+  return fs.normalize(fs.root(current_cwd, { '.git' }) or current_cwd)
+end
 
-  local root = (ok and snacks_git.get_root()) or current_cwd
-
+local function get_session_name()
+  local root = persistence.root
   local branch = get_git_branch(root)
-  if branch ~= '' then
-    branch = '@@' .. branch:gsub('[/:]', '%%')
-  end
+  if branch ~= '' then branch = '@@' .. branch:gsub('[/:]', '%%') end
 
   local name = root:gsub('[/:]', '%%') .. branch
-  return fs.joinpath(session_dir, name .. '.vim')
+  return fs.joinpath(persistence.session_dir, name .. '.vim')
 end
 
 function M.save()
+  if not persistence then setup_persistence() end
+
+  if not persistence.session then return end
+
   if vim.g.session_stopped then return end
 
   local has_real_file = false
@@ -109,20 +122,24 @@ function M.save()
 end
 
 function M.load(last)
+  if not persistence then setup_persistence() end
+
+  if not persistence.session then return end
+
   local target_file = get_session_name()
 
   if last then
     local max_time = 0
     local latest_file = nil
 
-    local req = fs_scandir(session_dir)
+    local req = fs_scandir(persistence.session_dir)
     if req then
       while true do
         local name, type = fs_scandir_next(req)
         if not name then break end
 
         if type == 'file' and name:sub(-4) == '.vim' then
-          local path = fs.joinpath(session_dir, name)
+          local path = fs.joinpath(persistence.session_dir, name)
           local stat = fs_stat(path)
           if stat and stat.mtime.sec > max_time then
             max_time = stat.mtime.sec
@@ -149,15 +166,16 @@ function M.load(last)
     vim.cmd('silent! source ' .. fn.fnameescape(target_file))
 
     if bpm.is_available() then
-      local bpm_mod = bpm.get()
-      if stat then
-        local fd = fs_open(json_path, 'r', 438)
+      local bpm_path = target_file:gsub('%.vim$', '.json')
+      local bpm_stat = fs_stat(bpm_path)
+      if bpm_stat then
+        local fd = fs_open(bpm_path, 'r', 438)
         if fd then
-          local data = fs_read(fd, stat.size, 0)
+          local data = fs_read(fd, bpm_stat.size, 0)
           fs_close(fd)
 
           if data and data ~= '' then
-            bpm_mod.from_json(data)
+            bpm.get().from_json(data)
 
             local after_bufs = nvim_list_bufs()
             for i = 1, #after_bufs do
@@ -179,7 +197,51 @@ function M.load(last)
   end
 end
 
+setup_persistence = function()
+  local config = vim.tbl_extend('force', DEFAULT_PERSISTENCE, vim.g.session_persistence or {})
+  local root = get_workspace_root()
+  local base_dir = fs.joinpath(root, config.dir)
+  local session_dir = fs.joinpath(base_dir, 'sessions')
+
+  persistence = {
+    root = root,
+    session = config.session,
+    session_dir = session_dir,
+  }
+
+  if config.session then ensure_dir(session_dir) end
+
+  vim.o.undofile = config.undo
+  if config.undo then
+    local undo_dir = fs.joinpath(base_dir, 'undo')
+    ensure_dir(undo_dir)
+    vim.o.undodir = undo_dir
+  end
+
+  if config.shada and vim.o.shadafile ~= 'NONE' then
+    local shada_dir = fs.joinpath(base_dir, 'shada')
+    ensure_dir(shada_dir)
+    vim.o.shadafile = fs.joinpath(shada_dir, 'main.shada')
+  elseif not config.shada then
+    vim.o.shada = ''
+  end
+
+  vim.o.swapfile = config.swap
+  if config.swap then
+    local swap_dir = fs.joinpath(base_dir, 'swap')
+    ensure_dir(swap_dir)
+    vim.o.directory = swap_dir .. '//'
+  end
+end
+
+local initialized = false
+
 function M.setup()
+  if not persistence then setup_persistence() end
+
+  if initialized then return end
+
+  setup_persistence()
   nvim_create_autocmd('VimLeavePre', {
     group = nvim_create_augroup('Session', { clear = true }),
     callback = M.save,
@@ -191,6 +253,8 @@ function M.setup()
     vim.g.session_stopped = true
     vim.notify('Session saving disabled for this instance', vim.log.levels.WARN, { title = TITLE })
   end, {})
+
+  initialized = true
 end
 
 return M

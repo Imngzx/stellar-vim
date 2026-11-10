@@ -252,13 +252,32 @@ assert_truthy(#lsp_init.enabled_servers > 0, 'No LSP servers enabled')
 pass('LSP servers: ' .. table_concat(lsp_init.enabled_servers, ', '))
 
 -- ============================================================
--- 7. Test session save/load
+-- 7. Test workspace-local persistence
 -- ============================================================
-pass('Testing session save/load...')
+pass('Testing workspace-local persistence...')
 local session = require('custom.session')
+session.load(false) -- Dashboard restore can run before User VeryLazy setup.
+session.setup()
+local session_root = require('snacks').git.get_root() or vim.uv.cwd()
+local persist_root = vim.fs.joinpath(session_root, '.cache', 'nvim')
+local persist_dirs = { 'sessions', 'undo', 'shada', 'swap' }
+for i = 1, #persist_dirs do
+  assert_truthy(
+    vim.uv.fs_stat(vim.fs.joinpath(persist_root, persist_dirs[i])),
+    'Missing persistence directory: ' .. persist_dirs[i]
+  )
+end
+assert_truthy(vim.o.undofile, 'Persistent undo is disabled')
+assert_truthy(vim.o.undodir == vim.fs.joinpath(persist_root, 'undo'), 'Undo is not workspace-local')
+assert_truthy(
+  vim.o.shadafile == vim.fs.joinpath(persist_root, 'shada', 'main.shada'),
+  'ShaDa is not workspace-local'
+)
+assert_truthy(vim.o.directory == vim.fs.joinpath(persist_root, 'swap') .. '//', 'Swap is not workspace-local')
+vim_cmd('edit ' .. vim.fn.fnameescape(vim.fs.joinpath(session_root, 'tests', 'smoke.lua')))
 session.save()
 session.load()
-pass('Session save/load works')
+pass('Workspace-local persistence works')
 
 -- ============================================================
 -- 8. Test workspace picker
