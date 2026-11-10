@@ -11,6 +11,7 @@ local assert = assert
 local string_format = string.format
 local vim_inspect = vim.inspect
 local vim_wait = vim.wait
+local vim_system = vim.system
 local vim_cmd = vim.cmd
 local vim_pack_get = vim.pack.get
 local vim_api_list_rtp = vim.api.nvim_list_runtime_paths
@@ -255,6 +256,22 @@ pass('LSP servers: ' .. table_concat(lsp_init.enabled_servers, ', '))
 -- 7. Test workspace-local persistence
 -- ============================================================
 pass('Testing workspace-local persistence...')
+local config_root = vim.fn.stdpath('config')
+local early_load = vim_system({
+  vim.v.progpath,
+  '-u',
+  'NONE',
+  '--cmd',
+  'set rtp^=' .. vim.fn.fnameescape(config_root),
+  '-c',
+  "lua require('custom.session').load(false)",
+  '-c',
+  'qall',
+}, { text = true }):wait()
+assert_truthy(
+  early_load.code == 0,
+  'Early session load failed: ' .. (early_load.stderr or early_load.stdout or 'unknown error')
+)
 local session = require('custom.session')
 session.load(false) -- Dashboard restore can run before User VeryLazy setup.
 session.setup()
