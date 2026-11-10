@@ -48,7 +48,8 @@
     },
     "flash-any.nvim": {
       "rev": "d96e244a884e441c315954604766b22230f87fb8",
-      "src": "https://github.com/dirichy/flash-any.nvim"
+      "src": "https://github.com/dirichy/flash-any.nvim",
+      "version": "'main'"
     },
     "flash.nvim": {
       "rev": "5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a",
@@ -131,7 +132,7 @@
       "src": "https://github.com/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "993d048db0d83d8e8ba3f9cb376456321acdcce3",
+      "rev": "443d92c6bea761ab54cdde46fb197a2b4d614bdd",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-nio": {

@@ -244,6 +244,7 @@ require('resonance').load({
   {
     'https://github.com/dirichy/flash-any.nvim',
     dependencies = 'https://github.com/folke/flash.nvim',
+    version = 'main',
     keys = {
       { { 'n', 'x', 'o' }, '<CR>', function() require('flash-any').jump() end, { desc = 'Flash-any' } },
       { { 'n', 'x', 'o' }, '<S-CR>', function() require('flash').treesitter() end, { desc = 'Flash treesitter' } },
