@@ -243,7 +243,12 @@ require('resonance').load({
 
   {
     'https://github.com/dirichy/flash-any.nvim',
-    dependencies = 'https://github.com/folke/flash.nvim',
+    dependencies = {
+      'https://github.com/folke/flash.nvim',
+      'https://github.com/dirichy/flash-any-pinyin.nvim',
+      -- 'https://github.com/dirichy/flash-any-nerdfont.nvim',
+    },
+    build = 'make',
     version = 'main',
     keys = {
       { { 'n', 'x', 'o' }, '<CR>', function() require('flash-any').jump() end, { desc = 'Flash-any' } },
@@ -257,14 +262,17 @@ require('resonance').load({
         modes = {
           char = {
             enabled = false,
+            matcher = function(win, state, range)
+              return require('flash-any').char(win, state, range)
+            end,
           }
         }
       })
       require('flash-any').setup({
         sources = {
           'pinyin',
-          'nerdfont',
-          'unicode',
+          -- 'nerdfont',
+          'latin',
         },
       })
     end

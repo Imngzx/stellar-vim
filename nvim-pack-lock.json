@@ -46,8 +46,12 @@
       "rev": "f190de76d2eca0380ddcb2425cd582d740699b55",
       "src": "https://github.com/hat0uma/csvview.nvim"
     },
+    "flash-any-pinyin.nvim": {
+      "rev": "74a399a41cdb4c94f2d40ebd91cb220937935089",
+      "src": "https://github.com/dirichy/flash-any-pinyin.nvim"
+    },
     "flash-any.nvim": {
-      "rev": "d96e244a884e441c315954604766b22230f87fb8",
+      "rev": "1a7046b1f066970f85f86317fb713943563c2723",
       "src": "https://github.com/dirichy/flash-any.nvim",
       "version": "'main'"
     },
