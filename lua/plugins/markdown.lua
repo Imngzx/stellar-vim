@@ -3,6 +3,7 @@ require('resonance').load({
     'https://github.com/MeanderingProgrammer/render-markdown.nvim',
     -- cmd = { 'Tg', 'TgLogout', 'TgSend', 'TgPr' },
     ft = { 'markdown', 'norg', 'rmd', 'org', 'codecompanion', 'telegram' },
+    cond = require('libs.power').is_ac,
     config = function()
       local render_markdown = require('render-markdown')
       render_markdown.setup({
@@ -57,9 +58,6 @@ require('resonance').load({
             end
           end,
         }):map('<leader>um')
-      end
-      if not require('libs.power').is_ac() then
-        require('render-markdown').disable()
       end
       -- mpls markdown preview keymap
       if ok then
