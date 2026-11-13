@@ -6,6 +6,9 @@ local str_sub = string.sub
 local str_byte = string.byte
 local get_line = api.nvim_get_current_line
 local get_cursor = api.nvim_win_get_cursor
+local set_text = api.nvim_buf_set_text
+local schedule = vim.schedule
+local EMPTY_TEXT = { '' }
 local spec = require('custom.autopairs.spec')
 
 local open_pairs = spec.open_pairs
@@ -42,8 +45,15 @@ local function get_context(mode)
   end
   return str_sub(line, col, col), str_sub(line, col + 1, col + 1), line, col
 end
+local function delete_insert_pair(col, width)
+  local row = get_cursor(0)[1] - 1
+  schedule(function()
+    set_text(0, row, col - width, row, col + width, EMPTY_TEXT)
+  end)
+  return ''
+end
 
-local function make_bs_handler(mode)
+local function make_bs_handler(_, mode)
   local triple_quotes = { ['"'] = '"""', ["'"] = "'''", ['`'] = '```' }
 
   return function()
@@ -51,9 +61,15 @@ local function make_bs_handler(mode)
 
     if open_pairs[prev_char] == next_char or (quotes[prev_char] and prev_char == next_char) then
       local t_quote = triple_quotes[prev_char]
-      if t_quote and col >= 3 and str_sub(line, col - 2, col) == t_quote and str_sub(line, col + 1, col + 3) == t_quote then
-        return '<BS><BS><BS><Del><Del><Del>'
+      local is_triple = t_quote
+        and col >= 3
+        and str_sub(line, col - 2, col) == t_quote
+        and str_sub(line, col + 1, col + 3) == t_quote
+
+      if mode == 'i' then
+        return delete_insert_pair(col, is_triple and 3 or 1)
       end
+      if is_triple then return '<BS><BS><BS><Del><Del><Del>' end
       return '<BS><Del>'
     end
 
@@ -61,7 +77,7 @@ local function make_bs_handler(mode)
   end
 end
 
-local function make_cr_handler(mode)
+local function make_cr_handler(_, mode)
   return function()
     local prev_char, next_char = get_context(mode)
     if fn.pumvisible() == 1 then return '<CR>' end

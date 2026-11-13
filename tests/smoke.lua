@@ -273,7 +273,14 @@ for i = 1, #autopairs_maps do
   assert_truthy(maparg(map[2], map[1]) ~= '',
     'Missing autopairs mapping: ' .. map[1] .. ' ' .. map[2])
 end
-pass('Autopairs modules and mappings verified')
+local pairs_callback = maparg('<BS>', 'i', false, true).callback
+assert_truthy(type(pairs_callback) == 'function', 'Missing autopairs backspace callback')
+vim.api.nvim_buf_set_lines(0, 0, -1, false, { '()' })
+vim.api.nvim_win_set_cursor(0, { 1, 1 })
+assert_truthy(pairs_callback() == '', 'Empty-pair backspace did not defer deletion')
+vim_wait(50)
+assert_truthy(vim.api.nvim_get_current_line() == '', 'Empty-pair backspace left a delimiter')
+pass('Autopairs mappings and empty-pair deletion verified')
 
 -- ============================================================
 -- 7. Verify LSP servers registered
