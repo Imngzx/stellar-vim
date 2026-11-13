@@ -27,7 +27,7 @@
       "version": "'main'"
     },
     "codecompanion.nvim": {
-      "rev": "36587a09d7afa65ca9970475b037e6c747afe7a0",
+      "rev": "8ffcc9a78d87732a26243de37ef697f54efe91c2",
       "src": "https://github.com/olimorris/codecompanion.nvim"
     },
     "colorful-menu.nvim": {
@@ -47,11 +47,11 @@
       "src": "https://github.com/hat0uma/csvview.nvim"
     },
     "flash-any-pinyin.nvim": {
-      "rev": "74a399a41cdb4c94f2d40ebd91cb220937935089",
+      "rev": "566e0b55b9eaec689a17b74be5e5610a89658827",
       "src": "https://github.com/dirichy/flash-any-pinyin.nvim"
     },
     "flash-any.nvim": {
-      "rev": "1a7046b1f066970f85f86317fb713943563c2723",
+      "rev": "433b7fe3c197e757492f3015693bbf7096423939",
       "src": "https://github.com/dirichy/flash-any.nvim",
       "version": "'main'"
     },
@@ -64,7 +64,7 @@
       "src": "https://github.com/rafamadriz/friendly-snippets"
     },
     "fzf-lua": {
-      "rev": "22f0bbd3140a8a3b34fec75e5a640513ca6d4ce3",
+      "rev": "ded1c96d3d9d74634287d722431c26690968a4bf",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "heirline.nvim": {
@@ -80,7 +80,7 @@
       "src": "https://github.com/folke/lazydev.nvim"
     },
     "markdown-preview2.nvim": {
-      "rev": "e9e1c7a4f4e646aa01649c4e3021ffde33b7a353",
+      "rev": "a6ae7a27bc1700955668cd7c353c32106e0a4adf",
       "src": "https://github.com/aurora0x27/markdown-preview2.nvim"
     },
     "mason.nvim": {
@@ -100,7 +100,7 @@
       "src": "https://github.com/nvim-mini/mini.icons"
     },
     "neogit": {
-      "rev": "ba2f33b64b996ff5530c4c45a3c432fb63aaa95b",
+      "rev": "aa99b440b266bcf7e03399f149ed46f981555fa3",
       "src": "https://github.com/NeogitOrg/neogit"
     },
     "neominimap.nvim": {
@@ -144,7 +144,7 @@
       "src": "https://github.com/nvim-neotest/nvim-nio"
     },
     "nvim-treesitter": {
-      "rev": "19bdfc04f40ed2ccb3340591d125f759b0406875",
+      "rev": "60c0f468de3e636fa660a419d537e8033aca4e39",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
@@ -169,11 +169,11 @@
       "src": "https://github.com/kevinhwang91/promise-async"
     },
     "render-markdown.nvim": {
-      "rev": "9c235bedc4f96145e63fcad5b78cd78bce8822c4",
+      "rev": "8801162e041e34c64d0d1397cd1f353a14b01950",
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
-      "rev": "1763e38b8d56bf7410901bfd8fd2cb8025e48c9b",
+      "rev": "03b63481920a108966dec4583575675fbddcdba8",
       "src": "https://github.com/Imngzx/resonance.nvim",
       "version": "'main'"
     },
