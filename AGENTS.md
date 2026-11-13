@@ -182,27 +182,41 @@ nvim --headless -u NONE -c "luafile ~/.config/nvim/init.lua" -c "qall"  # must c
 nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua dofile(vim.env.MYVIMRC)" -c "qall"
 ```
 
-### Step 4.5: Run Smoke Test (Mandatory for Config Changes)
+### Step 4.5: Run Configuration Tests (Mandatory for Config Changes)
 
 ```bash
-# Full smoke test - verifies plugins, modules, LSP, session, git, UI
-nvim --headless -c "luafile ~/.config/nvim/tests/smoke.lua" -c "qall"
-# Exit code 0 = all pass, non-zero = failure with details
+# Strict boot test - safe_load/safe_setup failures become fatal
+nvim --headless -u NONE \
+  -c "luafile ~/.config/nvim/tests/strict_boot.lua" \
+  -c "qall"
+# Exit code 0 = strict configuration boot passed
 
-# What the smoke test covers:
-# 1. Core config load (init.lua + custom.startup + config.resonance)
-# 2. resonance.nvim API available
-# 3. VeryLazy trigger fires
-# 4. All 57 plugins verified (rtp for eager, vim.pack.get for lazy)
-# 5. All 32 custom modules load
-# 6. LSP servers registered (18+)
-# 7. Session save/load works
-# 8. Workspace picker works
-# 9. Git integration works
-# 10. Heirline, snacks, bpm.nvim available
-# 11. Transparent toggle, todo, coderunner work
-# 12. Config reload works
+# Full integration smoke test - verifies plugins, modules, LSP, session, git, UI
+nvim --headless \
+  -c "luafile ~/.config/nvim/tests/smoke.lua" \
+  -c "qall"
+# Exit code 0 = all pass, non-zero = failure with details
 ```
+
+The strict boot test loads the configuration from a clean `-u NONE` process,
+sets `NVIM_CONFIG_STRICT=1`, triggers `User VeryLazy`, and verifies the core
+autopairs mappings. In strict mode, `libs.utils.safe_load()` and
+`libs.utils.safe_setup()` re-raise errors instead of only notifying.
+
+The integration smoke test covers:
+
+1. Core config load (`init.lua` + `custom.startup` + `config.resonance`)
+2. `resonance.nvim` API availability
+3. `VeryLazy` trigger and deferred setup
+4. Plugin availability (runtime path for eager, `vim.pack.get()` for lazy)
+5. Custom modules and autopairs mappings
+6. LSP server registration (18+)
+7. Session save/load
+8. Workspace picker
+9. Git integration
+10. Heirline, Snacks, and bpm.nvim
+11. Transparent toggle, todo, and coderunner
+12. Config reload
 
 ### Step 5: Commit
 
@@ -583,4 +597,4 @@ lsp(action="references", file="~/.config/nvim/lua/custom/session.lua", line=69, 
 
 ---
 
-*Generated 2026-10-14. Follows resonance.nvim AI_GUIDELINES.md pattern.*
+*Generated 2026-11-13. Follows resonance.nvim AI_GUIDELINES.md pattern.*

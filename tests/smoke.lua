@@ -57,7 +57,8 @@ pass('resonance.nvim API available')
 -- ============================================================
 pass('Triggering VeryLazy...')
 resonance.trigger_verylazy()
-vim_wait(100) -- allow async loads to complete
+vim.api.nvim_exec_autocmds('User', { pattern = 'VeryLazy' })
+vim_wait(100)
 pass('VeryLazy triggered')
 
 -- ============================================================
@@ -214,9 +215,7 @@ local custom_modules = {
   'custom.incline',
   'custom.lsp-loading',
   'custom.multicursor',
-  'custom.pairs',
-  'custom.surround',
-  'custom.word-jump',
+  'custom.autopairs',
   'custom.cheatsheet',
   'custom.sudo',
   'custom.yazi',
@@ -242,9 +241,42 @@ for i = 1, #custom_modules do
   assert_truthy(mod_obj, 'Module returned nil: ' .. mod)
 end
 pass('All ' .. #custom_modules .. ' custom modules loaded')
+-- ============================================================
+-- 6. Verify autopairs mappings
+-- ============================================================
+pass('Checking autopairs mappings...')
+local autopairs_modules = {
+  'custom.autopairs.spec',
+  'custom.autopairs.pairs',
+  'custom.autopairs.surround',
+  'custom.autopairs.tabout',
+}
+
+for i = 1, #autopairs_modules do
+  local mod = autopairs_modules[i]
+  local ok, mod_obj = pcall(require, mod)
+  assert_truthy(ok, 'Failed to require ' .. mod .. ': ' .. tostring(mod_obj))
+  assert_truthy(mod_obj, 'Module returned nil: ' .. mod)
+end
+
+local maparg = vim.fn.maparg
+local autopairs_maps = {
+  { 'i', '<Tab>' },
+  { 'i', '<S-Tab>' },
+  { 'n', 'sa' },
+  { 'n', 'sd' },
+  { 'n', 'sr' },
+  { 'x', '(' },
+}
+for i = 1, #autopairs_maps do
+  local map = autopairs_maps[i]
+  assert_truthy(maparg(map[2], map[1]) ~= '',
+    'Missing autopairs mapping: ' .. map[1] .. ' ' .. map[2])
+end
+pass('Autopairs modules and mappings verified')
 
 -- ============================================================
--- 6. Verify LSP servers registered
+-- 7. Verify LSP servers registered
 -- ============================================================
 pass('Checking LSP servers...')
 local lsp_init = require('lsp.init')
@@ -252,8 +284,7 @@ lsp_init.setup()
 assert_truthy(#lsp_init.enabled_servers > 0, 'No LSP servers enabled')
 pass('LSP servers: ' .. table_concat(lsp_init.enabled_servers, ', '))
 
--- ============================================================
--- 7. Test workspace-local persistence
+-- 8. Test workspace-local persistence
 -- ============================================================
 pass('Testing workspace-local persistence...')
 local config_root = vim.fn.stdpath('config')

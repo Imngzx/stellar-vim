@@ -83,8 +83,7 @@ vim.api.nvim_create_autocmd('User', {
     safe_load('plugins.treesitter-context')
     safe_load('plugins.colorful-lsp-menu')
     safe_load('plugins.ufo')
-    safe_setup('custom.pairs', require('custom.pairs').setup)
-    safe_setup('custom.surround', require('custom.surround').setup)
+    safe_setup('custom.autopairs', require('custom.autopairs').setup)
     safe_load('custom.word-jump')
 
     -- UI

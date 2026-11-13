@@ -6,10 +6,11 @@ local str_sub = string.sub
 local str_byte = string.byte
 local get_line = api.nvim_get_current_line
 local get_cursor = api.nvim_win_get_cursor
+local spec = require('custom.autopairs.spec')
 
-local open_pairs = { ['('] = ')', ['['] = ']', ['{'] = '}' }
-local close_pairs = { [')'] = true, [']'] = true, ['}'] = true }
-local quotes = { ['"'] = true, ["'"] = true, ['`'] = true }
+local open_pairs = spec.open_pairs
+local close_pairs = spec.close_pairs
+local quotes = spec.quotes
 
 local BYTE_0 = str_byte('0')
 local BYTE_9 = str_byte('9')
@@ -106,18 +107,6 @@ local function make_quote_handler(key, mode)
   end
 end
 
---------------------------------------------------------------------------------
--- Setup
---------------------------------------------------------------------------------
----@class CustomPairsOpts
----@field enable_cmdline? boolean
-
----@type CustomPairsOpts
-M.config = {
-  enable_cmdline = true,
-}
-
----@param opts? CustomPairsOpts
 function M.setup(opts)
   M.config = vim.tbl_deep_extend('force', M.config, opts or {})
   local keymap_opts = { expr = true, replace_keycodes = true }
@@ -136,5 +125,9 @@ function M.setup(opts)
   for key in pairs(close_pairs) do bind(key, make_close_handler) end
   for key in pairs(quotes) do bind(key, make_quote_handler) end
 end
+
+M.config = {
+  enable_cmdline = true,
+}
 
 return M

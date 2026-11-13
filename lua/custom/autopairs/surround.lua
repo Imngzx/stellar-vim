@@ -4,30 +4,11 @@ local api = vim.api
 local fn = vim.fn
 local str_byte = string.byte
 local math_min = math.min
+local spec = require('custom.autopairs.spec')
 
+local surrounds = spec.surrounds
 local ESC_KEY = api.nvim_replace_termcodes('<Esc>', true, false, true)
 local TITLE = 'Stellar:Surround'
-
-local surrounds = {
-  ['('] = { '(', ')' },
-  [')'] = { '(', ')' },
-  ['b'] = { '(', ')' },
-  ['['] = { '[', ']' },
-  [']'] = { '[', ']' },
-  ['{'] = { '{', '}' },
-  ['}'] = { '{', '}' },
-  ['<'] = { '<', '>' },
-  ['>'] = { '<', '>' },
-  ['"'] = { '"', '"' },
-  ["'"] = { "'", "'" },
-  ['`'] = { '`', '`' },
-}
-
-for _, pair in pairs(surrounds) do
-  pair.l_byte = str_byte(pair[1])
-  pair.r_byte = str_byte(pair[2])
-  pair.is_bracket = pair[1] ~= pair[2]
-end
 
 --- Ask user safely
 local function get_char(prompt)
@@ -55,7 +36,7 @@ local function find_surround(char)
     char,
     l_byte = str_byte(char),
     r_byte = str_byte(char),
-    is_bracket = false
+    is_bracket = false,
   }
 
   local l_byte, r_byte = pair.l_byte, pair.r_byte
@@ -176,10 +157,6 @@ function M.replace()
   api.nvim_buf_set_text(0, row, l_pos - 1, row, l_pos - 1 + #old_pair[1], { new_pair[1] })
 end
 
---------------------------------------------------------------------------------
--- Closure Factory (VS Code Visual Auto-Wrap)
---------------------------------------------------------------------------------
-
 local function make_visual_handler(char)
   local pair = surrounds[char]
   local l_char, r_char = pair[1], pair[2]
@@ -187,10 +164,6 @@ local function make_visual_handler(char)
     apply_visual_surround(l_char, r_char)
   end
 end
-
---------------------------------------------------------------------------------
--- Setup
---------------------------------------------------------------------------------
 
 function M.setup()
   vim.keymap.set('n', 'sa', M.add_normal,

@@ -1,10 +1,17 @@
 -- this is for highly repetition codes
 local M = {}
 
+local function handle_error(message)
+  if vim.env.NVIM_CONFIG_STRICT == '1' then
+    error(message, 0)
+  end
+  vim.notify(message, vim.log.levels.ERROR)
+end
+
 M.safe_load = function(mod)
   local ok, err = pcall(require, mod)
   if not ok then
-    vim.notify('[config] Failed to load ' .. mod .. ': ' .. err, vim.log.levels.ERROR)
+    handle_error('[config] Failed to load ' .. mod .. ': ' .. err)
   end
   return ok
 end
@@ -12,7 +19,7 @@ end
 M.safe_setup = function(mod, setup_fn, ...)
   local ok, err = pcall(setup_fn, ...)
   if not ok then
-    vim.notify('[config] Failed to setup ' .. mod .. ': ' .. err, vim.log.levels.ERROR)
+    handle_error('[config] Failed to setup ' .. mod .. ': ' .. err)
   end
   return ok
 end
