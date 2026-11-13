@@ -280,7 +280,17 @@ vim.api.nvim_win_set_cursor(0, { 1, 1 })
 assert_truthy(pairs_callback() == '', 'Empty-pair backspace did not defer deletion')
 vim_wait(50)
 assert_truthy(vim.api.nvim_get_current_line() == '', 'Empty-pair backspace left a delimiter')
-pass('Autopairs mappings and empty-pair deletion verified')
+local tabout = require('custom.autopairs.tabout')
+vim.api.nvim_buf_set_lines(0, 0, -1, false, { '() ' })
+vim.api.nvim_win_set_cursor(0, { 1, 1 })
+local forward_result = tabout.tabout()
+assert_truthy(forward_result == '<Right>', 'Forward tabout did not cross the pair')
+vim.api.nvim_win_set_cursor(0, { 1, 2 })
+assert_truthy(tabout.tabout_back(), 'Backward tabout did not re-enter the pair')
+assert_truthy(vim.api.nvim_win_get_cursor(0)[2] == 1, 'Backward tabout landed before the pair')
+local tabout_map = maparg('<S-Tab>', 'i', false, true)
+assert_truthy(tabout_map.expr == 0, 'Backward tabout must use a non-expression mapping')
+pass('Autopairs mappings, deletion, and tabout verified')
 
 -- ============================================================
 -- 7. Verify LSP servers registered

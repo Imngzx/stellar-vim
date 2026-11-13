@@ -7,6 +7,8 @@ local get_line = api.nvim_get_current_line
 local get_cursor = api.nvim_win_get_cursor
 local set_cursor = api.nvim_win_set_cursor
 local pumvisible = fn.pumvisible
+local replace_termcodes = api.nvim_replace_termcodes
+local feedkeys = api.nvim_feedkeys
 local tabout_pairs = require('custom.autopairs.spec').tabout_pairs
 
 local open_to_close = {}
@@ -85,7 +87,7 @@ local function get_tabout_back_col(line, col)
   if not open_byte then return nil end
 
   local open_pos = find_open(line, col, open_byte, close_byte)
-  if open_pos then return open_pos - 1 end
+  if open_pos then return open_pos end
 end
 
 function M.tabout()
@@ -102,16 +104,26 @@ function M.tabout()
   return ''
 end
 
+local function fallback_shift_tab()
+  feedkeys(replace_termcodes(SHIFT_TAB, true, true, true), 'n', false)
+end
+
 function M.tabout_back()
-  if pumvisible() ~= 0 then return SHIFT_TAB end
+  if pumvisible() ~= 0 then
+    fallback_shift_tab()
+    return false
+  end
 
   local line = get_line()
   local cursor = get_cursor(0)
   local target_col = get_tabout_back_col(line, cursor[2])
-  if not target_col then return SHIFT_TAB end
+  if not target_col then
+    fallback_shift_tab()
+    return false
+  end
 
   set_cursor(0, { cursor[1], target_col })
-  return ''
+  return true
 end
 
 function M.setup()
@@ -123,9 +135,10 @@ function M.setup()
   vim.keymap.set('i', '<Tab>', M.tabout, vim.tbl_extend('force', keymap_opts, {
     desc = 'Tab out of pair',
   }))
-  vim.keymap.set('i', '<S-Tab>', M.tabout_back, vim.tbl_extend('force', keymap_opts, {
+  vim.keymap.set('i', '<S-Tab>', M.tabout_back, {
+    silent = true,
     desc = 'Tab backwards out of pair',
-  }))
+  })
 end
 
 return M
