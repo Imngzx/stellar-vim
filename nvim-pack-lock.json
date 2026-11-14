@@ -72,7 +72,7 @@
       "src": "https://github.com/rebelot/heirline.nvim"
     },
     "jisho.nvim": {
-      "rev": "461222564d154c5e3fe45d3f19403934b4b81f44",
+      "rev": "d4bcb6b71ca9e9454e7dbe48b6006b8d15e1d45f",
       "src": "https://github.com/Imngzx/jisho.nvim"
     },
     "lazydev.nvim": {
@@ -88,15 +88,15 @@
       "src": "https://github.com/mason-org/mason.nvim"
     },
     "mini.diff": {
-      "rev": "2890bd1edc42b57af769774e53c2bfbbe3f45d4d",
+      "rev": "91d6ce4b7f400439fe761f01a58280f2c0f99c01",
       "src": "https://github.com/nvim-mini/mini.diff"
     },
     "mini.hipatterns": {
-      "rev": "b435ff459774b7ec234f1ae2834062f5829e75fa",
+      "rev": "7a79e5f000beb530ade0fa9faec70f01469dbcb3",
       "src": "https://github.com/nvim-mini/mini.hipatterns"
     },
     "mini.icons": {
-      "rev": "eab3e692d796d78ea6ffc978d8a380ff26fcf4e3",
+      "rev": "fc90b3925a2a68282be06e28cfe0cbb366c75dad",
       "src": "https://github.com/nvim-mini/mini.icons"
     },
     "neogit": {
@@ -173,7 +173,7 @@
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
-      "rev": "03b63481920a108966dec4583575675fbddcdba8",
+      "rev": "7d234cc9f0a4bbbd3f5d3bd22459a3cbce6d702e",
       "src": "https://github.com/Imngzx/resonance.nvim",
       "version": "'main'"
     },
