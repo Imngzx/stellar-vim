@@ -1,7 +1,7 @@
 require('resonance').load({
   'https://github.com/vyfor/cord.nvim',
 
-  cond = require('libs.power').is_ac(),
+  cond = require('libs.power').is_ac,
   lazy = true,
 
   config = function()

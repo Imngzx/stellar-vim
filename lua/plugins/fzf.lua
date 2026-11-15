@@ -1,9 +1,8 @@
-local is_ac = require('libs.power').is_ac()
-
-local fzf_keys = {}
-
-if not is_ac then
-  fzf_keys = {
+require('resonance').load({
+  'https://github.com/ibhagwan/fzf-lua',
+  cond = function() return not require('libs.power').is_ac() end,
+  cmd = 'FzfLua',
+  keys = {
     { 'n', '<leader><leader>', function() require('fzf-lua').files() end, { desc = 'Smart find' } },
     { 'n', '<leader>/', function() require('fzf-lua').live_grep() end, { desc = 'Grep' } },
     { 'n', '<leader>fc', function() require('fzf-lua').files({ cwd = vim.fn.stdpath('config') }) end, { desc = 'Find Neovim Config' } },
@@ -39,13 +38,7 @@ if not is_ac then
     { 'n', 'gr', function() require('fzf-lua').lsp_references() end, { nowait = true, desc = 'References' } },
     { 'n', 'gI', function() require('fzf-lua').lsp_implementations() end, { desc = 'Goto implementation' } },
     { 'n', 'gy', function() require('fzf-lua').lsp_typedefs() end, { desc = 'Goto type definition' } },
-  }
-end
-
-require('resonance').load({
-  'https://github.com/ibhagwan/fzf-lua',
-  cmd = 'FzfLua',
-  keys = fzf_keys,
+  },
   config = function()
     require('fzf-lua').setup({
       'default',

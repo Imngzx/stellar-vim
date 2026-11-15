@@ -135,8 +135,9 @@ function M.picker()
     -- 🔋 电池: Fzf-lua (性能拉满)
     -- ==========================================
     local ok_loader, loader = pcall(require, 'resonance.loader')
-    if ok_loader and loader.specs['fzf-lua'] then
-      loader.specs['fzf-lua']._force_load()
+    local load_fzf = ok_loader and loader.force_load_fns['fzf-lua']
+    if load_fzf then
+      load_fzf()
     else
       vim.cmd('packadd fzf-lua')
     end
