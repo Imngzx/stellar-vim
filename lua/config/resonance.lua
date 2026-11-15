@@ -1,7 +1,7 @@
 -- =====================================================================
 -- 🎵 Install Resonance.nvim
 -- =====================================================================
-vim.pack.add({'https://github.com/Imngzx/resonance.nvim'})
+vim.pack.add({ 'https://github.com/Imngzx/resonance.nvim' })
 
 -- =====================================================================
 -- 🚀 Configuration
