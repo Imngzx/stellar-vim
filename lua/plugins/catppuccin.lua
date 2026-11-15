@@ -6,9 +6,7 @@ require('resonance').load({
     name = 'catppuccin',
     version = 'main',
   },
-
-  event = { 'User', pattern = 'ForceLoadCatppuccin' },
-
+  lazy = false,
   setup = function()
     require('catppuccin').setup({
       compile_path = vim.fn.stdpath('cache') .. path_sep .. 'catppuccin',
@@ -71,5 +69,3 @@ require('resonance').load({
     vim.cmd.colorscheme('catppuccin')
   end
 })
-
-vim.api.nvim_exec_autocmds('User', { pattern = 'ForceLoadCatppuccin' })
