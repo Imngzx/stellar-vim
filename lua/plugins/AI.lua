@@ -2,7 +2,10 @@ require('resonance').load({
   {
     'https://github.com/olimorris/codecompanion.nvim',
 
-    dependencies = 'https://github.com/nvim-lua/plenary.nvim',
+    dependencies = {
+      'https://github.com/nvim-lua/plenary.nvim',
+      'https://github.com/nvim-treesitter/nvim-treesitter',
+    },
 
     cmd = { 'CodeCompanion', 'CodeCompanionChat', 'CodeCompanionCmd', 'CodeCompanionActions' },
 
@@ -16,13 +19,9 @@ require('resonance').load({
     config = function()
       require('codecompanion').setup({
 
-        -- ──────────────────────────────────────────────────────────────
-        --  interactions（原 strategies，v19 起已改名）
-        --  在 Chat buffer 内按 `ga` 可以随时切换 adapter 和 model
-        -- ──────────────────────────────────────────────────────────────
         interactions = {
           chat = {
-            adapter = 'gemini', -- 默认 HTTP adapter
+            adapter = 'gemini',
             opts = {
               system_prompt = function(ctx)
                 local maid_persona = [[
@@ -46,13 +45,8 @@ require('resonance').load({
 
         adapters = {
 
-          -- ════════════════════════════════════════════════════════════
-          --  HTTP ADAPTERS（直接 API 调用，无需额外 CLI 工具）
-          -- ════════════════════════════════════════════════════════════
           http = {
 
-            -- ── Gemini（保留原有，修正模型名） ────────────────────────
-            -- 环境变量：export GEMINI_API_KEY=xxx
             gemini = function()
               return require('codecompanion.adapters').extend('gemini', {
                 env = {
@@ -60,23 +54,21 @@ require('resonance').load({
                 },
                 schema = {
                   model = {
-                    default = 'gemini-2.5-flash',
+                    default = 'gemini-3.5-flash',
                     choices = {
-                      'gemini-2.5-pro-preview-03-25',
+                      'gemini-3.1-pro-preview',
+                      'gemini-3.5-flash',
+                      'gemini-3.1-flash-lite-preview',
+                      'gemini-3-flash-preview',
+                      'gemini-2.5-pro',
                       'gemini-2.5-flash',
-                      'gemini-2.0-flash',
-                      'gemini-2.0-pro-exp-02-05',
-                      'gemini-1.5-pro',
-                      'gemini-1.5-flash',
+                      'gemini-2.5-flash-lite',
                     },
                   },
                 },
               })
             end,
 
-            -- ── Anthropic Claude（HTTP 直连，最稳定方式） ─────────────
-            -- 环境变量：export ANTHROPIC_API_KEY=sk-ant-xxx
-            -- 支持 prompt caching，适合长上下文任务
             anthropic = function()
               return require('codecompanion.adapters').extend('anthropic', {
                 env = {
@@ -84,7 +76,7 @@ require('resonance').load({
                 },
                 schema = {
                   model = {
-                    default = 'claude-sonnet-4-6',
+                    default = 'claude-sonnet-5',
                     choices = {
                       'claude-opus-4-6',
                       'claude-sonnet-4-6',
@@ -98,50 +90,27 @@ require('resonance').load({
               })
             end,
 
-          }, -- end adapters.http
+          },
 
-          -- ════════════════════════════════════════════════════════════
-          --  ACP ADAPTERS（Agent Client Protocol，需要本地 CLI 工具）
-          --  ACP adapter 只支持 chat interaction，不支持 inline/cmd
-          -- ════════════════════════════════════════════════════════════
           acp = {
 
-            -- ── Claude Code（ACP）────────────────────────────────────
-            -- 前置条件：
-            --   1. npm install -g @anthropic-ai/claude-code
-            --   2. npm install -g @zed-industries/claude-agent-acp  ← ACP bridge
-            --   3a. 用 API key：export ANTHROPIC_API_KEY=sk-ant-xxx
-            --   3b. 用 Claude Pro 订阅：claude setup-token
-            --
-            -- 与 HTTP anthropic 的区别：
-            --   - claude_code 走本地 CLI，有 agentic 能力（文件读写、shell 等）
-            --   - anthropic   走 REST API，是普通 chat，无 agentic 工具调用
             claude_code = function()
               return require('codecompanion.adapters').extend('claude_code', {
                 env = {
-                  -- 二选一：API key 或 OAuth token（Claude Pro 订阅）
-                  ANTHROPIC_API_KEY = 'ANTHROPIC_API_KEY',
-                  -- CLAUDE_CODE_OAUTH_TOKEN = 'CLAUDE_CODE_OAUTH_TOKEN',
+                  CLAUDE_CODE_OAUTH_TOKEN = 'CLAUDE_CODE_OAUTH_TOKEN',
                 },
                 defaults = {
-                  ---@param self CodeCompanion.ACPAdapter
-                  ---@return string
-                  model = function(self) return 'sonnet' end,
-                  -- 可选值: 'sonnet' | 'opus' | 'haiku'
+                  session_config_options = {
+                    model = function(self) return 'sonnet' end,
+                  },
                 },
               })
             end,
 
-            -- ── Codex（ACP）──────────────────────────────────────────
-            -- 前置条件：
-            --   1. npm install -g @openai/codex
-            --   2. npm install -g @zed-industries/codex-acp  ← ACP bridge
-            --   3. export OPENAI_API_KEY=sk-xxx
-            --      或者用 ChatGPT 订阅（auth_method = 'chatgpt'）
             codex = function()
               return require('codecompanion.adapters').extend('codex', {
                 defaults = {
-                  auth_method = 'openai-api-key', -- 'openai-api-key'|'codex-api-key'|'chatgpt'
+                  auth_method = 'api-key',
                 },
                 env = {
                   OPENAI_API_KEY = 'OPENAI_API_KEY',
@@ -149,9 +118,9 @@ require('resonance').load({
               })
             end,
 
-          }, -- end adapters.acp
+          },
 
-        }, -- end adapters
+        },
 
         display = {
           action_palette = {
@@ -159,11 +128,10 @@ require('resonance').load({
           },
           chat = {
             window = { width = 0.4 },
-            show_header_separator = false,
           },
         },
 
-      }) -- end setup
+      })
     end
   },
 })
