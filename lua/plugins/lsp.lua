@@ -50,7 +50,7 @@ require('resonance').load({
 
   {
     'https://github.com/stevearc/conform.nvim',
-    event = { 'BufReadPost', 'BufNewFile' },
+    event = { 'BufWritePost' },
     keys = {
       { 'n', '<leader>cf', function()
         require('conform').format({ async = true, lsp_format = 'fallback' })
