@@ -55,7 +55,6 @@ vim.api.nvim_create_autocmd('User', {
   pattern = 'VeryLazy',
   callback = function()
     -- restore session
-    safe_setup('custom.session', require('custom.session').setup)
     safe_setup('custom.workspace', require('custom.workspace').setup)
     safe_load('plugins.fzf')
 
@@ -101,11 +100,15 @@ vim.api.nvim_create_autocmd('User', {
 
 
     -- [git]
-    require('custom.git').setup({
+    safe_setup('custom.git', function(opts)
+      require('custom.git').setup(opts)
+    end, {
       stage_action = Snacks.picker.actions.git_stage,
       get_git_root = Snacks.git.get_root
     })
-    require('custom.git-blame').setup({
+    safe_setup('custom.git-blame', function(opts)
+      require('custom.git-blame').setup(opts)
+    end, {
       enabled = true,
       message_template = '  󰈔 <summary>,  <author> (<date>)',
       date_format = '%r',

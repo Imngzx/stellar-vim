@@ -39,10 +39,10 @@ require('resonance').load({
 
       local vim_key = vim.keymap.set
       vim_key('n', 'n',
-        [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]],
+        [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>normal! zv<CR><Cmd>lua require('hlslens').start()<CR>]],
         kopts)
       vim_key('n', 'N',
-        [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]],
+        [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>normal! zv<CR><Cmd>lua require('hlslens').start()<CR>]],
         kopts)
       vim_key('n', '*', [[*<Cmd>lua require('hlslens').start()<CR>]], kopts)
       vim_key('n', '#', [[#<Cmd>lua require('hlslens').start()<CR>]], kopts)

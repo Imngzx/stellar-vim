@@ -241,7 +241,6 @@ function M.setup()
 
   if initialized then return end
 
-  setup_persistence()
   nvim_create_autocmd('VimLeavePre', {
     group = nvim_create_augroup('Session', { clear = true }),
     callback = M.save,

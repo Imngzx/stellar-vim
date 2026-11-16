@@ -83,7 +83,7 @@ require('resonance').load({
       -- Use centralized linter config from registry
       lint.linters_by_ft = lsp_manager.get_lint_config()
 
-      vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
+      vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost' }, {
         group = vim.api.nvim_create_augroup('DIY_Linting', { clear = true }),
         callback = function()
           vim.schedule(function()
@@ -104,8 +104,8 @@ require('resonance').load({
       -- Yazi
       local homedir = vim.uv.os_homedir()
       local yazi_path = utils.is_windows()
-        and (homedir .. '~/AppData/Roaming/yazi/config/plugins/types.yazi')
-        or (homedir .. '~/.config/yazi/plugins/types.yazi')
+        and vim.fs.joinpath(homedir, 'AppData', 'Roaming', 'yazi', 'plugins', 'types.yazi')
+        or vim.fs.joinpath(homedir, '.config', 'yazi', 'plugins', 'types.yazi')
 
       -- Hypr
       local hyprland_stubs = '/usr/share/hypr/stubs'

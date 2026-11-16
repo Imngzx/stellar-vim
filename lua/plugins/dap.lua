@@ -14,7 +14,7 @@ require('resonance').load({
 
     -- 🐍 DAP Python
     { 'n', '<localleader>dT', function() require('dap-python').test_method() end, { desc = 'Debug Method (Python)' } },
-    { 'n', '<localleader>dC', function() require('dap-python').test_class() end, { desc = 'Debug Class (Python)' } },
+    { 'n', '<leader>dTC', function() require('dap-python').test_class() end, { desc = 'Debug Class (Python)' } },
 
     -- ⚙️ DAP Core
     { 'n', '<leader>dB', function()

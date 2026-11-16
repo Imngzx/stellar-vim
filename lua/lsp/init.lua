@@ -244,10 +244,9 @@ function M.lsp_config()
       local client = vim_lsp.get_client_by_id(args.data.client_id)
 
       if client and client:supports_method('textDocument/inlayHint') then
-        vim.lsp.inlay_hint.enable(
-          not vim_lsp.inlay_hint.is_enabled({ bufnr = args.buf }),
-          { bufnr = args.buf }
-        )
+        if not vim_lsp.inlay_hint.is_enabled({ bufnr = args.buf }) then
+          vim_lsp.inlay_hint.enable(true, { bufnr = args.buf })
+        end
       end
 
       local map = function(mode, lhs, rhs, desc)
@@ -258,7 +257,7 @@ function M.lsp_config()
       map('n', 'gr', vim_lsp_buf.references, 'Goto References')
       map('n', 'gI', vim_lsp_buf.implementation, 'Goto Implementation')
       map('n', '<leader>D', vim_lsp_buf.type_definition, 'Type Definition')
-      map('n', '<leader>ds', vim_lsp_buf.document_symbol, 'Document Symbols')
+      map('n', '<leader>dS', vim_lsp_buf.document_symbol, 'Document Symbols')
       map('n', '<leader>cS', vim_lsp_buf.workspace_symbol, 'Workspace Symbols')
       map('n', '<leader>cr', vim_lsp_buf.rename, 'Rename symbol')
       map({ 'n', 'x' }, '<leader>ca', vim_lsp_buf.code_action, 'Code Action')

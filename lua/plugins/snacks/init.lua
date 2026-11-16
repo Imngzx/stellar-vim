@@ -118,8 +118,6 @@ require('resonance').load({
     end
 
     local Toggle = Snacks.toggle
-    Toggle.option('spell', { name = 'Spelling' }):map('<leader>us')
-    Toggle.option('wrap', { name = 'Wrap' }):map('<leader>uw')
     Toggle.option('relativenumber', { name = 'Relative Number' }):map('<leader>uL')
     Toggle.diagnostics():map('<leader>ud')
     Toggle.line_number():map('<leader>ul')

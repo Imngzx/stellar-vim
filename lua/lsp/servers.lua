@@ -187,12 +187,6 @@ M.servers = {
     mason = 'prettier',
     name = 'prettier',
   },
-  prettierd = {
-    formatter_only = true,
-    ft = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'html', 'css' },
-    mason = 'prettierd',
-    name = 'prettierd',
-  },
   shfmt = { formatter_only = true, ft = { 'sh', 'bash' }, mason = 'shfmt', name = 'shfmt' },
   jq = { formatter_only = true, ft = { 'json' }, mason = 'jq', name = 'jq' },
   goimports = { formatter_only = true, ft = { 'go' }, mason = 'goimports', name = 'goimports' },

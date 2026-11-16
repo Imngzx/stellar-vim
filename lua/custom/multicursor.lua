@@ -129,7 +129,7 @@ local function setup_keymaps()
 
   map('n', ']c', function() jump_next_cursor(false) end,
     { desc = 'Multicursor: jump to next cursor' })
-  map('n', '[c', function() jump_prev_cursor(false) end,
+  map('n', '[p', function() jump_prev_cursor(false) end,
     { desc = 'Multicursor: jump to prev cursor' })
   map('n', ']C', function() jump_next_cursor(true) end,
     { desc = 'Multicursor: jump to next cursor & remove' })

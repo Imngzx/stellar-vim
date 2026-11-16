@@ -4,6 +4,7 @@ local win_cache = {}
 local api = vim.api
 local fn = vim.fn
 local nvim_win_is_valid = api.nvim_win_is_valid
+local nvim_win_close = api.nvim_win_close
 local nvim_win_get_buf = api.nvim_win_get_buf
 local nvim_win_get_config = api.nvim_win_get_config
 local nvim_buf_is_valid = api.nvim_buf_is_valid

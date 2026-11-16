@@ -367,9 +367,9 @@ function M.build_run_command()
   local fileNameWithoutExt = fileName:match('(.+)%..+') or fileName
 
   local cmd = type(cmd_template) == 'table' and table_concat(cmd_template, ' ') or cmd_template
-  cmd = cmd:gsub('%$dir', dir)
-  cmd = cmd:gsub('%$fileNameWithoutExt', fileNameWithoutExt)
-  cmd = cmd:gsub('%$fileName', fileName)
+  cmd = cmd:gsub('%$dir', function() return shellescape(dir) end)
+  cmd = cmd:gsub('%$fileNameWithoutExt', function() return shellescape(fileNameWithoutExt) end)
+  cmd = cmd:gsub('%$fileName', function() return shellescape(fileName) end)
 
   return cmd
 end
