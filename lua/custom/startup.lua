@@ -1,3 +1,4 @@
+_G.start_time = vim.uv.hrtime()
 _G.I = require('libs.icons')
 
 local vim_g = vim.g
