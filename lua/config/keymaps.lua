@@ -11,10 +11,6 @@ map('n', '<leader>qr', '<cmd>restart!<cr>', { desc = 'Restart' })
 map('n', '<leader>ww', '<cmd>w<cr>', { desc = 'Save file' })
 map('n', '<leader>wq', '<cmd>x<cr>', { desc = 'Save and quit' })
 
--- [View]
-map('n', '<leader>us', '<cmd>setlocal spell! spell?<cr>', { desc = 'Toggle spelling' })
-map('n', '<leader>uw', '<cmd>setlocal wrap! wrap?<cr>', { desc = 'Toggle wrap' })
-
 -- [Edit]
 -- Indent
 map({ 'n', 'v' }, 'j', 'gj')

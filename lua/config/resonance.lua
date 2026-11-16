@@ -36,7 +36,7 @@ local safe_setup = utils.safe_setup
 safe_load('plugins.catppuccin')
 
 -- load core ui elements at the same time
-local Snacks = require('plugins.snacks')
+safe_load('plugins.snacks')
 safe_load('plugins.cmdline')
 safe_load('plugins.ui')
 
@@ -103,8 +103,8 @@ vim.api.nvim_create_autocmd('User', {
     safe_setup('custom.git', function(opts)
       require('custom.git').setup(opts)
     end, {
-      stage_action = Snacks.picker.actions.git_stage,
-      get_git_root = Snacks.git.get_root
+      stage_action = function(picker) require('snacks').picker.actions.git_stage(picker) end,
+      get_git_root = function(filepath) return require('snacks').git.get_root(filepath) end
     })
     safe_setup('custom.git-blame', function(opts)
       require('custom.git-blame').setup(opts)
@@ -114,7 +114,7 @@ vim.api.nvim_create_autocmd('User', {
       date_format = '%r',
       delay = 1000,
       max_summary_length = 30,
-      get_git_root = Snacks.git.get_root
+      get_git_root = function(filepath) return require('snacks').git.get_root(filepath) end
     })
 
     safe_load('plugins.telegram')
