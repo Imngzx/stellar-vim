@@ -1,600 +1,136 @@
 # Neovim Configuration — AI Development Guidelines
 
-> **Purpose**: Step-by-step reference for AI assistants working on this Neovim configuration.
-> **Audience**: Any AI agent editing `~/.config/nvim/`.
-> **Last Updated**: 2026-10-14
+> **Purpose:** the hard rules for editing this config. Read it, then read
+> the source — the source wins.
+> **Target:** Neovim **0.13+** (`vim.pack` + `vim.async`), plugins lazy-loaded
+> by [resonance.nvim](https://github.com/Imngzx/resonance.nvim).
 
 ---
 
-## 1. Repository Overview
+## 1. Project structure
 
-| Aspect | Detail |
-|--------|--------|
-| **Type** | Personal Neovim configuration (modular, lazy-loaded via resonance.nvim) |
-| **Entry Point** | `init.lua` → `require('custom.startup')` → `require('config.resonance')` |
-| **Core Modules** | `lua/custom/` (24 modules), `lua/plugins/` (30+ plugin configs), `lua/config/` (7 configs), `lua/libs/` (5 utilities) |
-| **Plugin Manager** | `resonance.nvim` (lazy-loader wrapper around `vim.pack`, Neovim 0.13+) |
-| **Config Style** | Lazy specs with triggers: `event`, `cmd`, `keys`, `ft`, `User VeryLazy` |
-| **Knowledge Base** | `note/knowledge/` — auto-generated module documentation |
+| Path | Role |
+|---|---|
+| `init.lua` | `custom.startup` → `config` → `config.resonance`, in that order |
+| `lua/custom/startup.lua` | `vim.loader.enable()`, disabled built-ins, `libs.power` picker switch, session setup |
+| `lua/config/` | Options, keymaps, autocmds; `resonance.lua` bootstraps resonance and loads every plugin config |
+| `lua/plugins/` | One resonance spec per file (`heirline/`, `snacks/` are directories) |
+| `lua/custom/` | Self-written feature modules (session, workspace, coderunner, repl, …) |
+| `lua/libs/` | Shared helpers: `utils` (safe_load/safe_setup, OS checks), `power`, `bpm`, `git`, `icons`, `spell` |
+| `lua/lsp/servers.lua` | **Single registry** for LSP servers, formatters, linters, Mason tools. Spec format is documented in its header comment. |
+| `lua/lsp/servers/*.lua` | Per-server config modules referenced from the registry |
+| `note/knowledge/` | Per-module docs — update the matching file when you change a module |
+| `tests/` | `strict_boot.lua`, `smoke.lua` |
+
+Installed plugins (read their README/doc before configuring — the source
+wins over memory):
+
+```text
+~/.local/share/nvim/site/pack/core/opt/<plugin>/
+```
+
+resonance.nvim's own copy lives there too and is auto-managed; edit it
+only in its own repo.
+
+**Tools:** `rg` and `fd` over `grep`/`find`; `nvim --headless` for testing;
+`lua-language-server --check=FILE` for diagnostics.
 
 ---
 
-## 2. Available Tools on This Machine
+## 2. Red lines — violating these causes bugs
 
-| Tool | Path | Purpose |
-|------|------|---------|
-| `nvim` | System `nvim` (0.13+) | Headless testing: `nvim --headless -c "..." -c "qall"` |
-| `lua` | Embedded in `nvim` | All Lua execution via `nvim --headless -c "lua ..."` |
-| `rg` (ripgrep) | System `rg` | Fast code search |
-| `git` | System `git` | Version control, `git show HEAD:<file>` for original versions |
-| `bash` / `fish` | Standard | Shell commands, pipelines |
-| `python3` | System `python3` | `scripts.py` utility runner |
-| `fzf` | System `fzf` | Fuzzy finder (used in picker configs) |
-| `fd` | System `fd` | Fast file finder (used in picker configs) |
-| `lua-language-server` | Mason (`~/.local/share/nvim/mason/bin/lua-language-server`) | LSP diagnostics: `lua-language-server --check=FILE` |
+1. **Load configs through `libs.utils.safe_load` / `safe_setup`,** never a
+   bare `require` in `config/resonance.lua`. One failing plugin must not
+   take down the rest of startup; `NVIM_CONFIG_STRICT=1` turns these into
+   hard errors for the tests.
+2. **Theme first.** `plugins.catppuccin` loads before any UI plugin, or
+   the UI flickers.
+3. **Non-core plugin configs are required inside the `User VeryLazy`
+   autocmd** in `config/resonance.lua`. Requiring them at top level makes
+   LuaJIT parse every config file at startup.
+4. **`resonance.trigger_verylazy()` stays the last line** of
+   `config/resonance.lua`. The buffer-replay autocmd above it must stay a
+   *separate*, *synchronous* VeryLazy callback — see the comment there.
+5. **Every plugin spec needs a lazy trigger** (`event`, `cmd`, `keys`,
+   `ft`) unless it is genuinely core UI.
+6. **Never write state into an unwritable or arbitrary cwd.** Paths derived
+   from the workspace root (e.g. `custom/session.lua`) must fall back to
+   `stdpath('state')` — nvim is launched from `/etc` and the like.
+7. **Read the plugin's docs before setting options it manages** (e.g.
+   nvim-ufo owns folding: do not set `foldmethod`/`foldexpr`).
 
-### Benchmark Command Template
+---
+
+## 3. Code style — match the surrounding code
+
+- Module shape: `local M = {}` … `return M`, with `M.setup()` for init.
+- **Localize what the module uses, at the top** (`local api = vim.api`,
+  `local nvim_buf_get_name = api.nvim_buf_get_name`, `local uv_fs_stat =
+  vim.uv.fs_stat`). No unused aliases.
+- Lazy-require heavy deps: `package.loaded['snacks'] or require('snacks')`.
+- **Arrays → numeric `for i = 1, #t`. Dictionaries → `pairs()`.**
+- **AoS by default; SoA only for large numeric hot loops** (jump labels,
+  highlight/match coordinates). LuaJIT stores numbers inline in array
+  slots, so numeric SoA is contiguous and JIT-friendly; for small lists
+  AoS is clearer and sorts in place. In SoA, never store `nil` — a hole
+  makes `#t` undefined — keep an explicit count `n` or use `false`.
+- `vim.uv` sync calls / `vim.system` over `vim.fn` in hot paths; no
+  allocations or `pcall` per iteration in hot loops.
+- OS checks via `libs.utils` (`is_penguin()`, `is_mac()`, `is_windows()`),
+  not inline `jit.os`.
+- Early returns, flat conditionals, comments only for *why*.
+
+---
+
+## 4. Development loop
+
+### Test (mandatory for config changes)
 
 ```bash
-# Startup benchmark (10 runs, 3 warmup, no user config)
-nvim --headless -u NONE -c "luafile ~/.config/nvim/init.lua" -c "qall"  # baseline
+# Strict boot: clean -u NONE process, safe_load/safe_setup errors are fatal
+nvim --headless -u NONE -c "luafile ~/.config/nvim/tests/strict_boot.lua" -c "qall"
 
-# With resonance
-nvim --headless -u NONE -c "luafile ~/.config/nvim/init.lua" -c "lua require('custom.startup')" -c "qall"
+# Integration smoke: plugins, modules, LSP registry, session, git, UI, reload
+nvim --headless -c "luafile ~/.config/nvim/tests/smoke.lua" -c "qall"
+```
 
-# Direct module timing
+Exit code 0 = pass. If a test already fails before your change, say so —
+confirm by re-running against `git show HEAD:<file>`.
+
+### Benchmark (performance changes only)
+
+```bash
 nvim --headless -c "lua local t=vim.uv.hrtime(); require('custom.startup'); print('startup:', (vim.uv.hrtime()-t)/1e6, 'ms')" -c "qall"
 ```
 
----
-
-## 3. Key Architecture Patterns
-
-### Startup Sequence (`init.lua`)
-
-```lua
--- 1. Bytecode cache + disable built-ins + UI init + power-aware picker
-require('custom.startup')
-
--- 2. Core editor options
-require('config')
-
--- 3. Plugin manager bootstrap + all plugin configs
-require('config.resonance')
-```
-
-### Module Pattern (`lua/custom/*.lua`, `lua/plugins/*.lua`)
-
-```lua
-local M = {}
-
--- Localize globals at top
-local api = vim.api
-local fn = vim.fn
-local uv = vim.uv
-local resonance = require('resonance')
-
--- Lazy-require heavy deps
-local function get_snacks()
-  return package.loaded['snacks'] or require('snacks')
-end
-
-function M.setup()
-  -- Initialization logic
-end
-
-function M.core_function()
-  -- Feature implementation
-end
-
-return M
-```
-
-### Plugin Spec (via resonance.nvim)
-
-```lua
-local resonance = require('resonance')
-
-resonance.load({
-  {
-    src = "https://github.com/author/plugin",
-    event = { "BufReadPost", "BufNewFile" },  -- or cmd, keys, ft
-    dependencies = "https://github.com/author/dep",
-    build = 'make',  -- or 'npm i', function() end
-    config = function()
-      local plugin = require('plugin')
-      plugin.setup({ ... })
-    end
-  },
-})
-```
+No startup regression allowed.
 
 ---
 
-## 4. Development Workflow
+## 5. Common tasks
 
-### Step 1: Read & Understand
+**Add a plugin** — create `lua/plugins/<name>.lua` with
+`require('resonance').load({{ src = ..., event/cmd/keys/ft = ..., config = function() ... end }})`,
+then `safe_load('plugins.<name>')` inside the VeryLazy block of
+`config/resonance.lua`.
 
-```bash
-# Read core entry points
-read ~/.config/nvim/init.lua
-read ~/.config/nvim/lua/custom/startup.lua
-read ~/.config/nvim/lua/config/resonance.lua
+**Add a custom module** — `lua/custom/<name>.lua` per §3, wire it via
+`safe_setup` in `config/resonance.lua`, add `note/knowledge/<name>.md`,
+keymaps in `config/keymaps.lua`.
 
-# Read key custom modules
-read ~/.config/nvim/lua/custom/*
+**Add an LSP server / formatter / linter / Mason tool** — edit only
+`lua/lsp/servers.lua` (`M.servers`, `M.linters`, `M.tools`). Mason
+binaries need absolute paths (`stdpath('data') .. '/mason/bin/<bin>'`) and
+often `--stdio`; check the filetype with `vim.filetype.match()`.
 
-# Read plugin configs
-read ~/.config/nvim/lua/plugins/*
-read ~/.config/nvim/lua/lsp/init.lua
-read ~/.config/nvim/lua/lsp/servers.lua
-read ~/.config/nvim/lua/lsp/servers/*.lua
-```
-
-### Step 2: Test Current Behavior
-
-```bash
-# Quick smoke test (full config)
-nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "qall"
-
-# Test specific module
-nvim --headless -c "lua require('custom.session').save()" -c "qall"
-
-# Test resonance plugin loading
-nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua print(vim.inspect(require('resonance').plugins))" -c "qall"
-
-# Benchmark startup
-for i in {1..10}; do nvim --headless -u NONE -c "luafile ~/.config/nvim/init.lua" -c "qall"; done 2>&1 | tail -5
-```
-
-### Step 3: Make Changes
-
-- Edit files in **config root** (`~/.config/nvim/`)
-- Test immediately with headless Neovim
-- For plugin changes: edit `lua/plugins/*.lua` or `lua/plugins/<plugin_name>/`
-
-### Step 3.5: Read Plugin Documentation (Critical)
-
-After installing or configuring a plugin, **read its README/markdown docs** in the plugin source:
-
-```bash
-# Plugin source is at ~/.local/share/nvim/site/pack/core/opt/<plugin-name>/
-cat ~/.local/share/nvim/site/pack/core/opt/nvim-ufo/README.md
-cat ~/.local/share/nvim/site/pack/core/opt/nvim-ufo/doc/example.lua
-
-# Or use nvim to browse
-nvim ~/.local/share/nvim/site/pack/core/opt/nvim-ufo/README.md
-```
-
-**Why:** Plugins often have critical config requirements not obvious from code alone (e.g., nvim-ufo requires `foldmethod=manual` internally, so user config must NOT set `foldmethod`/`foldexpr`).
-
-### Step 4: Verify
-
-```bash
-# Functional tests
-nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua require('custom.session').save(); print('session saved')" -c "qall"
-nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua require('custom.workspace').open()" -c "qall"
-
-# Startup regression check
-nvim --headless -u NONE -c "luafile ~/.config/nvim/init.lua" -c "qall"  # must complete < 200ms
-
-# Config reload test
-nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua dofile(vim.env.MYVIMRC)" -c "qall"
-```
-
-### Step 4.5: Run Configuration Tests (Mandatory for Config Changes)
-
-```bash
-# Strict boot test - safe_load/safe_setup failures become fatal
-nvim --headless -u NONE \
-  -c "luafile ~/.config/nvim/tests/strict_boot.lua" \
-  -c "qall"
-# Exit code 0 = strict configuration boot passed
-
-# Full integration smoke test - verifies plugins, modules, LSP, session, git, UI
-nvim --headless \
-  -c "luafile ~/.config/nvim/tests/smoke.lua" \
-  -c "qall"
-# Exit code 0 = all pass, non-zero = failure with details
-```
-
-The strict boot test loads the configuration from a clean `-u NONE` process,
-sets `NVIM_CONFIG_STRICT=1`, triggers `User VeryLazy`, and verifies the core
-autopairs mappings. In strict mode, `libs.utils.safe_load()` and
-`libs.utils.safe_setup()` re-raise errors instead of only notifying.
-
-The integration smoke test covers:
-
-1. Core config load (`init.lua` + `custom.startup` + `config.resonance`)
-2. `resonance.nvim` API availability
-3. `VeryLazy` trigger and deferred setup
-4. Plugin availability (runtime path for eager, `vim.pack.get()` for lazy)
-5. Custom modules and autopairs mappings
-6. LSP server registration (18+)
-7. Session save/load
-8. Workspace picker
-9. Git integration
-10. Heirline, Snacks, and bpm.nvim
-11. Transparent toggle, todo, and coderunner
-12. Config reload
-
-### Step 5: Commit
-
-```bash
-cd ~/.config/nvim
-git add lua/custom/session.lua lua/plugins/heirline.lua
-git commit -m "feat(session): add auto-save on focus lost"
-```
+**Statusline** — `lua/plugins/heirline/` (`statusline.lua`, `colors.lua`).
+**Picker** — `lua/plugins/snacks/picker.lua`; gate expensive features on
+`require('libs.power').is_ac()`.
 
 ---
 
-## 5. Critical Patterns & Conventions
-
-### resonance.nvim Integration Rules
-
-1. **Always use lazy triggers** — `event`, `cmd`, `keys`, `ft`; avoid `config` without trigger
-2. **Wrap plugin requires in `User VeryLazy` autocmd** — prevents luajit parsing at startup (see `config/resonance.lua:55-141`)
-3. **Load theme first** — `require('plugins.catppuccin')` before UI plugins to avoid flicker
-4. **Call `resonance.trigger_verylazy()` at end** — fires `User VeryLazy` for deferred configs
-
-### Performance Rules
-
-- **Bytecode cache first**: `if vim.loader then vim.loader.enable() end` (in `startup.lua:2-4`)
-- **Disable unused built-ins** — 11 plugins disabled in `startup.lua:8-23`
-- **Power-aware picker** — `libs.power` switches fzf (battery) vs snacks (AC) at `startup.lua:37-44`
-- **Lazy-require heavy modules** — `package.loaded['x'] or require('x')`
-- **Localize globals** — `local uv = vim.uv`, `local api = vim.api` at module top
-
-### Lua Style (Project Conventions)
-
-- Tables over multiple returns: `{name=..., path=..., loaded=...}`
-- Early returns, flat conditionals
-- Comments only for *why*, not *what*
-- `vim.uv` / `vim.system` over `vim.fn` in hot paths
-
-### LuaJIT/C API Performance Rules
-
-- **Prefer `vim.uv` sync APIs** (`fs_stat`, `fs_read`, `fs_write`) over async callbacks for small I/O — avoids callback/closure allocation.
-- **Hoist FFI `cdef` and `ffi.new` to module scope** — compile once, reuse struct instances; never allocate in hot paths.
-- **Use `libs.utils` OS helpers** (`is_penguin()`, `is_windows()`, `is_mac()`) — they cache `jit.os` checks; avoid inline `jit.os` duplication.
-- **Use byte operations** (`str:byte(i) == N`, `bit.band`) over string sub/compare — no intermediate string allocation.
-- **Numeric `for i = 1, #tbl` loops** over `ipairs`/`pairs` — avoids iterator function call overhead; JIT compiles to tight loop.
-- **Hoist C-API functions to local** at module scope (bypasses metatable lookups in hot paths):
-
-```lua
-local api = vim.api
-local nvim_buf_is_loaded = api.nvim_buf_is_loaded
-local nvim_buf_get_name = api.nvim_buf_get_name
-local uv_fs_stat = vim.uv.fs_stat
-local str_byte = string.byte
-local str_sub = string.sub
-local math_max = math.max
-```
-
-- **SoA (Struct of Arrays) over AoS** for cache-friendly access in hot loops:
-
-```lua
--- Good: parallel arrays
-local match_rows, match_cols = {}, {}
--- Bad: array of tables
-local matches = { {row=1, col=2}, ... }
-```
-
-- **Avoid allocations in hot paths**: reuse tables, use `table.clear()`, pre-allocate when size known.
-- **`pcall`/`xpcall` are expensive** — don't wrap every C-API call; only where failure is expected/handled.
-- **`vim.schedule`/`vim.schedule_wrap`** for deferring to event loop (avoids blocking UI).
-- **`local x = M.x`** for module self-references in methods (avoids table lookup per call).
-
-### vim.async Reference
-
-See `note/knowledge/vim.async.md` for full API documentation, patterns, and config usage.
-
-### Cross-Module Communication
-
-```lua
--- Shared state via _G
-_G.MyGlobalState = _G.MyGlobalState or {}
-
--- Event-driven
-vim.api.nvim_create_autocmd('VimLeavePre', {
-  pattern = '*',
-  callback = function() M.save() end
-})
-
--- Direct require (for lightweight modules)
-local utils = require('libs.utils')
-```
-
----
-
-## 6. Common Tasks
-
-### Add New Custom Module (`lua/custom/newmodule.lua`)
-
-1. Create module following pattern in §3
-2. Add `require('custom.newmodule')` to `config/resonance.lua` (after core UI, before `trigger_verylazy`)
-3. Create `note/knowledge/newmodule.md` with purpose, functions, keymaps
-4. Add keymaps in `config/keymaps.lua` if needed
-
-### Add New Plugin (`lua/plugins/newplugin.lua`)
-
-1. Create file with `resonance.load({{ src=..., event=..., config=... }})`
-2. Add `require('plugins.newplugin')` to `config/resonance.lua`
-3. For complex plugins: create `lua/plugins/newplugin_config/` with `init.lua`, `config.lua`, etc.
-4. Follow lazy trigger conventions: `event` for filetypes, `keys` for keymaps, `cmd` for commands
-
-### Modify Heirline Statusline
-
-1. Edit `lua/plugins/heirline/statusline.lua` (components)
-2. Edit `lua/plugins/heirline/colors.lua` (color palette)
-3. Test: `nvim --headless -u NONE -c "luafile ~/.config/nvim/init.lua" -c "doautocmd User VeryLazy" -c "lua vim.cmd('redrawstatus'); vim.cmd('redrawtabline'); vim.cmd('colorscheme catppuccin')" -c "qall"`
-
-### Modify Snacks Picker Config
-
-1. Edit `lua/plugins/snacks/picker.lua`
-2. Power-aware: check `require('libs.power').is_ac()` for conditional features
-
-### Update Knowledge Base
-
-```bash
-# After modifying a custom module, update its docs
-# Example: coderunner.lua → note/knowledge/coderunner.md
-```
-
-### Add New LSP Server
-
-Current architecture uses a **unified registry** in `lua/lsp/servers.lua` — single source of truth for LSP configs, formatters, and Mason packages.
-
-**Server spec format (in `lua/lsp/servers.lua`):**
-
-```lua
--- Simple (string): name = mason_package_name
-jsonls = 'json-lsp',
-
--- Complex (table): name = { config_module, mason?, mason_name?, config_key?, formatter? }
-clangd = { 'c-language', mason = false, formatter = { name = 'clang_format', mason = false, ft = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' } } },
-ruff = { 'python', mason = true, config_key = 'ruff', formatter = { name = 'ruff_format', mason = false, ft = { 'python' } } },
-['lua-language-server'] = { 'lua', mason = true, config_key = 'lua_ls' },
-taplo = { false, mason = true, formatter = { name = 'taplo', mason = false, ft = { 'toml' } } },
-
--- Formatter-only (no LSP server):
-prettier = { formatter_only = true, ft = { 'javascript', 'html', 'css' }, mason = 'prettier', name = 'prettier' },
-```
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `[1]` | string | Config module under `lsp.servers.*` (e.g., `'c-language'` → `lsp.servers.c-language`) |
-| `mason` | boolean | Auto-install via Mason (default: `true`) |
-| `mason_name` | string | Mason package name if different from server name |
-| `config_key` | string | Override server name for `vim.lsp.config()` |
-| `formatter` | table | Conform.nvim formatter spec (see below) |
-
-**Formatter sub-spec:**
-
-```lua
-formatter = {
-  name = 'clang_format',    -- conform.nvim formatter name (required)
-  mason = 'clang-format',   -- false (bundled), true (same name), or string (Mason package)
-  ft = { 'c', 'cpp' }       -- filetypes (required)
-}
-```
-
-**To add a server:** Edit `lua/lsp/servers.lua`, add entry to `M.servers` table. No other registration needed.
-
-**To add a Mason-only tool (formatter/linter/debugger):** Add to `M.tools` in `lua/lsp/servers.lua`:
-
-```lua
-M.tools = {
-  'codelldb',    -- C/C++/Rust debugger
-  'debugpy',     -- Python debugger
-  'shellcheck',  -- Shell linter
-  'mpls',        -- Markdown preview LSP
-  'new-tool',    -- add here
-}
-```
-
-**To add a linter (nvim-lint):** Add to `M.linters` in `lua/lsp/servers.lua`:
-
-```lua
-M.linters = {
-  htmlhint = { ft = { 'html' }, mason = 'htmlhint' },
-  new_linter = { ft = { 'ft' }, mason = 'package-name' },
-}
-```
-
-**Test new server:**
-
-```bash
-nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "lua require('custom.startup')" -c "lua require('config.resonance')" -c "lua require('lsp.init').setup()" -c "lua vim.lsp.enable(require('lsp.init').enabled_servers)" -c "edit test.<ft>" -c "lua vim.wait(2000)" -c "lua print(vim.inspect(vim.lsp.get_clients({name='<server_name>'})))" -c "qall"
-```
-
-### Key Gotchas for LSP
-
-- **Use absolute path** for Mason binaries: `vim.fn.stdpath('data') .. '/mason/bin/<binary>'`
-- **`--stdio` flag** often needed for LSP servers installed via Mason
-- **Filetype must match** — check `vim.filetype.match({filename='test.xxx'})`
-- **Single registry** — all servers, formatters, linters, tools in `lua/lsp/servers.lua`; `lsp/init.lua` reads directly from it
-
----
-
-## 7. Debugging Checklist
-
-| Symptom | Check |
-|---------|-------|
-| Slow startup | `vim.loader.enable()` called? Built-ins disabled? `vim-startuptime` output |
-| Plugin not loading | Trigger registered? `:packadd` called? Check `resonance.plugins` |
-| UI flicker on theme change | Theme loaded first? `catppuccin` before `snacks`/`heirline`? |
-| Keymap not working | Defined in `config/keymaps.lua` or plugin `keys` spec? `which-key` conflict? |
-| LSP not attaching | `lsp.lua` config? `vim.lsp.enable()` called? Check `:LspInfo` |
-| Session not restoring | `session.lua` autocmds? `VimLeavePre` firing? Check `~/.local/state/nvim/sessions/` |
-| Power mode not switching | `libs.power` setup called? `/sys/class/power_supply/AC/online` readable? |
-
----
-
-## 8. Reference: resonance.nvim API Used
-
-| Function | Purpose | Config Usage |
-|----------|---------|--------------|
-| `resonance.load(specs)` | Register plugins lazily | `config/resonance.lua:33-141`, all `plugins/*.lua` |
-| `resonance.setup(opts)` | Configure loader | `config/resonance.lua:19-27` |
-| `resonance.open_ui()` | Open plugin manager UI | `config/resonance.lua:30` keymap |
-| `resonance.trigger_verylazy()` | Fire `User VeryLazy` | `config/resonance.lua:145` |
-| `resonance.plugins` | Access plugin table | Debugging, inspection |
-
-### `vim.pack` API (via resonance)
-
-| Function | Purpose |
-|----------|---------|
-| `vim.pack.add(specs, {confirm=false, load=false})` | Install plugins |
-| `vim.pack.get(names?, {info, offline})` | Query installed |
-| `vim.pack.update(names?, {force, offline})` | Update plugins |
-| `vim.pack.del(names, {force})` | Delete plugins |
-| `PackChanged` event | Build hooks |
-
----
-
-## 9. Sync Locations
-
-| Source (Edit Here) | Runtime (Test Here) |
-|--------------------|---------------------|
-| `~/.config/nvim/lua/custom/` | Loaded directly from config |
-| `~/.config/nvim/lua/plugins/` | Loaded directly from config |
-| `~/.config/nvim/lua/config/` | Loaded directly from config |
-| `~/.config/nvim/lua/libs/` | Loaded directly from config |
-| `~/.local/share/nvim/site/pack/core/opt/resonance.nvim/` | resonance.nvim itself (auto-managed) |
-
-**Always test in runtime** — that's what Neovim actually loads.
-
----
-
-## 10. Emergency: Restore Original Files
-
-```bash
-# From git HEAD (config repo)
-cd ~/.config/nvim
-git show HEAD:lua/custom/session.lua > lua/custom/session.lua
-git show HEAD:lua/plugins/heirline.lua > lua/plugins/heirline.lua
-
-# Re-clone resonance.nvim if corrupted
-rm -rf ~/.local/share/nvim/site/pack/core/opt/resonance.nvim
-nvim --headless -c "luafile ~/.config/nvim/init.lua" -c "qall"  # auto-reclones
-```
-
----
-
-## 11. AI Workflow & Communication Patterns
-
-### Todo System (Mandatory for Multi-Step Work)
-
-**Initialize at start of any multi-step task:**
-
-```lua
-todo(i="Brief purpose", op="init", list=[{"phase": "PhaseName", "items": ["Task 1", "Task 2"]}])
-```
-
-**Update as work progresses:**
-
-```lua
-todo(i="Task description", op="start", task="Task 1", phase="PhaseName")
-todo(i="Task description", op="done", task="Task 1", phase="PhaseName")
-```
-
-**Phase transitions are automatic** — earliest incomplete task in phase order becomes active.
-
-### Code Editing Patterns
-
-#### Use `edit` tool with anchored patches (not `write` for modifications)
-
-```lua
-edit(i="Purpose", input=[[
-*** Begin Patch
-[~/.config/nvim/lua/custom/session.lua#HASH]
-PUT 69.=69:
-+  vim.notify('Session saved to ' .. target_file)
-PUT 185.=185:
-+  nvim_create_autocmd('FocusLost', { callback = M.save })
-*** End Patch
-]])
-```
-
-#### For new files, use `write`
-
-```lua
-write(i="Create new module", path="~/.config/nvim/lua/custom/newmodule.lua", content=[[
-local M = {}
-local api = vim.api
-
-function M.setup()
-  -- init
-end
-
-return M
-]])
-```
-
-#### Use `lsp` for cross-file renames/references
-
-```lua
-lsp(action="rename", file="~/.config/nvim/lua/custom/session.lua", line=69, symbol="save", new_name="persist", apply=true)
-lsp(action="references", file="~/.config/nvim/lua/custom/session.lua", line=69, symbol="save")
-```
-
----
-
-## 12. Module Reference Quick Index
-
-### Core Custom Modules (`lua/custom/`)
-
-| Module | Purpose | Key Functions | Knowledge Doc |
-|--------|---------|---------------|---------------|
-| `startup.lua` | Boot sequence, bytecode cache, built-in disable, power-aware picker | — | — |
-| `session.lua` | Workspace persistence (git-branch-aware) | `save()`, `load(last)`, `setup()` | `note/knowledge/session.md` |
-| `coderunner.lua` | Build/run integration (C/C++/Rust/Go/Python) | `run_project()`, `build_run_command()` | `note/knowledge/coderunner.md` |
-| `workspace.lua` | Project navigation | `open()`, `switch()` | `note/knowledge/workspace.md` |
-| `transparent.lua` | Background transparency toggle | `toggle()`, `setup()` | `note/knowledge/transparent.md` |
-| `zettel.lua` | Note-taking system | `new()`, `search()`, `link()` | `note/knowledge/zettel.md` |
-| `git.lua` / `git-blame.lua` | Git workflow helpers | `blame()`, `diff()`, `status()` | — |
-| `repl.lua` | Interactive REPL per filetype | `open()`, `send()` | — |
-| `todo.lua` | Code annotation search (TODO/FIXME) | `search()`, `list()` | — |
-| `ui2.lua` | UI enhancements | `setup()` | — |
-| `word-jump.lua` | Navigation utilities | `jump()`, `setup()` | — |
-| `cheatsheet.lua` | Quick reference system | `show()`, `build()` | — |
-| `sudo.lua` | Elevated privilege commands | `write()`, `read()` | — |
-| `language-switcher.lua` | Language toggling | `toggle()`, `setup()` | — |
-| `pairs.lua` | Utility functions | various | — |
-| `incline.lua` | LSP client management | `setup()` | — |
-| `color-list.lua` | Color scheme tools | `list()`, `preview()` | — |
-| `surround.lua` | Surround text objects | `setup()` | — |
-| `lsp-loading.lua` | LSP progress UI | `setup()` | — |
-
-### Key Plugin Configs (`lua/plugins/`)
-
-| Config | Plugin | Trigger | Notes |
-|--------|--------|---------|-------|
-| `heirline.lua` | heirline.nvim | `BufReadPost`, `BufNewFile` | Statusline, tabline, winbar |
-| `snacks.lua` | snacks.nvim | Various | Picker, explorer, profiler, image |
-| `lsp.lua` | nvim-lspconfig + mason | `FileType` | LSP setup per language |
-| `treesitter.lua` | nvim-treesitter | `BufReadPost` | Parsing, highlight, indent |
-| `fzf.lua` | fzf-lua | `Cmd`/`Keys` | Fuzzy finder (battery mode) |
-| `catppuccin.lua` | catppuccin | `VeryLazy` | Theme (load first) |
-| `dap.lua` | nvim-dap | `Keys` | Debugging |
-| `markdown.lua` | render-markdown | `FileType` | Markdown rendering |
-| `cmdline.lua` | noice.nvim | `VeryLazy` | Command line UI |
-| `ufo.lua` | nvim-ufo | `BufReadPost` | Folding |
-| `csvview.lua` | csvview.nvim | `FileType` | CSV viewer |
-| `telegram.lua` | telegram.nvim | `Cmd` | Telegram integration |
-
-### Libraries (`lua/libs/`)
-
-| Lib | Purpose |
-|-----|---------|
-| `power.lua` | AC/battery detection, auto-switch picker |
-| `utils.lua` | OS detection, version checks |
-| `git.lua` | Git root detection for heirline |
-| `icons.lua` | Icon definitions |
-| `spell.lua` | Spell check utilities |
-| `bpm.lua` | Centralized bpm.nvim access |
-
----
-
-*Generated 2026-11-13. Follows resonance.nvim AI_GUIDELINES.md pattern.*
+## 6. Committing
+
+Commit only when asked. Stage specific files, never `git add -A` — the
+tree often holds unrelated user work (`nvim-pack-lock.json`, notes).
+Conventional subjects: `feat(session): …`, `fix(lsp): …`.
