@@ -27,7 +27,7 @@
       "version": "'main'"
     },
     "codecompanion.nvim": {
-      "rev": "8ffcc9a78d87732a26243de37ef697f54efe91c2",
+      "rev": "5a454c91d77c8464dad6ef12e663618cd427ad9e",
       "src": "https://github.com/olimorris/codecompanion.nvim"
     },
     "colorful-menu.nvim": {
@@ -51,7 +51,7 @@
       "src": "https://github.com/dirichy/flash-any-pinyin.nvim"
     },
     "flash-any.nvim": {
-      "rev": "433b7fe3c197e757492f3015693bbf7096423939",
+      "rev": "485b12994b6eb959eb94195aed498bda9ac93c5a",
       "src": "https://github.com/dirichy/flash-any.nvim",
       "version": "'main'"
     },
@@ -100,7 +100,7 @@
       "src": "https://github.com/nvim-mini/mini.icons"
     },
     "neogit": {
-      "rev": "aa99b440b266bcf7e03399f149ed46f981555fa3",
+      "rev": "17929b7b0b9c05fe3dfc788fbba9881eb9c1cbec",
       "src": "https://github.com/NeogitOrg/neogit"
     },
     "neominimap.nvim": {
@@ -136,7 +136,7 @@
       "src": "https://github.com/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "6e72b89d499455611f09f46d13ee9f79325406e5",
+      "rev": "4648fd8ba5c678d7e2db75ae44ffac269bb589d8",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-nio": {
@@ -144,7 +144,7 @@
       "src": "https://github.com/nvim-neotest/nvim-nio"
     },
     "nvim-treesitter": {
-      "rev": "04f17886f75416dfdc25374c950a52c63f0e98fe",
+      "rev": "cedae6b82c2b1b1cfdd210a20e2b8985ee33748c",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
@@ -169,11 +169,11 @@
       "src": "https://github.com/kevinhwang91/promise-async"
     },
     "render-markdown.nvim": {
-      "rev": "8801162e041e34c64d0d1397cd1f353a14b01950",
+      "rev": "a67f826164c38c836fc6060f32b275c4c43317a7",
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
-      "rev": "aeab796aafb63527abe65c358b562f7aecbb0c03",
+      "rev": "6a4801c7ab05c96a0d2492be605d5ed7fe7f4db5",
       "src": "https://github.com/Imngzx/resonance.nvim",
       "version": "'main'"
     },
