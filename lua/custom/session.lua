@@ -37,7 +37,8 @@ local persistence
 local setup_persistence
 
 local function ensure_dir(path)
-  if not fs_stat(path) then vim.fs.mkdir(path, { parents = true }) end
+  if fs_stat(path) then return true end
+  return (pcall(vim.fs.mkdir, path, { parents = true }))
 end
 
 local function get_git_branch(root)
@@ -201,6 +202,11 @@ setup_persistence = function()
   local config = vim.tbl_extend('force', DEFAULT_PERSISTENCE, vim.g.session_persistence or {})
   local root = get_workspace_root()
   local base_dir = fs.joinpath(root, config.dir)
+  -- Unwritable roots (e.g. /etc) fall back to stdpath('state'); session names embed the root path so they stay unique
+  if not ensure_dir(base_dir) then
+    base_dir = fs.joinpath(fn.stdpath('state'), 'persistence')
+    ensure_dir(base_dir)
+  end
   local session_dir = fs.joinpath(base_dir, 'sessions')
 
   persistence = {
