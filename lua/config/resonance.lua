@@ -118,28 +118,32 @@ vim.api.nvim_create_autocmd('User', {
     })
 
     safe_load('plugins.telegram')
-
-    vim.schedule(function()
-      local api = vim.api
-      local uv_fs_stat = vim.uv.fs_stat
-      local bufs = api.nvim_list_bufs()
-      for i = 1, #bufs do
-        local buf = bufs[i]
-        local name = api.nvim_buf_get_name(buf)
-        if api.nvim_buf_is_loaded(buf) and name ~= '' then
-          local stat = uv_fs_stat(name)
-          if stat and stat.type == 'file' then
-            pcall(api.nvim_exec_autocmds, 'BufReadPre', { buf = buf, modeline = false })
-            pcall(api.nvim_exec_autocmds, 'BufReadPost', { buf = buf, modeline = false })
-          else
-            pcall(api.nvim_exec_autocmds, 'BufNewFile', { buf = buf, modeline = false })
-            pcall(api.nvim_exec_autocmds, 'BufEnter', { buf = buf, modeline = false })
-          end
-          pcall(api.nvim_exec_autocmds, 'FileType', { buf = buf, modeline = false })
-        end
-      end
-    end)
   end
+})
+
+-- The replay lives in its OWN autocmd, registered after the VeryLazy one, so
+-- it runs after every trigger has been registered but is NOT aborted when a
+-- plugin's setup() raises (popup.nvim raises on this neovim build).
+--
+-- `replay_for_buffer` fires only the trigger groups that have not yet run
+-- for the buffer, so the UI plugins (heirline, bpm, treesitter, lsp, ...)
+-- register their triggers during VeryLazy -- AFTER BufReadPost/BufEnter
+-- already fired -- and still get their chance to load.
+vim.api.nvim_create_autocmd('User', {
+  pattern = 'VeryLazy',
+  callback = function()
+    -- Synchronous on purpose: a scheduled callback runs after this callback
+    -- returns, by which point the `once = true` triggers have already been
+    -- consumed and the replay fires into nothing.
+    local api = vim.api
+    local bufs = api.nvim_list_bufs()
+    for i = 1, #bufs do
+      local buf = bufs[i]
+      if api.nvim_buf_is_loaded(buf) and api.nvim_buf_get_name(buf) ~= '' then
+        pcall(resonance.replay_for_buffer, buf)
+      end
+    end
+  end,
 })
 
 
