@@ -42,7 +42,9 @@ only in its own repo.
 1. **Load configs through `libs.utils.safe_load` / `safe_setup`,** never a
    bare `require` in `config/resonance.lua`. One failing plugin must not
    take down the rest of startup; `NVIM_CONFIG_STRICT=1` turns these into
-   hard errors for the tests.
+   hard errors for the tests. Note `safe_setup('x', require('x').setup)`
+   evaluates the `require` *before* `safe_setup` runs, so a require error
+   escapes it — wrap it: `safe_setup('x', function() require('x').setup() end)`.
 2. **Theme first.** `plugins.catppuccin` loads before any UI plugin, or
    the UI flickers.
 3. **Non-core plugin configs are required inside the `User VeryLazy`
