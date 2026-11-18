@@ -139,7 +139,7 @@ M.servers = {
   -- [lua]
   lua_ls = {
     'lua',
-    mason = true,
+    mason = have_exe('lua-language-server') == 0,
     mason_name = 'lua-language-server',
     config_key = 'lua_ls',
     -- uses lua-ls built-in formatter, no external formatter
