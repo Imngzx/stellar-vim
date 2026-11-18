@@ -1,124 +1,58 @@
 # word-jump.lua — DIY Flash-Style Jump Navigation
 
-> **Purpose**: Flash.nvim-like jump navigation with hierarchical labels, zero-GC hot path, and custom highlight groups.
+> **Purpose**: Flash.nvim-like character jump: type a character, then a label, to jump to any visible occurrence.
 > **Location**: `lua/custom/word-jump.lua`
-> **Trigger**: `f` (normal, visual, operator-pending modes)
+> **Loaded by**: `config/resonance.lua` → `safe_load('custom.word-jump')` inside the `User VeryLazy` block. The keymap is set at module load (no `setup()`).
 
 ---
 
-## Overview
+## Public API
 
-Minimal Flash.nvim alternative built for:
+| Function | Description |
+|----------|-------------|
+| `M.jump()` | Prompt for a target character, label every visible occurrence, then jump to the chosen label |
 
-- **Zero GC in hot path** — cached labels, cached C-API, byte operations
-- **Hierarchical labels** — Single char → Double letter → Digit+letter (962 max)
-- **Zero external deps** — Pure Lua + Neovim API
+## Keymaps
 
----
-
-## Label Hierarchy (962 max)
-
-```text
-1-26:       a, b, c, ... z                    (single lowercase)
-27-702:     aA, aB, ... zZ                   (lower + upper = 26*26)
-703-962:    1a, 1b, ... 9z, 0a, ... 0z       (digit + lower = 10*26)
-```
-
-Total capacity: **962** unique jump targets per screen.
-
----
-
-## Core Architecture
-
-### Cached C-API (Hot Path Optimization)
-
-```lua
-local set_extmark = api.nvim_buf_set_extmark
-local clear_namespace = api.nvim_buf_clear_namespace
-local ns_id = api.nvim_create_namespace('flash_diy')
-```
-
-- Bypasses metatable lookups in jump loop
-- Namespace reused, not recreated
-
-### Pre-split Character Pools
-
-```lua
-local lower_chars, upper_chars, digit_chars = {}, {}, {}
-for i = 1, 26 do lower_chars[i] = lower:sub(i, i) end
--- Avoids runtime string slicing in jump loop
-```
-
-### Byte-Based UTF-8 Navigation
-
-```lua
-local function get_utf8_len(line, col)
-  local b = line:byte(col)
-  if b < 0x80 then return 1 end
-  if b < 0xE0 then return 2 end
-  if b < 0xF0 then return 3 end
-  return 4
-end
-```
-
-- Zero string allocation
-- Uses cached byte constants (`BYTE_0`...`BYTE_Z_LOWER`)
+| Mode | Key | Action |
+|------|-----|--------|
+| `n`, `x`, `o` | `f` | `M.jump()` — replaces the built-in `f` |
 
 ---
 
 ## Jump Flow
 
-1. **`M.jump()`** called via `f` keymap
-2. **Collect matches** — Scan visible window lines for alphanumeric positions
-3. **Generate labels** — Hierarchical (single → double → digit+letter)
-4. **Place extmarks** — Highlight labels with `FlashDiyMatch`/`FlashDiyLabel`
-5. **Wait for input** — `vim.fn.getchar()` captures keystroke
-6. **Match label → position** — Jump cursor, cleanup extmarks
+1. Prompt `⚡ Flash ❯` and read one character (`getcharstr`); `<Esc>` or an empty read cancels.
+2. Find every literal (plain `string.find`) occurrence of that character in lines `w0`..`w$`, up to 962 matches.
+3. 0 matches → nothing happens; 1 match → jump immediately.
+4. Otherwise dim the visible range and draw a label next to each match.
+5. Read a label key. A single-key label jumps; a prefix key (uppercase or digit) redraws only the labels with that prefix and reads a second key.
 
----
+## Label Hierarchy (962 max)
+
+Labels are generated in order, with only as many tiers as the match count needs:
+
+1. Lowercase singles, in home-row order `asdfghjklqwertyuiopzxcvbnm` (26)
+2. Uppercase singles `A S D F …` (up to 26). Each two-key prefix needed takes one uppercase letter, starting from the end of the list (`M`, `N`, `B`, …).
+3. Uppercase prefix + lowercase, e.g. `Ma`, `Ms` (26 per prefix)
+4. Digit prefix + lowercase, `1a` … `0z` (only above 702 matches)
 
 ## Highlight Groups
 
+Redefined on every `ColorScheme` (augroup `FlashDiyHL`).
+
 | Group | Purpose | Colors |
 |-------|---------|--------|
-| `FlashDiyBackdrop` | Dimmed background | `#545c7e` |
-| `FlashDiyMatch` | Match highlight | `#c0caf5` on `#3d59a1` bold |
-| `FlashDiyLabel` | Label highlight | `#15161e` on `#ff007c` bold |
+| `FlashDiyBackdrop` | Dims the visible range | fg `#545c7e` |
+| `FlashDiyMatch` | The matched character | `#c0caf5` on `#3d59a1`, bold |
+| `FlashDiyLabel` | Label overlay | `#15161e` on `#ff007c`, bold |
+
+Extmarks live in the `flash_diy` namespace.
 
 ---
 
-## Keymappings
+## Gotchas
 
-| Mode | Key | Action |
-|------|-----|--------|
-| `n`, `x`, `o` | `f` | `M.jump()` — DIY Flash Jump |
-
----
-
-## Performance Characteristics
-
-| Metric | Value |
-|--------|-------|
-| Max labels | 962 |
-| GC in hot path | Zero (cached labels, byte ops) |
-| C-API lookups | Cached at module load |
-| String ops in loop | Zero (byte ops, pre-split pools) |
-
----
-
-## Related Files
-
-- `lua/config/keymaps.lua` — `f` keymap registration
-- `lua/plugins/flash.lua` — Flash.nvim (alternative, not used)
-
----
-
-## Design Decisions
-
-| Decision | Rationale |
-|----------|-----------|
-| Hierarchical labels | Scales to 962 without multi-char input delay |
-| Byte operations | Zero allocation, LuaJIT-friendly |
-| Cached C-API | Avoids metatable overhead in jump loop |
-| No external deps | Flash.nvim is 2k+ lines; this is ~200 |
-| `f` key | Muscle memory compatible with Flash |
+- Overriding `f` removes built-in `f` behavior, including `;`/`,` repeat. The jump uses `nvim_win_set_cursor`, so in operator-pending mode the motion is not inclusive like the built-in `f` (`df<char>` does not delete the target character).
+- The label is drawn as an overlay on the column *after* the match, so it covers the next character instead of the match.
+- Matches past 962 are dropped silently.

@@ -1,8 +1,8 @@
 # vim.async — Structured Concurrency for Neovim Lua
 
-> **Source**: Neovim 0.13+ runtime documentation (`:h vim.async`, `lua-async.txt`)
+> **Source**: `$VIMRUNTIME/lua/vim/async.lua` (+ `lua/vim/async/_core.lua`, `_semaphore.lua`), `:h lua-async` (`doc/lua-async.txt`)
 > **Available**: Nightly/0.13+ — Lua coroutine-based async workflows
-> **Config Usage**: `libs/power.lua` uses `vim.async` for power state polling
+> **Config Usage**: `libs/power.lua`, `custom/transparent.lua`, `custom/git-blame.lua`, `plugins/heirline/statusline.lua` (see below)
 
 ---
 
@@ -10,7 +10,8 @@
 
 `vim.async` lets Lua code wait for timers, callbacks, and other tasks without blocking Nvim's event loop. Async work runs inside **tasks**, which can pause at checkpoints and manage child tasks.
 
-**Key distinction**: Your config uses `vim.system` (subprocess spawning) — different API. `vim.async` is for Lua coroutine-based async.
+`vim.system()` is not an alternative to `vim.async` but composes with it: `SystemObj` implements `vim.async.Closable`,
+so `async.await(3, vim.system, cmd, opts)` returns the result object and closing the awaiting task stops the process.
 
 ---
 
@@ -18,15 +19,15 @@
 
 | Function | Purpose |
 |----------|---------|
-| `vim.async.run(fn, ...)` | Create task (top-level or child), returns `Task` |
-| `vim.async.await(awaitable)` | Suspend until task/callback completes; raises errors |
-| `vim.async.pawait(awaitable)` | Protected await → returns `ok, ...` |
+| `vim.async.run([name,] fn, ...)` | Create task (top-level or child), returns `Task`; optional `name` string first |
+| `vim.async.await(...)` | Suspend until done; forms: `await(task)`, `await(fn(cb))`, `await(argc, fn, ...)`; raises errors |
+| `vim.async.pawait(...)` | Protected await (same forms) → returns `ok, ...` |
 | `vim.async.sleep(ms)` | Async sleep without blocking event loop |
-| `vim.async.timeout(ms, task)` | Await task with deadline |
-| `vim.async.iter(tasks)` | Iterator yielding completed tasks in finish order |
-| `vim.async.semaphore(n)` | Limit concurrent operations |
-| `vim.async.wrap(argc, fn)` | Convert callback-style fn to async fn |
-| `vim.async.checkpoint()` | Process pending children/cancellation |
+| `vim.async.timeout(ms, task)` | Await task with deadline; on expiry closes the task and raises `"timeout"` |
+| `vim.async.iter(tasks)` | Iterator yielding completed task **handles** (not results) in finish order |
+| `vim.async.semaphore(permits?)` | `Semaphore` (default 1 permit) with `:with(fn)`, `:acquire()`, `:release()` |
+| `vim.async.wrap(argc, fn)` | Convert callback-style fn to async fn (callback at position `argc`) |
+| `vim.async.checkpoint()` | Start pending children, deliver pending cancellation/failure; does **not** yield to the event loop |
 | `vim.async.is_closing()` | Check if current task was closed |
 
 ---
@@ -37,14 +38,14 @@ Created via `vim.async.run()`. Methods:
 
 | Method | Purpose |
 |--------|---------|
-| `task:wait(timeout?)` | Sync wait (pumps event loop); raises on timeout/error |
-| `task:pwait(timeout?)` | Protected wait → `ok, ...` |
+| `task:wait(timeout?)` | Sync wait (pumps event loop); raises `"timeout"` (task keeps running) or the task error; CTRL-C raises `"interrupted"` |
+| `task:pwait(timeout?)` | `pcall(task.wait, task, timeout)` → `ok, ...` |
 | `task:close(callback?)` | Request cooperative close for task + children |
-| `task:detach()` | Fire-and-forget; becomes top-level, parent no longer waits |
-| `task:on_complete(fn)` | Observe completion without blocking |
+| `task:detach()` | Fire-and-forget; becomes top-level, parent no longer waits; returns self |
+| `task:on_complete(fn)` | Observe completion without blocking; `fn(err, ...)`; returns an unsubscribe function |
 | `task:status()` | `"running" \| "awaiting" \| "normal" \| "completed"` |
 | `task:completed()` | Boolean |
-| `task:raise_on_error()` | Raise error for detached/fire-and-forget tasks |
+| `task:raise_on_error()` | Report the error (via scheduler) when an unobserved task fails; returns self |
 | `task:traceback(msg?, level?)` | Get traceback when not active |
 
 ---
@@ -56,6 +57,8 @@ Created via `vim.async.run()`. Methods:
 - Tasks form a tree: child tasks attached to parent
 - Parent waits for children at checkpoints
 - Child created while parent running → attached, runs at parent's next checkpoint
+- Unhandled child failure fails the parent, which closes the remaining children
+- Awaiting a task only observes it; ownership is fixed at creation
 
 ### Checkpoints (Where Task Can Pause)
 
@@ -79,6 +82,7 @@ Inside a task, these are checkpoints:
 - `task:detach()` → fire-and-forget background work
 - Becomes top-level; original parent no longer waits/closes
 - Errors don't propagate automatically → use `task:on_complete()` or `task:raise_on_error()`
+- Dropping a task handle does **not** stop it; keep the handle and call `task:close()`
 
 ---
 
@@ -121,56 +125,6 @@ async.run(function()
 end)
 ```
 
-### Protected Await (Recoverable Failures)
-
-```lua
-local async = vim.async
-
-async.run(function()
-  local ok, text_or_err = async.pawait(async.run(read_file, 'notes.txt'))
-  if not ok then text_or_err = '' end
-  show_buffer(text_or_err)
-end)
-```
-
-### Semaphore for Concurrency Control
-
-```lua
-local async = vim.async
-
-async.run(function()
-  local limit = async.semaphore(4)
-  local tasks = {}
-
-  for _, path in ipairs(paths) do
-    table.insert(tasks, async.run(function()
-      return limit:with(function()
-        return read_file(path)
-      end)
-    end))
-  end
-
-  local next_task = async.iter(tasks)
-  while true do
-    local task = next_task()
-    if task == nil then break end
-    async.await(task)
-  end
-end)
-```
-
-### Timeout
-
-```lua
-local async = vim.async
-
-async.run(function()
-  local task = async.run(read_file, 'notes.txt')
-  local text = async.timeout(5000, task)  -- raises "timeout" if deadline wins
-  show_buffer(text)
-end)
-```
-
 ### Wrap Callback APIs Reusably
 
 ```lua
@@ -207,49 +161,27 @@ print(task:wait())  -- blocks, pumps event loop
 
 ---
 
-## Differences from vim.system
-
-| Aspect | `vim.async` | `vim.system` |
-|--------|-------------|--------------|
-| **Purpose** | Lua coroutine async | Subprocess spawning |
-| **Blocking** | Never blocks event loop | Can block if `:wait()` used |
-| **Cancellation** | Cooperative (checkpoints) | Process kill |
-| **Use Case** | Timers, callbacks, I/O, coordination | External commands, LSP, formatters |
-
----
-
 ## In This Config
 
-**`lua/libs/power.lua`** uses `vim.async` for power state polling:
-
-```lua
-local async = vim.async
-local fs_open = async.wrap(4, uv.fs_open)
-local fs_read = async.wrap(4, uv.fs_read)
-local fs_write = async.wrap(4, uv.fs_write)
-local fs_close = async.wrap(2, uv.fs_close)
-local system = async.wrap(3, vim.system)
-
--- Async tasks for Linux/Windows/macOS power detection
-async.run('power-linux-check', function() ... end):raise_on_error()
-```
-
-**Note**: This config also uses `vim.system` directly in `zettel/init.lua` for graph generation — different API.
+| File | Usage |
+|------|-------|
+| `lua/libs/power.lua` | `async.wrap` around `uv.fs_open/fs_read/fs_write/fs_close` and `vim.system`; named one-shot tasks (`power-linux-check`, `power-windows-check`, `power-macos-check`, `power-cache-write`) with `:raise_on_error()`, run at setup and on `FocusGained` (not polling) |
+| `lua/custom/transparent.lua` | `async.pawait(argc, vim.uv.fs_*, ...)` for the state cache; `cache_read()` blocks on `task:pwait()` from sync code |
+| `lua/custom/git-blame.lua` | Debounce: `task:close()` on the previous task cancels its `async.sleep(config.delay)`, then spawns `vim.system` with a plain callback (the job is killed separately) |
+| `lua/plugins/heirline/statusline.lua` | `HeirlineClock` top-level task looping `async.sleep()` to the next minute boundary |
 
 ---
 
 ## Common Pitfalls
 
-1. **Forgetting checkpoints** — long-running sync code never yields; use `vim.async.checkpoint()`
+1. **Long sync loops** — nothing preempts Lua code; `checkpoint()` does not yield to the event loop, so to let the UI run use `async.sleep(0)` or `async.await(vim.schedule)`
 2. **Blocking in task** — don't use `task:wait()` inside a task; use `await(task)`
 3. **Unobserved detached errors** — call `task:raise_on_error()` or `task:on_complete()`
 4. **Assuming preemption** — scheduling is cooperative; sync code runs to checkpoint
-5. **Confusing with vim.system** — different APIs for different purposes
+5. **PUC Lua 5.1 + `for task in async.iter(...)`** — the iterator may suspend; use the direct-call form if PUC Lua support matters (LuaJIT is fine)
 
 ---
 
 ## Reference Links
 
-- `:h vim.async` — Full API documentation
-- `:h lua-async` — Module overview
-- `lua-async.txt` in runtime docs
+- `:h lua-async` / `:h vim.async` (`doc/lua-async.txt`) — full API and more examples (semaphore, timeout, pawait)

@@ -1,59 +1,56 @@
-# zettel.lua Documentation
+# zettel — Zettelkasten Note-Taking
 
-## Overview
+> **Purpose**: Create a Zettelkasten workspace and its notes (cards, inbox notes), find backlinks, and render a link graph.
+> **Location**: `lua/custom/zettel/init.lua` (logic), `lua/custom/zettel/contents.lua` (file templates)
+> **Loaded by**: `lua/plugins/snacks/keys.lua` (requires it for the snacks.nvim `keys` spec) and the `:ZettelInit` command in `lua/config/autocmds.lua`
 
-Manages Zettelkasten-style note-taking with advanced Neovim integration.
+---
 
-## Core Dependencies
+## Workspace Root
 
-- Uses Lua's `vim` API and `uv` library for filesystem operations
-- Leverages `snacks` for backlink functionality
+Every function resolves the root with `vim.fs.root(current_buf, { '.marksman.toml', '.git', 'Makefile', '.jj' })`, falling back to cwd. Inside any git or Makefile project, notes and `.meta/graph.html` are created in that project's root.
 
-## Key Components
+## Public API
 
-### 1. File Operations
+| Function | Description |
+|----------|-------------|
+| `M.init_workspace()` | Prompt for a path (default: workspace root, `~` expanded), create the directory tree, write any template files that don't exist yet, then open `index.md` |
+| `M.new_card()` | Prompt for a title and create `Cards/<slug>.md` (no timestamp). An empty title uses `YYYYMMDDHHMM` as the filename and `Untitled` as the title |
+| `M.new_inbox_note()` | Pick a scenario (Daily, Meetings, Idea, Snippet, Root, Projects, People), then a title, and create the note under `Inbox/<folder>/` |
+| `M.backlinks()` | Snacks grep picker for `[[<current file stem>]]` |
+| `M.generate_graph(silent?)` | Collect `[[links]]` with `rg`, write an ECharts graph to `<root>/.meta/graph.html` and open it (unless `silent`) |
 
-- `get_workspace_root()`: Detects project root using `.marksman.toml`, `.git`, or `Makefile`
-- `createbuf_and_curpos()`: Creates buffer and sets cursor position
-- `get_target_filepath()`: Generates target file path for notes
+### Filenames
 
-### 2. Note Management
+The title is lowercased, whitespace becomes `-`, and characters outside `a-z0-9_.-` and CJK/kana/hangul are stripped. Non-daily inbox notes get a `YYYYMMDDHHMM-` prefix. Daily notes default to the title `YYYY-MM-DD`, use the exact name, and open the existing file if there is one.
 
-- `M.new_card()`: Creates new note with title input
-- `M.new_inbox_note()`: Quick capture for inbox notes
-- `M.backlinks()`: Displays network of connected notes
+New notes are unsaved buffers (`filetype=markdown`) with YAML frontmatter (`title`, `date`, plus `tags: []` for cards or `scenario:` for inbox notes). Cards also get a `Links: [[index]]` line.
 
-### 3. Graph Visualization
+### Workspace Layout (`init_workspace`)
 
-- `M.generate_graph()`: Creates visual graph of note connections
-- Uses HTML templates (`GRAPH_TEMPLATE_HEAD`, `GRAPH_TEMPLATE_TAIL`)
+Directories: `.meta/`, `Inbox/{Daily,Meetings,Idea,Snippet,Projects,People}/`, `Cards/Examples/`, `Assets/`.
 
-### 4. Utilities
+Files written from `contents.lua`: `.marksman.toml`, `.markdownlint.json`, `.editorconfig`, `.gitignore`, `.rumdl.toml`, `.moxide.toml` (empty), `index.md`, `Cards/Examples/{example-card,example-tag,example-usage}.md`, `.meta/user.md`, `.meta/agent_rules.md`, `AGENTS.md`.
 
-- File system helpers (`normalize_path`, `find_upward`)
-- String manipulation functions (`string_match`, `string_gsub`)
-- OS execution utilities (`os.execute`, `vim.system`)
+### Graph
 
-## Templates
+- Requires `rg`. Skips `.meta/`, `Assets/`, and dot-directories. Nodes are file stems and link targets; duplicate edges are merged.
+- The first call registers a `BufWritePost *.md` autocmd (augroup `ZettelAutoGraph`). It silently regenerates the graph when a saved file is under the root from that first call; reload the browser to see changes.
+- The HTML loads ECharts 5.5.0 from the jsDelivr CDN, so viewing it needs network access.
 
-Predefined content templates:
+---
 
-- `TOML_CONTENT`: Sample configuration
-- `INDEX_CONTENT`: Index structure
-- `EXAMPLE_CARD_CONTENT`: Note template
-- `EDITORCONFIG`: Editor configuration
+## Keymaps & Commands
 
-## Key Mappings
+| Key / Command | Action |
+|---------------|--------|
+| `<leader>zn` | `new_card()` |
+| `<leader>zi` | `new_inbox_note()` |
+| `<leader>zI`, `:ZettelInit` | `init_workspace()` |
+| `<leader>zb` | `backlinks()` |
+| `<leader>zg` | `generate_graph()` |
 
-```lua
--- Example note creation workflow
-vim.ui.input({ prompt = ' 󰎚 Card Title (Enter for Quick Note): ' }, function(title)
-  if title == '' then
-    M.new_inbox_note()
-  else
-    M.new_card(title)
-  end
-end)
-```
+## Gotchas
 
-This documentation provides a structural overview of zettel.lua to facilitate AI-assisted development in Neovim.
+- `backlinks()` matches only the exact `[[stem]]`. Aliased or heading links (`[[stem|alias]]`, `[[stem#h]]`) are not found. The graph regex keeps the `|alias`/`#h` part in the target name.
+- Template files are written asynchronously, so `init_workspace()` can open `index.md` before its content has been written.

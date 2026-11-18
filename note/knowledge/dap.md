@@ -42,103 +42,43 @@ Debug configuration using `nvim-dap` with UI, virtual text, and language-specifi
 | `<leader>dt` | `dap.terminate()` | Terminate session |
 | `<leader>dw` | `dap.ui.widgets.hover()` | Evaluate expression under cursor |
 
-**Python-specific** (`<localleader>` prefix):
+**Python-specific** (note the inconsistent prefixes):
 
 | Key | Action |
 |-----|--------|
 | `<localleader>dT` | `dap-python.test_method()` |
-| `<localleader>dC` | `dap-python.test_class()` |
+| `<leader>dTC` | `dap-python.test_class()` |
+
+The whole spec is lazy-loaded on first use of any of these keys.
 
 ## Configuration (`config` function)
 
-### Sign Definitions
+- **Signs**: custom icons for `DapBreakpoint`, `DapBreakpointCondition`, `DapLogPoint`, `DapStopped`, `DapBreakpointRejected`.
+- **Auto UI**: dap-ui opens on `event_initialized` and closes on `event_terminated` / `event_exited` (listener key `dapui-auto-open` / `dapui-auto-close`).
+- **nvim-dap-virtual-text**: default setup.
 
-Custom breakpoint signs:
+### Adapters & configurations
 
-- `DapBreakpoint` — `` (normal)
-- `DapBreakpointCondition` — `` (conditional)
-- `DapLogPoint` — `` (log point)
-- `DapStopped` — `` (current line)
-- `DapBreakpointRejected` — `` (rejected)
+| Language | Adapter | Configuration |
+|----------|---------|---------------|
+| C / C++ / Rust | `codelldb` (server, Mason binary; `codelldb.cmd` on Windows) | `Launch file`: prompts for executable (default `cwd/`), `stopOnEntry = false`. `c` and `rust` reuse the `cpp` table |
+| Zig | `codelldb` | `Launch Zig`: prompts for executable (default `cwd/zig-out/bin/`), `stopOnEntry = true` |
+| Go | delve, registered by `require('dap-go').setup({})` | from dap-go |
+| Python | debugpy, via `require('dap-python').setup('python3', {})` | from dap-python |
 
-### Auto UI Management
+> [!NOTE]
+> dap-python is given `python3` from PATH, so debugpy must be importable by that interpreter; the Mason `debugpy`
+> package is not wired into this config.
 
-```lua
-dap.listeners.after.event_initialized['dapui-auto-open'] = function() dapui.open() end
-dap.listeners.before.event_terminated['dapui-auto-close'] = function() dapui.close() end
-dap.listeners.before.event_exited['dapui-auto-close'] = function() dapui.close() end
-```
+## Mason Packages
 
-### Adapters
+Listed in `M.tools` (`lua/lsp/servers.lua`); installed when the Mason panel is opened with `<leader>pm`.
 
-#### codelldb (C/C++/Rust/Zig)
-
-```lua
-dap.adapters.codelldb = {
-  type = 'server',
-  port = '${port}',
-  executable = {
-    command = codelldb_cmd,  -- Mason path: ~/.local/share/nvim/mason/bin/codelldb
-    args = { '--port', '${port}' },
-  },
-}
-```
-
-### Configurations
-
-#### Zig
-
-```lua
-dap.configurations.zig = {
-  {
-    type = 'codelldb',
-    request = 'launch',
-    name = 'Launch Zig',
-    program = function()
-      return vim.fn.input('Path to executable: ', vim.uv.cwd() .. '/zig-out/bin/', 'file')
-    end,
-    cwd = '${workspaceFolder}',
-    stopOnEntry = true,
-    args = {},
-  },
-}
-```
-
-#### C/C++/Rust (shared)
-
-```lua
-dap.configurations.cpp = {
-  {
-    name = 'Launch file',
-    type = 'codelldb',
-    request = 'launch',
-    program = function()
-      return vim.fn.input('Path to executable: ', vim.uv.cwd() .. '/', 'file')
-    end,
-    cwd = '${workspaceFolder}',
-    stopOnEntry = false,
-    args = {},
-  },
-}
-dap.configurations.c = dap.configurations.cpp
-dap.configurations.rust = dap.configurations.cpp
-```
-
-#### Go
-
-Uses `nvim-dap-go` adapter (configured via `require('dap-go').setup({})`).
-No manual configuration needed — delve adapter auto-registers.
-
-#### Python
-
-Uses `nvim-dap-python` with `debugpy` (configured via `require('dap-python').setup('python3', {})`).
-
-## Mason Packages Required
 
 | Package | Language | Purpose |
 |---------|----------|---------|
 | `codelldb` | C/C++/Rust/Zig | Debug adapter |
-| `debugpy` | Python | Debug adapter |
+| `debugpy` | Python | Listed in `M.tools`, but not used by dap-python here (see note above) |
 | `delve` | Go | Debug adapter (used by dap-go) |
 
 ## Adding a New Language
@@ -147,7 +87,7 @@ Uses `nvim-dap-python` with `debugpy` (configured via `require('dap-python').set
 2. **Add adapter** in `dap.adapters.<name>` (if not auto-registered by plugin)
 3. **Add configuration** in `dap.configurations.<filetype>`
 4. **Add keymaps** if language-specific actions needed
-5. **Add to `M.tools`** in `lua/lsp/servers.lua` for Mason auto-install
+5. **Add to `M.tools`** in `lua/lsp/servers.lua` so `<leader>pm` installs it
 
 ## Troubleshooting
 
@@ -156,10 +96,6 @@ Uses `nvim-dap-python` with `debugpy` (configured via `require('dap-python').set
 | Adapter not found | Check Mason package installed, verify `command` path |
 | Breakpoints not hit | Ensure debug build (`-g` flag), check `stopOnEntry` |
 | UI not opening | Verify `dapui.setup()` called, check listeners |
-| Python/Go not working | Ensure `dap-python`/`dap-go` setup called with correct Python/delve path |
+| Python not working | `python3 -c "import debugpy"` must succeed |
+| Go not working | Ensure `delve` (`dlv`) is installed |
 
-## Integration with LSP
-
-- DAP is independent of LSP but often uses same Mason packages
-- LSP provides code intelligence; DAP provides runtime debugging
-- `dap-go`/`dap-python` handle language-specific launch configurations

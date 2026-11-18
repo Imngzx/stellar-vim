@@ -1,47 +1,19 @@
 # multicursor.lua — Built-in Multicursor (Neovim 0.13+) Wrapper
 
-> **Purpose**: Thin wrapper around Neovim's built-in `vim._core.mcursor` with ergonomic keymaps and match management.
+> **Purpose**: Ergonomic `<leader>j` keymaps over Neovim's built-in multicursor (`zq`, `Q`, `q=`, `vim._core.mcursor`).
 > **Location**: `lua/custom/multicursor.lua`
-> **Dependency**: Neovim 0.13+ (built-in multicursor API)
+> **Loaded by**: `config/resonance.lua` → `safe_setup('custom.multicursor', require('custom.multicursor').setup)` (inside the `User VeryLazy` block)
+> **Dependency**: Neovim 0.13+ (`vim._core.mcursor`, no external plugins)
 
 ---
 
-## Overview
+## Public API
 
-Thin wrapper (~140 lines) around `vim._core.mcursor` providing:
+| Function | Description |
+|----------|-------------|
+| `M.setup()` | Gets the `nvim.multicursor` namespace, requires `vim._core.mcursor`, registers keymaps |
 
-- **Word/all-matches cursors** — `mcA` / `mcw`
-- **Visual multicursor** — `mcV`
-- **Numbered cursors** — `mcN` / `mcP` (padded)
-- **Navigation** — `mcj` / `mck` (next/prev), with remove variants
-- **Follow mode** — `mcF` toggle
-- **Numbers** — `mc#` (1,2,3...) / `mc#p` (001,002...)
-
----
-
-## Requirements
-
-- **Neovim 0.13+** — Built-in `vim._core.mcursor` module
-- No external plugins needed
-
----
-
-## Core Functions
-
-| Function | Trigger | Description |
-|----------|---------|-------------|
-| `multicursor_all_matches()` | `mcA` | All matches of current search |
-| `multicursor_word_under_cursor()` | `mcw` | Word under cursor |
-| `multicursor_visual_matches()` | `mcV` | Visual selection matches |
-| `clear_multicursors()` | `mcc` | Clear all cursors |
-| `restore_multicursors()` | `mcr` | Restore previous cursors |
-| `multicursor_numbers()` | `mc#` | Number cursors 1,2,3... |
-| `multicursor_numbers_padded()` | `mc#p` | Number cursors 001,002... |
-| `follow_mode_state()` | `mcF` | Toggle follow mode |
-| `jump_next_cursor()` | `mcj` | Jump to next cursor |
-| `jump_prev_cursor()` | `mck` | Jump to prev cursor |
-| `jump_next_cursor(true)` | `mcJ` | Jump next + remove |
-| `jump_prev_cursor(true)` | `mcK` | Jump prev + remove |
+Everything else is module-local. The built-in functions actually used are `mcursor.active()`, `mcursor.restore()`, `mcursor.jump(forward, count)` and `mcursor.number(start, step, format)`.
 
 ---
 
@@ -49,126 +21,29 @@ Thin wrapper (~140 lines) around `vim._core.mcursor` providing:
 
 | Mode | Key | Action |
 |------|-----|--------|
-| `n`, `x` | `mcA` | All matches of search |
-| `n` | `mcw` | Word under cursor |
-| `x` | `mcV` | Visual selection matches |
-| `n` | `mcc` | Clear all cursors |
-| `n` | `mcr` | Restore cursors |
-| `n` | `mc#` | Number cursors (1,2,3) |
-| `n` | `mc#p` | Number cursors (001,002) |
-| `n` | `mcF` | Toggle follow mode |
-| `n` | `mcj` | Jump to next cursor |
-| `n` | `mck` | Jump to prev cursor |
-| `n` | `mcJ` | Jump next + remove cursor |
-| `n` | `mcK` | Jump prev + remove cursor |
+| `n` | `<leader>j*` | Cursor at every match of `<cword>` (sets `/` to `\V<word>`, enables `hlsearch`, runs `zqgn`) |
+| `n` | `<leader>j/` | Cursor at every match of the current search pattern (`zqgn`); warns if there are no matches |
+| `n` | `<leader>jn` / `<leader>jN` | `zqgn` / `zqgN` |
+| `n` | `<leader>jl` | `Vzqj` (desc: each line in current paragraph) |
+| `n` | `<leader>jL` | `Vzqj` (same as `<leader>jl`, desc: each line in visual selection) |
+| `x` | `<leader>j` | `zq` — cursors at the following motion within the selection |
+| `x` | `<leader>jl` | `vQ` (desc: each line in selection) |
+| `x` | `<leader>j*` | `zqgn` within the selection |
+| `n` | `<leader>jc` | Clear all cursors (clears the `nvim.multicursor` extmark namespace) |
+| `n` | `<leader>jQ` | Restore the previous session's cursors (`mcursor.restore()`) |
+| `n` | `<leader>jt` | Toggle follow mode (`q=`), then notify the buffer-local `'follow'` state |
+| `n` | `<leader>ji` | Insert ascending numbers at cursors: `1, 2, 3…` |
+| `n` | `<leader>jI` | Insert zero-padded numbers: `001, 002…` |
+| `n` | `]c` / `[p` | Jump to next / previous cursor (`[count]` supported) |
+| `n` | `]C` / `[C` | Jump to next / previous cursor, then `Q` to remove the cursor there |
+
+Jump, number, and clear mappings do nothing (or warn) when no multicursor session is active.
 
 ---
 
-## Internal API Usage
+## Gotchas
 
-```lua
-local mcursor = require('vim._core.mcursor')
-
--- Check active
-mcursor.active()
-
--- Create cursors
-mcursor.add()           -- Add cursor at cursor
-mcursor.add_all()       -- All matches
-mcursor.add_word()      -- Word under cursor
-mcursor.add_visual()    -- Visual selection
-
--- Navigation
-mcursor.jump_next()
-mcursor.jump_prev()
-mcursor.jump_next_remove()
-mcursor.jump_prev_remove()
-
--- Numbers
-mcursor.number(start, step, format)  -- format: '%d' or '%03d'
-
--- State
-mcursor.follow  -- boolean, follow mode
-mcursor.restore()  -- Restore saved cursors
-mcursor.clear()    -- Clear all
-```
-
----
-
-## Search Integration
-
-```lua
-local function get_matches()
-  local total = vim.fn.searchcount({ maxcount = 0 }).total
-  return { total = total }
-end
-
-local function escape_search(word)
-  return vim.fn.escape(word, '\\')
-end
-```
-
-- Uses `vim.fn.searchcount()` for match counting
-- Escapes regex special chars for word search
-
----
-
-## Setup Function
-
-```lua
-function M.setup()
-  ns_mc = api.nvim_create_namespace('nvim.multicursor')
-  mcursor = require('vim._core.mcursor')
-  setup_keymaps()
-end
-```
-
-- Creates dedicated namespace
-- Loads built-in multicursor module
-- Registers all keymaps
-
----
-
-## Visual Mode Behavior
-
-| Mapping | Behavior |
-|---------|----------|
-| `mcV` | Creates cursors at each line of visual selection |
-| `mcA` | Uses current search register (`/`) for all matches |
-| `mcw` | Uses `<cword>` for word under cursor |
-
----
-
-## Follow Mode
-
-```lua
-local function follow_mode_state()
-  local state = vim.bo.follow and 'ON' or 'OFF'
-  vim.notify('Follow mode is ' .. state, vim.log.levels.INFO)
-end
-```
-
-- Toggles `vim.bo.follow`
-- Shows notification with current state
-
----
-
-## Related Files
-
-- `lua/config/keymaps.lua` — Keymap registration
-- `:help vim._core.mcursor` — Built-in API docs
-
----
-
-## Design Decisions
-
-| Decision | Rationale |
-|----------|-----------|
-| Wrapper not replacement | Uses Neovim's built-in (stable, maintained) |
-| Minimal API surface | Only exposes useful keymaps |
-| `vim._core.mcursor` | Official internal API (stable in 0.13+) |
-| No external deps | Zero dependencies |
-
-- `vim._core.mcursor` is internal — subject to change (low risk in 0.13+)
-- No undo integration for multicursor operations
-- No column-block editing (line-based only)
+- `]c` overrides Vim's built-in diff-mode `]c`; `]C`/`[C` override the built-in mcursor jumps (which also work without an active session).
+- `<leader>jc` clears the extmarks directly instead of using the built-in `gQ`, so it does not save the snapshot that `mcursor.restore()` (`<leader>jQ`) reads.
+- `vim._core.mcursor` is an internal module and may change.
+- Built-in reference: `:help zq`, `:help Q`, `:help q=`, `:help 'follow'`.

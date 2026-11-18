@@ -3,6 +3,8 @@
 ## Overview
 
 Unified LSP server + formatter + linter + Mason tool registry. Single source of truth in `lua/lsp/servers.lua`.
+`lua/plugins/lsp.lua` (loaded on `User VeryLazy`) calls `require('lsp').setup()` and `lsp_config()`, then registers the
+completion/format/lint plugins.
 
 ## Architecture
 
@@ -10,109 +12,93 @@ Unified LSP server + formatter + linter + Mason tool registry. Single source of 
 lua/lsp/
 ├── init.lua       # LSP manager: registration, formatter/linter config, Mason tools
 ├── servers.lua    # Unified registry (servers, formatters, linters, tools)
-└── servers/       # Per-language server configs (return vim.lsp.Config)
-    ├── c-language.lua
-    ├── golang.lua
-    ├── lua.lua
-    ├── python.lua
-    ├── rust.lua
-    └── ...
+└── servers/       # Per-language config modules
+    ├── c-language.lua  # clangd (currently unused; clangd entry is commented out)
+    ├── cmake.lua       # neocmake
+    ├── golang.lua      # gopls
+    ├── lua.lua         # lua_ls, emmylua_ls (only lua_ls is registered)
+    ├── luau.lua        # luau-lsp
+    ├── markdown.lua    # rumdl, markdown_oxide
+    ├── python.lua      # ruff, ty, basedpyright, pyrefly (only ruff + ty registered)
+    ├── qml.lua         # qmlls6
+    ├── rust.lua        # rust_analyzer
+    ├── vue.lua         # vtsls (currently unused; entry commented out)
+    └── zig.lua         # zls
 ```
 
-## Registry Spec (`servers.lua`)
+## Registry (`servers.lua`)
 
-### Server Spec Formats
+The spec format (simple / complex / formatter-only entries, formatter sub-spec, `config_module`) is documented in the
+header comment of `lua/lsp/servers.lua`. Gotchas not obvious from that comment:
 
-**Simple** (no custom config, no formatter):
+- **`config_key` picks a sub-table of the config module**, it does not rename the server. `register_server()` always calls
+  `vim.lsp.config(name, ...)` with the registry key as `name`, using `mod[config_key or name] or mod` as the config.
+  Modules returning several configs (`lua.lua`, `python.lua`, `markdown.lua`) rely on this.
+- **`mason` is only checked for `~= false`** on server entries; the package name comes from `mason_name` or the server
+  name. A string value (e.g. `['luau-lsp'] = { 'luau', mason = 'luau-lsp' }`) is not used as the package name.
+  On formatter-only entries and formatter sub-specs, `mason` *is* the package name (`true` = formatter name).
+- Several servers use `mason = have_exe('<bin>') == 0` so Mason installs them only if no system binary exists.
+- Entries with `false` as config module rely on nvim-lspconfig's `lsp/<name>.lua` defaults.
 
-```lua
-jsonls = 'json-lsp',  -- Mason package name
-```
+### Registered servers
 
-**Complex** (custom config module, optional formatter):
+| Server | Filetypes / purpose | Config module | Formatter |
+|--------|---------------------|---------------|-----------|
+| `mesonlsp` | Meson | — | — |
+| `jsonls` | JSON | — | (`jq`, formatter-only) |
+| `fish_lsp` | fish | — | — |
+| `emmet_language_server` | HTML/CSS abbreviations | — | — |
+| `taplo` | TOML | — | `taplo` |
+| `bashls` | sh, bash | — | `shfmt` |
+| `html` | HTML | — | `prettier` |
+| `clice` | C/C++ (system binary, not Mason) | — | `clang-format` |
+| `neocmake` | CMake | `cmake` | `cmake_format` (Mason `cmakelang`) |
+| `gopls` | Go | `golang` | `gofumpt` (+ `goimports`, formatter-only) |
+| `zls` | Zig | `zig` | `zigfmt` |
+| `rust_analyzer` | Rust | `rust` | `rustfmt` |
+| `qmlls6` | QML (quickshell), system binary | `qml` | — |
+| `luau-lsp` | Luau (Roblox) | `luau` | — |
+| `lua_ls` | Lua | `lua` | built-in |
+| `ruff` | Python lint/format | `python` | `ruff_format` |
+| `ty` | Python type checker | `python` | — |
+| `rumdl` | Markdown lint | `markdown` | `rumdl` |
+| `md_oxide` | Markdown notes/wiki-links (Mason `markdown-oxide`) | `markdown` (`markdown_oxide` key) | — |
 
-```lua
-clangd = {
-  'c-language',           -- config module: lsp.servers.c-language
-  mason = false,          -- don't install via Mason (system clangd)
-  formatter = {
-    name = 'clang_format', -- conform.nvim formatter name
-    mason = 'clang-format', -- Mason package for formatter
-    ft = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' }
-  }
-}
-```
+Formatter-only entries: `prettier` (js/jsx/ts/tsx/html/css/yaml), `shfmt`, `jq` (json), `goimports`.
 
-**Complex fields:**
+Commented out: `clangd`, `basedpyright`, `vtsls` (Vue).
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `[1]` | string | Config module under `lsp.servers.*` |
-| `mason` | boolean | Auto-install via Mason (default: true) |
-| `mason_name` | string | Mason package name if different from server name |
-| `config_key` | string | Override server name for `vim.lsp.config()` |
-| `formatter` | table | Formatter sub-spec (see below) |
+### Linters (`M.linters`)
 
-**Formatter-only** (no LSP server):
+`htmlhint` (html), `golangcilint` (go). Used for nvim-lint `linters_by_ft` and Mason install list.
 
-```lua
-prettier = {
-  formatter_only = true,
-  ft = { 'javascript', 'html', 'css' },
-  mason = 'prettier',
-  name = 'prettier'
-}
-```
+### Mason tools (`M.tools`)
 
-**Formatter sub-spec:**
+`codelldb`, `debugpy`, `shellcheck`, `mpls`, `gomodifytags`, `impl`, `delve`.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | string | conform.nvim formatter name (required) |
-| `mason` | false\|true\|string | false=bundled, true=same name, string=Mason package |
-| `ft` | string[] | Filetypes this formatter applies to (required) |
-
-### Linters Registry (`M.linters`)
-
-```lua
-M.linters = {
-  golangcilint = { ft = { 'go' }, mason = 'golangci-lint' },
-  htmlhint = { ft = { 'html' }, mason = 'htmlhint' },
-}
-```
-
-Used by `nvim-lint` for `linters_by_ft` and Mason auto-install.
-
-### Mason Tools (`M.tools`)
-
-```lua
-M.tools = {
-  'codelldb', 'debugpy', 'shellcheck', 'mpls',
-  'gomodifytags', 'impl', 'delve',  -- Go tools
-}
-```
-
-Non-LSP tools installed via Mason (debuggers, linters, etc.).
-
-## LSP Manager (`init.lua`)
+## LSP Manager (`lua/lsp/init.lua`, required as `lsp`)
 
 ### Public API
 
-| Function | Returns | Description |
-|----------|---------|-------------|
-| `setup()` | nil | Registers all servers, builds `enabled_servers` + `mason_tools` |
-| `get_conform_config()` | table | `formatters_by_ft` for conform.nvim |
-| `get_lint_config()` | table | `linters_by_ft` for nvim-lint |
-| `get_mason_tools()` | string[] | Deduplicated Mason packages list |
-| `lsp_config()` | nil | Enables servers, sets up LspAttach keymaps, diagnostics |
+| Function / field | Description |
+|------------------|-------------|
+| `setup()` | Registers every non-formatter-only server via `vim.lsp.config()`, fills `enabled_servers` and `mason_tools` |
+| `lsp_config()` | `vim.lsp.enable(enabled_servers)`, installs the `LspAttach` autocmd (group `LspKeymaps`), sets diagnostics config |
+| `get_conform_config()` | `formatters_by_ft` for conform.nvim |
+| `get_lint_config()` | `linters_by_ft` for nvim-lint |
+| `get_mason_tools()` | Deduplicated list of all Mason packages: servers, formatters, linters, `M.tools` |
+| `enabled_servers` | Server names passed to `vim.lsp.enable()` |
+| `mason_tools` | Server packages + `M.tools` only (no formatters/linters); use `get_mason_tools()` for the full list |
 
-### Internal Helpers
+Internal helpers: `register_server`, `build_by_ft`, `make_dedupe`/`dedupe`.
 
-- `register_server(name, spec)` — loads config module, calls `vim.lsp.config(name, config)`
-- `build_by_ft(registry, name_getter, ft_getter)` — generic `{ft = {names}}` builder
-- `dedupe(list)` — closure-based deduplication (zero allocations)
+> [!NOTE]
+> `build_by_ft()` iterates the registry with `next`, so the order of multiple formatters for one filetype (e.g. go:
+> `gofumpt` + `goimports`) is hash order, not file order.
 
-### LspAttach Keymaps (set in `lsp_config()`)
+### LspAttach behavior & keymaps (buffer-local)
+
+Inlay hints are enabled automatically when the client supports `textDocument/inlayHint`.
 
 | Key | Action |
 |-----|--------|
@@ -120,72 +106,46 @@ Non-LSP tools installed via Mason (debuggers, linters, etc.).
 | `gr` | Goto References |
 | `gI` | Goto Implementation |
 | `<leader>D` | Type Definition |
-| `<leader>ds` | Document Symbols |
-| `<leader>ws` | Workspace Symbols |
+| `<leader>dS` | Document Symbols |
+| `<leader>cS` | Workspace Symbols |
 | `<leader>cr` | Rename Symbol |
-| `<leader>ca` | Code Action |
+| `<leader>ca` | Code Action (n, x) |
 | `K` | Hover |
-| `gK` / `<C-k>` | Signature Help |
-| `]d` / `[d` | Next/Prev Diagnostic |
+| `gK` (n) / `<C-k>` (i) | Signature Help |
+| `<leader>pl` | `:checkhealth vim.lsp` |
+| `<leader>cl` | Line Diagnostics (float) |
+| `]d` / `[d` | Next/Prev Diagnostic (opens float after jump, honors count) |
 | `]e` / `[e` | Next/Prev Error |
 | `]w` / `[w` | Next/Prev Warning |
 
-### Diagnostics Config
+### Diagnostics config
 
-- `virtual_text = false` (using tiny-inline-diagnostic)
-- `underline = true`
-- `severity_sort = true`
+- `virtual_text = false` (tiny-inline-diagnostic renders inline instead)
+- `underline = true`, `update_in_insert = false`, `severity_sort = true`
 - Rounded float border
-- Custom signs from `I.lsp` icons
+- Sign text from the global `I.lsp` icons
 
-## Server Config Modules (`lsp/servers/*.lua`)
+## Plugins (`lua/plugins/lsp.lua`)
 
-Each returns a `vim.lsp.Config` table (or table of configs keyed by server name).
+| Plugin | Trigger | Notes |
+|--------|---------|-------|
+| `mason.nvim` | `:Mason*` cmds, `<leader>pm` | `<leader>pm` opens Mason, refreshes the registry and installs anything missing from `get_mason_tools()` — Mason packages are **not** auto-installed otherwise |
+| `nvim-lspconfig` | `BufReadPre`, `BufNewFile` | Provides default `lsp/<name>.lua` configs |
+| `conform.nvim` | `BufReadPost`, `<leader>cf` | `formatters_by_ft` from registry; format on save (`timeout_ms = 800`, `lsp_format = 'fallback'`); `stop_after_first` only for js/jsx/ts/tsx/html/css. `<leader>cf` formats async |
+| `nvim-lint` | `BufReadPre`, `BufNewFile` | `linters_by_ft` from registry; `try_lint()` on `BufEnter`/`BufWritePost` (augroup `DIY_Linting`) |
+| `lazydev.nvim` | `ft = lua` | Library includes several plugins, the config `lua/` dir, yazi `types.yazi`, and Hyprland stubs (`/usr/share/hypr/stubs`) |
+| `blink.cmp` (v1) | `InsertEnter`, `CmdlineEnter` | `enter` preset; disabled in prompt buffers, snacks picker input, and inside treesitter comment nodes; sources: `lazydev` first for lua, `telegram` source for telegram ft; cmdline completion enabled (`<C-y>` select+accept); labels via colorful-menu |
+| `tiny-inline-diagnostic.nvim` | `BufReadPre`, `BufNewFile` | `modern` preset, shows source |
 
-Example (`golang.lua`):
-
-```lua
----@type vim.lsp.Config
-return {
-  cmd = { 'gopls' },
-  filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
-  root_markers = { 'go.work', 'go.mod', '.git' },
-  settings = {
-    gopls = {
-      gofumpt = true,
-      staticcheck = true,
-      -- ... all gopls settings
-    },
-  },
-}
-```
+Also sets `vim.g.markdown_fenced_languages`.
 
 ## Adding a New Language
 
-1. **Create config module**: `lua/lsp/servers/<name>.lua` returning `vim.lsp.Config`
-2. **Add to registry**: Edit `lua/lsp/servers.lua`, add entry to `M.servers`
-   - Use complex spec if custom config/formatter needed
-   - Use simple spec for default nvim-lspconfig behavior
-3. **Add formatter** (if needed): Add `formatter` sub-spec or `formatter_only` entry
-4. **Add linter** (if needed): Add to `M.linters`
-5. **Add Mason tools**: Add debugger/tools to `M.tools`
-6. **Add treesitter parsers**: Update `lua/plugins/treesitter.lua`
-7. **Test**: `nvim --headless -c "luafile ~/.config/nvim/tests/smoke.lua" -c "qall"`
+1. If custom config is needed, create `lua/lsp/servers/<name>.lua` returning a `vim.lsp.Config` (or a table of configs keyed by `config_key`)
+2. Add an entry to `M.servers` in `lua/lsp/servers.lua` (formatter via `formatter` sub-spec or a formatter-only entry)
+3. Linters → `M.linters`; debuggers/other tools → `M.tools`
+4. Treesitter parsers → `lua/plugins/treesitter.lua`
+5. Test: `nvim --headless -c "luafile ~/.config/nvim/tests/smoke.lua" -c "qall"`
 
 > [!TIP]
-> Each name just needed to be mentioned **once** in servers.lua, duplication is discouraged
-
-## Integration Points
-
-| Plugin | Config Source |
-|--------|---------------|
-| `nvim-lspconfig` | `vim.lsp.config()` via `register_server()` |
-| `conform.nvim` | `get_conform_config()` → `formatters_by_ft` |
-| `nvim-lint` | `get_lint_config()` → `linters_by_ft` |
-| `mason.nvim` | `get_mason_tools()` → `ensure_installed` |
-
-## Performance Notes
-
-- LuaJIT optimized: `next` for hash traversal, hoisted locals, closure-based dedupe
-- Lazy loading: All plugins triggered via `User VeryLazy` autocmd
-- Bytecode cache enabled in `custom/startup.lua`
+> Each name only needs to be mentioned **once** in `servers.lua`; duplication is discouraged.

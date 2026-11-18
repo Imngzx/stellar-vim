@@ -1,94 +1,36 @@
 # todo.lua — Project-wide TODO/FIXME Search
 
-> **Purpose**: Search and navigate TODO/FIXME comments across the entire project using Snacks.nvim's grep engine.
+> **Purpose**: Search annotated comments across the project with Snacks' grep picker.
 > **Location**: `lua/custom/todo.lua`
-> **Trigger**: `<Leader>st` (defined in keymaps)
+> **Loaded**: `safe_setup('custom.todo', ...)` inside the `User VeryLazy` block of `lua/config/resonance.lua`
 
 ---
 
-## Overview
+## Keywords
 
-Minimal wrapper around `snacks.picker.grep` that searches for annotated comments using a pre-defined keyword list. No custom highlighting or parsing — delegates to `mini.hipatterns` for inline highlighting and Snacks for project-wide search.
+`TODO`, `FIXME`, `NOTE`, `WARN`, `HACK`, `PERF` (module-local `keywords` table).
 
----
-
-## Keywords Tracked
-
-```lua
-local keywords = {
-  'TODO',    -- Work to be done
-  'FIXME',   -- Known bug/broken code
-  'NOTE',    -- Important context
-  'WARN',    -- Warning/potential issue
-  'HACK',    -- Temporary workaround
-  'PERF'     -- Performance optimization needed
-}
-```
+The search regex is built as `\b(TODO|FIXME|NOTE|WARN|HACK|PERF):` — the word boundary avoids `NOTTODO:` and the trailing `:` limits hits to annotations rather than bare words.
 
 ---
 
-## Core Functions
+## Public API
 
 | Function | Purpose |
 |----------|---------|
-| `M.setup()` | No-op — highlights handled by `mini.hipatterns` |
-| `M.search()` | Opens Snacks grep picker with regex for keywords |
+| `M.setup()` | No-op; kept so the loader call doesn't fail. Highlighting lives in `plugins/mini-hipatterns.lua`. |
+| `M.search()` | Opens `snacks.picker.grep` (title `Todo Comments`, `regex = true`) with the pattern above. Silently returns if `snacks` can't be required. |
 
 ---
 
-## Search Implementation
+## Keymaps
 
-```lua
-function M.search()
-  local search_pattern = '\\b(' .. table.concat(keywords, '|') .. '):'
-  -- Results in regex: \b(TODO|FIXME|NOTE|WARN|HACK|PERF):
-  
-  snacks.picker.grep({
-    title = 'Todo Comments',
-    prompt = ' 󰄳  ',
-    search = search_pattern,
-    regex = true,
-  })
-end
-```
-
-- **`\b`** — Word boundary (matches `TODO:` but not `NOTTODO:`)
-- **`:` suffix** — Matches annotated comments (`TODO: fix this`) not bare words
-- **`regex = true`** — Enables ripgrep regex engine
+| Key | Action | Defined in |
+|-----|--------|------------|
+| `<Leader>st` | `require('custom.todo').search()` | `lua/plugins/snacks/keys.lua` |
 
 ---
 
-## Integration Points
+## Gotchas
 
-| Module | Role |
-|--------|------|
-| `mini.hipatterns` | Inline highlighting of keywords in buffers |
-| `snacks.picker` | Project-wide grep with preview, filters, actions |
-| `keymaps.lua` | `<Leader>st` → `require('custom.todo').search()` |
-
----
-
-## Keybindings
-
-| Key | Action |
-|-----|--------|
-| `<Leader>st` | Open project-wide TODO search |
-
----
-
-## Design Decisions
-
-| Decision | Rationale |
-|----------|-----------|
-| No custom highlight engine | `mini.hipatterns` uses extmarks (modern, no screen residue bugs) |
-| Delegates grep to Snacks | Ripgrep backend, preview, filters, actions built-in |
-| Keywords as table | Easy to extend, single source of truth |
-| Regex word boundary | Avoids false positives (`NOTTODO:`) |
-
----
-
-## Related Files
-
-- `lua/plugins/mini-hipatterns.lua` — Inline highlighting config
-- `lua/plugins/snacks/keys.lua` — `<Leader>st` keymap
-- `lua/config/keymaps.lua` — Keymap registration
+- In-buffer keyword highlighting is done by `mini.hipatterns` (extmarks), which keeps its own keyword list in `lua/plugins/mini-hipatterns.lua`. Adding a keyword here does not highlight it, and vice versa — update both.
