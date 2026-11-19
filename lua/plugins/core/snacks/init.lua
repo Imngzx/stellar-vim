@@ -1,6 +1,5 @@
 ---@module 'snacks'
 
-local utils = require('libs.utils')
 local power = require('libs.power')
 
 local function setup()
@@ -101,7 +100,7 @@ local function setup()
   -- NOTE: can enable this if you want snacks notifier shows lsp progress
   -- require('plugins.core.snacks.lsp_progress')
 
-  if utils.is_compatible_version('0.11') then
+  if require('libs.utils').is_compatible_version('0.11') then
     ---@diagnostic disable-next-line: duplicate-set-field
     vim._print = function(_, ...) dd(...) end
   else
