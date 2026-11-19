@@ -2,6 +2,8 @@ local H = {}
 
 -- calls the second init in this config
 local lsp_manager = require('lsp')
+-- Before any server, formatter or linter below can start.
+lsp_manager.add_mason_to_path()
 lsp_manager.setup()
 
 lsp_manager.lsp_config()
