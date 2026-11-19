@@ -16,8 +16,24 @@ M.safe_load = function(mod)
   return ok
 end
 
-M.safe_setup = function(mod, setup_fn, ...)
-  local ok, err = pcall(setup_fn, ...)
+--- Run a module's setup, reporting a failure instead of raising.
+---
+---   safe_setup('custom.todo')                        -- require(mod).setup()
+---   safe_setup('custom.transparent', { a = false })  -- require(mod).setup(opts)
+---   safe_setup('custom.git', function(opts) ... end, opts)  -- your own function
+---
+--- The require runs inside the pcall. Passing `require('x').setup` as the
+--- argument ran the require before safe_setup was even called, so a module
+--- that failed to load raised past it and aborted everything after it.
+M.safe_setup = function(mod, fn_or_opts, ...)
+  local ok, err
+  if type(fn_or_opts) == 'function' then
+    ok, err = pcall(fn_or_opts, ...)
+  else
+    ok, err = pcall(function(...)
+      return require(mod).setup(...)
+    end, fn_or_opts, ...)
+  end
   if not ok then
     handle_error('[config] Failed to setup ' .. mod .. ': ' .. err)
   end

@@ -55,7 +55,7 @@ vim.api.nvim_create_autocmd('User', {
   pattern = 'VeryLazy',
   callback = function()
     -- restore session
-    safe_setup('custom.workspace', require('custom.workspace').setup)
+    safe_setup('custom.workspace')
     safe_load('plugins.fzf')
 
     -- coding (Mason's PATH is set by plugins.lsp, see lsp.add_mason_to_path)
@@ -64,30 +64,30 @@ vim.api.nvim_create_autocmd('User', {
     safe_load('plugins.treesitter-context')
     safe_load('plugins.colorful-lsp-menu')
     safe_load('plugins.ufo')
-    safe_setup('custom.autopairs', require('custom.autopairs').setup)
+    safe_setup('custom.autopairs')
     safe_load('custom.word-jump')
 
     -- UI
     safe_load('plugins.heirline')
-    safe_setup('custom.incline', require('custom.incline').setup)
-    safe_setup('custom.lsp-loading', require('custom.lsp-loading').setup)
-    safe_setup('custom.transparent', require('custom.transparent').setup, { auto_enable = false })
-    safe_setup('custom.multicursor', require('custom.multicursor').setup)
+    safe_setup('custom.incline')
+    safe_setup('custom.lsp-loading')
+    safe_setup('custom.transparent', { auto_enable = false })
+    safe_setup('custom.multicursor')
     safe_load('plugins.minimap')
     safe_load('plugins.mini-hipatterns')
     safe_load('plugins.markdown')
     safe_load('plugins.csvview')
 
     -- Util
-    safe_setup('custom.coderunner', require('custom.coderunner').setup)
-    safe_setup('custom.repl', require('custom.repl').setup)
+    safe_setup('custom.coderunner')
+    safe_setup('custom.repl')
     safe_load('plugins.venv-selector')
     safe_load('plugins.dap')
     safe_load('plugins.jisho')
     safe_load('plugins.AI')
     safe_load('plugins.atone')
-    safe_setup('custom.language-switcher', require('custom.language-switcher').setup)
-    safe_setup('custom.todo', require('custom.todo').setup)
+    safe_setup('custom.language-switcher')
+    safe_setup('custom.todo')
     safe_load('custom.sudo')
 
 
