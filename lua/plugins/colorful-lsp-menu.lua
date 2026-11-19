@@ -1,5 +1,5 @@
 -- [Colorful Menu]
-require('resonance').load({
+return {
   'https://github.com/xzbdmw/colorful-menu.nvim',
   event = { 'InsertEnter', 'CmdlineEnter' },
   config = function()
@@ -39,4 +39,4 @@ require('resonance').load({
       max_width = 60,
     })
   end
-})
+}

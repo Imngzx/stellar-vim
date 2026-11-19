@@ -12,7 +12,7 @@ local function setup_compiler()
   end
 end
 
-require('resonance').load({
+return {
   'https://github.com/nvim-treesitter/nvim-treesitter',
   version = 'main',
 
@@ -46,4 +46,4 @@ require('resonance').load({
       end,
     })
   end
-})
+}

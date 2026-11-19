@@ -1,4 +1,4 @@
-require('resonance').load({
+return {
   'https://github.com/kevinhwang91/nvim-ufo',
   dependencies = 'https://github.com/kevinhwang91/promise-async',
   event = { 'BufReadPost', 'BufNewFile' },
@@ -110,4 +110,4 @@ require('resonance').load({
       }
     })
   end
-})
+}

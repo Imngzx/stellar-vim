@@ -1,4 +1,4 @@
-require('resonance').load({
+return {
   'https://github.com/ChuYanLon/telegram.nvim',
 
   build = 'npm i',
@@ -12,4 +12,4 @@ require('resonance').load({
   config = function()
     require('telegram').setup({})
   end
-})
+}

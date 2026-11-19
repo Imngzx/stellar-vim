@@ -1,4 +1,4 @@
-require('resonance').load({
+return {
   'https://github.com/ibhagwan/fzf-lua',
   cond = function() return not require('libs.power').is_ac() end,
   cmd = 'FzfLua',
@@ -54,4 +54,4 @@ require('resonance').load({
       }
     })
   end
-})
+}

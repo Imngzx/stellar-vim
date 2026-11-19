@@ -1,5 +1,5 @@
 -- [Treesitter Context]
-require('resonance').load({
+return {
   'https://github.com/nvim-treesitter/nvim-treesitter-context',
   -- 在打开文件时自动加载
   event = { 'BufReadPost', 'BufNewFile' },
@@ -21,4 +21,4 @@ require('resonance').load({
       require('treesitter-context').go_to_context(vim.v.count1)
     end, { silent = true, desc = 'Jump to upper context' })
   end
-})
+}

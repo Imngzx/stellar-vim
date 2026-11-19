@@ -1,5 +1,3 @@
-local H = {}
-
 -- calls the second init in this config
 local lsp_manager = require('lsp')
 -- Before any server, formatter or linter below can start.
@@ -14,7 +12,7 @@ vim.g.markdown_fenced_languages = {
 }
 
 -- [Dependencies] Mason auto install once you open the Mason panel
-require('resonance').load({
+return {
   {
     'https://github.com/mason-org/mason.nvim',
     cmd = { 'Mason', 'MasonInstall', 'MasonUninstall', 'MasonLog', 'MasonUpdate' },
@@ -300,6 +298,4 @@ require('resonance').load({
       })
     end
   }
-})
-
-return H
+}

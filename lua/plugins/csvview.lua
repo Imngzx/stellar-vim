@@ -4,7 +4,7 @@ local create_augroup = api.nvim_create_augroup
 local cmd = vim.cmd
 
 -- [CSV View]
-require('resonance').load({
+return {
   'https://github.com/hat0uma/csvview.nvim',
   cmd = { 'CsvViewEnable', 'CsvViewDisable', 'CsvViewToggle' },
   ft = { 'csv', 'tsv' },
@@ -33,4 +33,4 @@ require('resonance').load({
       cmd([[CsvViewEnable delimiter=, display_mode=border header_lnum=1]])
     end,
   })
-})
+}

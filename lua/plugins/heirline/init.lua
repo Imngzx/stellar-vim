@@ -1,4 +1,4 @@
-require('resonance').load({
+return {
   {
     'https://github.com/rebelot/heirline.nvim',
     event = { 'BufReadPost', 'BufNewFile', 'BufEnter' },
@@ -55,4 +55,4 @@ require('resonance').load({
       require('bpm').setup()
     end
   },
-})
+}

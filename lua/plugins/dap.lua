@@ -1,5 +1,5 @@
 -- [Debugger] Nvim-DAP
-require('resonance').load({
+return {
   plugin = {
     'https://github.com/mfussenegger/nvim-dap',
     'https://github.com/rcarriga/nvim-dap-ui',
@@ -113,4 +113,4 @@ require('resonance').load({
     dap.configurations.rust = dap.configurations.cpp
     -- Go uses nvim-dap-go adapter (configured via dap-go.setup)
   end
-})
+}

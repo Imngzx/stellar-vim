@@ -1,4 +1,4 @@
-require('resonance').load({
+return {
   {
     'https://github.com/olimorris/codecompanion.nvim',
 
@@ -134,4 +134,4 @@ require('resonance').load({
       })
     end
   },
-})
+}

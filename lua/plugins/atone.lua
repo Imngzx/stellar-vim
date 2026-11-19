@@ -1,4 +1,4 @@
-require('resonance').load({
+return {
   'https://github.com/XXiaoA/atone.nvim',
   cmd = { 'Atone' },
   keys = {
@@ -26,4 +26,4 @@ require('resonance').load({
       }
     })
   end
-})
+}

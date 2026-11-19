@@ -20,7 +20,7 @@ vim.g.neominimap = {
   notification_level = vim.log.levels.OFF,
 }
 
-require('resonance').load({
+return {
   'https://github.com/Isrothy/neominimap.nvim',
 
   keys = {
@@ -47,4 +47,4 @@ require('resonance').load({
     -- 强行触发一次
     vim.api.nvim_exec_autocmds('ColorScheme')
   end
-})
+}

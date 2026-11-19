@@ -1,4 +1,4 @@
-require('resonance').load({
+return {
   'https://github.com/nvim-mini/mini.hipatterns',
   event = { 'BufReadPost', 'BufNewFile' },
   config = function()
@@ -87,4 +87,4 @@ require('resonance').load({
       highlighters = highlighters,
     })
   end
-})
+}

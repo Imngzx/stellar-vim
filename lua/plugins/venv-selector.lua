@@ -1,5 +1,5 @@
 -- [Python Venv Selector]
-require('resonance').load({
+return {
   'https://github.com/linux-cultist/venv-selector.nvim',
   -- 只有在打开 Python 文件时，或者手动输入命令时才加载，极致优化启动速度
   ft = 'python',
@@ -18,4 +18,4 @@ require('resonance').load({
       },
     })
   end
-})
+}
