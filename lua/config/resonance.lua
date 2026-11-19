@@ -24,12 +24,19 @@ resonance.setup({
 local utils = require('libs.utils')
 local safe_load = utils.safe_load
 local safe_setup = utils.safe_setup
-local scan = require('config.scan')
+-- resonance.import() pcalls every spec file itself and reports a broken one
+-- through this, so one bad file never stops the rest -- no safe_setup needed.
+-- NVIM_CONFIG_STRICT=1 (tests) makes it fatal.
+local import_opts = {
+  on_error = function(mod, err)
+    local msg = '[config] Failed to load ' .. mod .. ': ' .. tostring(err)
+    if vim.env.NVIM_CONFIG_STRICT == '1' then error(msg, 0) end
+    vim.notify(msg, vim.log.levels.ERROR)
+  end,
+}
 
 --plugins
-safe_setup('config.scan', function()
-  scan.import('plugins.core')
-end)
+resonance.import('plugins.core', import_opts)
 
 -- [Core] lua/plugins/core/: theme + core UI, loaded now, highest `priority`
 -- first (catppuccin = 1000, so the theme lands before any UI plugin)
@@ -46,9 +53,9 @@ vim.api.nvim_create_autocmd('User', {
     -- restore session
     safe_setup('custom.workspace')
 
-    -- every top-level lua/plugins/* spec (core/ is skipped, see config/scan.lua)
+    -- every top-level lua/plugins/* spec (core/ is skipped: imported above)
     -- (Mason's PATH is set by plugins.lsp, see lsp.add_mason_to_path)
-    safe_setup('config.scan', function() scan.import('plugins') end)
+    resonance.import('plugins', import_opts)
 
     -- coding
     safe_setup('custom.autopairs')

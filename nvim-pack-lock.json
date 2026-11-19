@@ -174,8 +174,7 @@
     },
     "resonance.nvim": {
       "rev": "067ad92b268b5ddadb9c72f21f8e04bba7d2e4c2",
-      "src": "https://github.com/Imngzx/resonance.nvim",
-      "version": "'main'"
+      "src": "https://github.com/Imngzx/resonance.nvim"
     },
     "showkeys": {
       "rev": "ffd138f876dcb098fd1726ab4e85c2f7b4307c3c",
