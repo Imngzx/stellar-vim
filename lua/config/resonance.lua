@@ -56,36 +56,27 @@ vim.api.nvim_create_autocmd('User', {
   callback = function()
     -- restore session
     safe_setup('custom.workspace')
-    safe_load('plugins.fzf')
 
-    -- coding (Mason's PATH is set by plugins.lsp, see lsp.add_mason_to_path)
-    safe_load('plugins.treesitter')
-    safe_load('plugins.lsp')
-    safe_load('plugins.treesitter-context')
-    safe_load('plugins.colorful-lsp-menu')
-    safe_load('plugins.ufo')
+    -- every lua/plugins/* spec not in EAGER/SKIP
+    -- (Mason's PATH is set by plugins.lsp, see lsp.add_mason_to_path)
+    local plugins = require('config.scan').scan_plugins()
+    for i = 1, #plugins do
+      safe_load('plugins.' .. plugins[i])
+    end
+
+    -- coding
     safe_setup('custom.autopairs')
     safe_load('custom.word-jump')
 
     -- UI
-    safe_load('plugins.heirline')
     safe_setup('custom.incline')
     safe_setup('custom.lsp-loading')
     safe_setup('custom.transparent', { auto_enable = false })
     safe_setup('custom.multicursor')
-    safe_load('plugins.minimap')
-    safe_load('plugins.mini-hipatterns')
-    safe_load('plugins.markdown')
-    safe_load('plugins.csvview')
 
     -- Util
     safe_setup('custom.coderunner')
     safe_setup('custom.repl')
-    safe_load('plugins.venv-selector')
-    safe_load('plugins.dap')
-    safe_load('plugins.jisho')
-    safe_load('plugins.AI')
-    safe_load('plugins.atone')
     safe_setup('custom.language-switcher')
     safe_setup('custom.todo')
     safe_load('custom.sudo')
@@ -108,8 +99,6 @@ vim.api.nvim_create_autocmd('User', {
       max_summary_length = 30,
       get_git_root = function(filepath) return require('snacks').git.get_root(filepath) end
     })
-
-    safe_load('plugins.telegram')
   end
 })
 
