@@ -31,8 +31,8 @@ Go setup: LSP (gopls), formatting, linting, debugging, file/project running, and
 | `gofumpt` | `gofumpt` |
 | `goimports` | `goimports` |
 
-Both run on save (go is not in the `stop_after_first` list). Their relative order is **not** guaranteed:
-`get_conform_config()` builds the list by hash-iterating the registry.
+Both run on save (go is not in the `stop_after_first` list), always as `goimports` then `gofumpt`:
+`get_conform_config()` walks the registry in sorted key order (`goimports` < `gopls`).
 
 ## Linter (nvim-lint)
 

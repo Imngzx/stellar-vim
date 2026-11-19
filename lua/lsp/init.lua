@@ -7,6 +7,7 @@ local servers = require('lsp.servers')
 local vim_list_extend = vim.list_extend
 local type_check = type
 local table_insert = table.insert
+local table_sort = table.sort
 
 local vim_api = vim.api
 local vim_lsp = vim.lsp
@@ -56,7 +57,15 @@ local dedupe = make_dedupe()
 local function build_by_ft(registry, name_getter, ft_getter)
   local result = {}
 
-  for key, spec in next, registry do
+  -- Sorted keys: hash order is random per run, and conform runs an ft's
+  -- formatters in list order (go: goimports must stay before gofumpt).
+  local keys = {}
+  for key in pairs(registry) do keys[#keys + 1] = key end
+  table_sort(keys)
+
+  for i = 1, #keys do
+    local key = keys[i]
+    local spec = registry[key]
     local name = name_getter(key, spec)
     local ft_list = ft_getter(key, spec)
     if name and ft_list then

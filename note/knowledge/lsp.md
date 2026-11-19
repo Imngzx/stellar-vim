@@ -93,8 +93,9 @@ Commented out: `clangd`, `basedpyright`, `vtsls` (Vue).
 Internal helpers: `register_server`, `build_by_ft`, `make_dedupe`/`dedupe`.
 
 > [!NOTE]
-> `build_by_ft()` iterates the registry with `next`, so the order of multiple formatters for one filetype (e.g. go:
-> `gofumpt` + `goimports`) is hash order, not file order.
+> `build_by_ft()` walks the registry in sorted key order, so the order of multiple formatters for one filetype is
+> deterministic and follows the registry key names (e.g. go: `goimports` from the `goimports` entry, then `gofumpt`
+> from `gopls`). Rename a key to change the order.
 
 ### LspAttach behavior & keymaps (buffer-local)
 
