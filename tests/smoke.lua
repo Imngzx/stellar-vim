@@ -49,7 +49,6 @@ pass('Checking resonance.nvim...')
 local resonance = require('resonance')
 assert_truthy(resonance, 'resonance module not found')
 assert_truthy(resonance.load, 'resonance.load not found')
-assert_truthy(resonance.trigger_verylazy, 'resonance.trigger_verylazy not found')
 pass('resonance.nvim API available')
 
 -- resonance loads `lazy = false` specs (snacks, catppuccin) on VimEnter, but
@@ -62,7 +61,6 @@ pass('VimEnter fired')
 -- 3. Trigger VeryLazy to load all plugins
 -- ============================================================
 pass('Triggering VeryLazy...')
-resonance.trigger_verylazy()
 vim.api.nvim_exec_autocmds('User', { pattern = 'VeryLazy' })
 vim_wait(100)
 pass('VeryLazy triggered')
