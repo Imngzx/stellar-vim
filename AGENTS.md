@@ -3,7 +3,7 @@
 > **Purpose:** the hard rules for editing this config. Read it, then read
 > the source — the source wins.
 > **Target:** Neovim **0.13+** (`vim.pack` + `vim.async`), plugins lazy-loaded
-> by [resonance.nvim](https://github.com/Imngzx/resonance.nvim).
+> repo url [Stellar:Vim](https://github.com/Imngzx/stellar-vim).
 
 ---
 
