@@ -49,17 +49,16 @@ only in its own repo.
 2. **Theme first.** `plugins.core.catppuccin` (`priority = 1000`) loads before any UI plugin, or
    the UI flickers.
 3. **Non-core plugin configs are required inside the `User VeryLazy`
-   autocmd** in `config/resonance.lua`. Requiring them at top level makes
-   LuaJIT parse every config file at startup.
-4. **`resonance.trigger_verylazy()` stays the last line** of
-   `config/resonance.lua`. The buffer-replay autocmd above it must stay a
-   *separate*, *synchronous* VeryLazy callback — see the comment there.
-5. **Every plugin spec needs a lazy trigger** (`event`, `cmd`, `keys`,
+   autocmd** in `config/resonance.lua` (via `import('plugins')`). Requiring
+   them at top level makes LuaJIT parse every config file at startup. VeryLazy
+   fires on its own and resonance replays read events for open buffers —
+   no `trigger_verylazy()` call.
+4. **Every plugin spec needs a lazy trigger** (`event`, `cmd`, `keys`,
    `ft`) unless it is genuinely core UI.
-6. **Never write state into an unwritable or arbitrary cwd.** Paths derived
+5. **Never write state into an unwritable or arbitrary cwd.** Paths derived
    from the workspace root (e.g. `custom/session.lua`) must fall back to
    `stdpath('state')` — nvim is launched from `/etc` and the like.
-7. **Read the plugin's docs before setting options it manages** (e.g.
+6. **Read the plugin's docs before setting options it manages** (e.g.
    nvim-ufo owns folding: do not set `foldmethod`/`foldexpr`).
 
 ---
@@ -110,13 +109,55 @@ No startup regression allowed.
 
 ---
 
-## 5. Common tasks
+## 5. Plugins
 
-**Add a plugin** — create `lua/plugins/<name>.lua` that returns its spec:
-`return { 'https://…', event/cmd/keys/ft = ..., config = function() ... end }`.
-`config/scan.lua` picks it up in VeryLazy; no edit to `config/resonance.lua`.
-Startup-critical plugins go in `lua/plugins/core/` (ordered by `priority`).
-See `note/knowledge/resonance.md`.
+Plugin specs are **auto-imported** by `lua/config/scan.lua`; nothing is
+listed by hand in `config/resonance.lua`. Full details:
+`note/knowledge/resonance.md`.
+
+| Folder | Imported | Use for |
+|---|---|---|
+| `lua/plugins/core/` | at startup, highest `priority` first | theme (`catppuccin`, `priority = 1000`), core UI that must exist before VeryLazy |
+| `lua/plugins/` | in `User VeryLazy`, sorted by name | everything else (the default) |
+
+**Add a plugin** — create `lua/plugins/<name>.lua` that **returns** its
+spec (or a list of specs). Do not call `require('resonance').load()` in the
+file: a returned spec is the convention and the only form `priority` applies to.
+
+```lua
+return {
+  'https://github.com/<author>/<plugin>',          -- full URL, not 'author/plugin'
+  dependencies = 'https://github.com/<author>/<dep>',
+  event = { 'BufReadPost', 'BufNewFile' },        -- and/or cmd / keys / ft (§2.4)
+  keys = { { 'n', '<leader>xx', '<cmd>Foo<cr>', { desc = 'Foo' } } },
+  build = 'make',                                 -- if the plugin needs one
+  cond = require('libs.power').is_ac,             -- optional; false = disabled
+  config = function() require('<plugin>').setup({}) end,
+}
+```
+
+Spec fields resonance accepts: `src`/`url`/`[1]`, `name`, `version`,
+`dependencies`, `event`, `cmd`, `keys`, `ft`, `lazy`, `cond`, `build`,
+`config`/`setup`. `priority` is ours (stripped by `scan.lua` before
+`resonance.load`) and only matters inside `core/`. `lazy = false` means
+"load on VimEnter" and cannot be combined with `event`/`cmd`/`ft`.
+
+Rules:
+- **The spec must be recognizable.** `scan.lua` only registers a table whose
+  `[1]` is a full URL or that has `src`/`url`/`plugin`; anything else is
+  ignored silently.
+- **One top-level file or folder per plugin group.** Split a big config into
+  `lua/plugins/<name>/init.lua` + helpers (`heirline/`); helper files under it
+  are never imported on their own.
+- **Startup-critical goes in `core/`**, everything else in `lua/plugins/` —
+  putting a plugin in `core/` costs startup time (§4 benchmark).
+- **Disable** with `cond = false`, not by deleting or renaming the file.
+- Moving a file between `plugins/` and `core/` changes its module path
+  (`plugins.x` → `plugins.core.x`); update any `require` of it.
+- Installed plugins land in `~/.local/share/nvim/site/pack/core/opt/<name>/`;
+  pinned revisions in `nvim-pack-lock.json` (user-owned, see §8).
+
+## 6. Common tasks
 
 **Add a custom module** — `lua/custom/<name>.lua` per §3, wire it via
 `safe_setup` in `config/resonance.lua`, add `note/knowledge/<name>.md`,
@@ -133,7 +174,42 @@ often `--stdio`; check the filetype with `vim.filetype.match()`.
 
 ---
 
-## 6. Committing
+## 7. System dependencies
+
+User-facing install list: `README.md` → *Installation*. Keep both in sync
+when a feature starts or stops shelling out to a tool. Guard optional tools
+with `vim.fn.executable()` and degrade quietly — never error at startup
+because a tool is missing.
+
+| Tool | Needed by | Required? |
+|---|---|---|
+| Neovim 0.13 nightly | everything (`vim.pack`, `vim.async`) | yes |
+| `git` | `vim.pack`, `libs/git.lua`, neogit, snacks git | yes |
+| `gcc`/`cc`, `make` | treesitter parsers, flash-any `build = 'make'` | yes |
+| `tree-sitter-cli` | nvim-treesitter (main) parser builds | yes |
+| `rg`, `fd` | snacks/fzf pickers, `custom/zettel` | yes |
+| `curl`, `unzip`, `tar`, `gzip` | Mason installs | yes |
+| `node` + `npm` | Mason JS servers, telegram.nvim `build = 'npm i'` | yes |
+| `python` | python LSP/venv-selector, `scripts.py` | for Python |
+| `yarn` | markdown-preview `build = 'cd app && yarn install'` | for md preview |
+| `wl-clipboard` | clipboard on Wayland Linux | Linux |
+| `fcitx5` / `im-select` | `custom/language-switcher` | Linux / WSL |
+| `lazygit`, `yazi` | snacks lazygit key, `custom/yazi` | optional |
+| `pandoc` | `custom/md-paste` (`<leader>cz`) | optional |
+| `gpg` | neogit commit verification | optional |
+| `tdlib`, `kitty`/`ghostty` | telegram.nvim; snacks image | optional |
+| `tectonic` | LaTeX rendering | optional |
+| `clice` | C/C++ LSP (not from Mason) | for C/C++ |
+| `fish`/`zsh`/`pwsh` | terminal shell pick in `config/keymaps.lua` | optional |
+| `inotify-tools` | file watching on Linux | Linux |
+| `vim-startuptime` | startup profiling | optional |
+
+On Windows, `libs.utils.is_windows()` sets `CC=gcc`/`CXX=g++` for parser
+builds (`plugins/treesitter.lua`).
+
+---
+
+## 8. Committing
 
 Commit only when asked. Stage specific files, never `git add -A` — the
 tree often holds unrelated user work (`nvim-pack-lock.json`, notes).

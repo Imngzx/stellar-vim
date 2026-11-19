@@ -143,6 +143,10 @@ So I use fzf-lua instead of snacks during power-saver mode.
 - `git`
 - `tree-sitter-cli`
 - `gcc`
+- `make`, for plugins that build themselves (e.g. `flash-any.nvim`)
+- `curl`, `unzip`, `tar`, `gzip`, used by Mason to install LSP servers and tools
+- `node` + `npm`, for Mason's JS-based servers and `telegram.nvim`
+- `yarn`, for `markdown-preview.nvim` (browser preview)
 - `wl-clipboard` on **Linux**
 - `ripgrep`
 - `inotify-tools`
@@ -158,6 +162,7 @@ So I use fzf-lua instead of snacks during power-saver mode.
 - `clice` as LSP for C and CPP
 - `vim-startuptime,` optional
 - `kitty`||`ghostty` on **Linux** and **MacOS**, for image support
+- `gpg`, optional, lets Neogit verify signed commits
 
 ### How To Install System Dependencies?
 
@@ -283,6 +288,41 @@ After steps above, please `<Leader>pm` or `:Mason` to open Mason panel, it'll ha
 
 Then please having fun!
 
+### Adding Plugins
+
+Plugins are **auto-imported**, the same idea as lazy.nvim's `import`. You
+never edit a plugin list: drop a file into `lua/plugins/` that **returns** its
+spec, restart, and resonance.nvim installs and lazy-loads it.
+
+```lua
+-- lua/plugins/jisho.lua
+return {
+  'https://github.com/Imngzx/jisho.nvim',            -- full URL, not 'author/plugin'
+  dependencies = { 'https://github.com/atusy/budoux.lua' },
+  cmd = { 'Jisho' },                                 -- lazy trigger: event / cmd / keys / ft
+  config = function()
+    require('jisho').setup({ layout = 'spacious' })
+  end,
+}
+```
+
+A file can also return a list of specs `return { { ... }, { ... } }` (see
+`lua/plugins/core/ui.lua`).
+
+| Put the file in | Loaded | For |
+|---|---|---|
+| `lua/plugins/` | after startup (`VeryLazy`) | almost everything |
+| `lua/plugins/core/` | at startup, highest `priority` first | theme and core UI only |
+
+- **Disable a plugin:** add `cond = false` to its spec (or a function, e.g.
+  `cond = require('libs.power').is_ac` to load it only on AC power). Don't
+  delete the file.
+- **Big configs:** use a folder with an `init.lua` that returns the spec
+  (`lua/plugins/heirline/`); other files in that folder are just helpers.
+- **Remove a plugin:** delete its file, then `:Resonance` (`<leader>pL`) to
+  see what's still installed.
+- More details: [`note/knowledge/resonance.md`](note/knowledge/resonance.md).
+
 ### Config Managing
 
 As you can see there's a python script in this config, this is still experimental but I hope it helps.
@@ -304,8 +344,9 @@ python3 scripts.py uninstall --force --force  # FULL UNINSTALL (double --force f
 - `lua/custom/`: custom tools & features, gems happens here
 - `lua/libs/`: shared libraries
 - `lua/lsp/servers.lua` & `lua/lsp/servers/*.lua`: LSP installation & configuration for separate languages
-- `lua/plugins/`: plugin configurations
-- `lua/plugins/<plugin_name>/`: plugin configurations (**BIG**)
+- `lua/plugins/`: plugin specs, one file each, auto-imported after startup
+- `lua/plugins/core/`: theme & core UI specs, imported at startup
+- `lua/plugins/<plugin_name>/`: plugin configurations (**BIG**, entry is `init.lua`)
 
 ## Contributions
 
