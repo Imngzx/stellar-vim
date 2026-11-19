@@ -1,3 +1,47 @@
+local render_opts = {
+  file_types = { 'markdown', 'norg', 'rmd', 'org', 'codecompanion', 'telegram' },
+
+  code = {
+    sign = true,
+    width = 'block',
+    right_pad = 1,
+  },
+  heading = {
+    sign = true,
+    icons = { '󰲡 ', '󰲣 ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' },
+    width = 'block',
+    left_pad = 2,
+    right_pad = 4,
+  },
+  checkbox = {
+    enabled = true,
+  },
+  quote = {
+    enabled = true,
+  },
+  latex = {
+    enabled = true,
+    render_modes = false,
+    converter = { 'utftex', 'latex2text' },
+    highlight = 'RenderMarkdownMath',
+    position = 'center',
+    top_pad = 0,
+    bottom_pad = 0,
+  },
+  completions = { lsp = { enabled = false } },
+  -- WORKAROUND(nvim e77714b): 'linebreak' + conceal + virt_lines below the
+  -- last line (a table/heading border at EOF) raises E315 on every redraw.
+  -- Fixed upstream in neovim/neovim#42888 (f945964); drop this once the
+  -- installed nightly includes it.
+  win_options = {
+    linebreak = { default = vim.o.linebreak, rendered = false },
+  },
+}
+-- render-markdown's plugin/ file runs setup(vim.g.render_markdown_config) and
+-- attaches to the open buffer before config() runs; without this its first
+-- render uses the defaults (and so still trips the E315 above).
+vim.g.render_markdown_config = render_opts
+
 return {
   {
     'https://github.com/MeanderingProgrammer/render-markdown.nvim',
@@ -6,38 +50,7 @@ return {
     cond = require('libs.power').is_ac,
     config = function()
       local render_markdown = require('render-markdown')
-      render_markdown.setup({
-        file_types = { 'markdown', 'norg', 'rmd', 'org', 'codecompanion', 'telegram' },
-
-        code = {
-          sign = true,
-          width = 'block',
-          right_pad = 1,
-        },
-        heading = {
-          sign = true,
-          icons = { '󰲡 ', '󰲣 ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' },
-          width = 'block',
-          left_pad = 2,
-          right_pad = 4,
-        },
-        checkbox = {
-          enabled = true,
-        },
-        quote = {
-          enabled = true,
-        },
-        latex = {
-          enabled = true,
-          render_modes = false,
-          converter = { 'utftex', 'latex2text' },
-          highlight = 'RenderMarkdownMath',
-          position = 'center',
-          top_pad = 0,
-          bottom_pad = 0,
-        },
-        completions = { lsp = { enabled = false } },
-      })
+      render_markdown.setup(render_opts)
 
       local ok, snacks = pcall(require, 'snacks')
       if ok then
