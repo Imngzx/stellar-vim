@@ -18,7 +18,7 @@ require('config.resonance') -- plugin manager bootstrap + plugin configs
 2. Enables `vim.loader` bytecode cache.
 3. Sets `vim.g.markdown_recommended_style = 0`.
 4. Disables built-ins by setting `vim.g.loaded_<name> = 1` for: `fzf`, `gzip`, `matchit`, `netrwPlugin`, `netrwSettings`, `netrwFileHandlers`, `matchparen`, `tarPlugin`, `tutor`, `zipPlugin`, `tohtml`.
-5. `require('custom.ui2').setup()`.
+5. `require('custom.ui2').setup()` — enables ui2 (`targets = 'msg'`) and titles the msg window " Messages " from a `FileType msg` autocmd (ui2 has no title option).
 6. Startup profiler: if `$PROF` is set, `packadd snacks.nvim` and start `snacks.profiler` with `startup.event = 'VimEnter'`.
 7. `require('libs.power').setup({ enable_auto_switch = true })`.
 8. `require('custom.session').setup()` — workspace persistence (see `session.md`).
