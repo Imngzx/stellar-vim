@@ -39,10 +39,6 @@ return {
         completions = { lsp = { enabled = false } },
       })
 
-      vim.schedule(function()
-        vim.cmd('doautocmd FileType ' .. vim.bo.filetype)
-      end)
-
       local ok, snacks = pcall(require, 'snacks')
       if ok then
         snacks.toggle({
