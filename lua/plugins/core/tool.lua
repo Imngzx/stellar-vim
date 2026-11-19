@@ -1,5 +1,5 @@
 -- [Key note] Load on VeryLazy
-require('resonance').load({
+return {
   {
     'https://github.com/folke/which-key.nvim',
     lazy = true,
@@ -277,4 +277,4 @@ require('resonance').load({
       })
     end
   },
-})
+}

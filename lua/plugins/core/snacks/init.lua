@@ -62,11 +62,11 @@ local function setup()
       refresh = 150,
     },
 
-    dashboard = require('plugins.snacks.dashboard'),
-    picker = require('plugins.snacks.picker'),
+    dashboard = require('plugins.core.snacks.dashboard'),
+    picker = require('plugins.core.snacks.picker'),
   })
 
-  local key = require('plugins.snacks.keys')
+  local key = require('plugins.core.snacks.keys')
   local keymap_set = Snacks.keymap.set
 
   local set_keys = function(keys)
@@ -99,7 +99,7 @@ local function setup()
   _G.dd = function(...) Snacks.debug.inspect(...) end
 
   -- NOTE: can enable this if you want snacks notifier shows lsp progress
-  -- require('plugins.snacks.lsp_progress')
+  -- require('plugins.core.snacks.lsp_progress')
 
   if utils.is_compatible_version('0.11') then
     ---@diagnostic disable-next-line: duplicate-set-field
@@ -124,8 +124,9 @@ local function setup()
   Toggle.dim():map('<leader>uD')
 end
 
-require('resonance').load({
+return {
   'https://github.com/folke/snacks.nvim',
+  priority = 900,
   lazy = false,
   config = setup,
-})
+}

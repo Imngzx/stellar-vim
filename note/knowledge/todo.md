@@ -27,7 +27,7 @@ The search regex is built as `\b(TODO|FIXME|NOTE|WARN|HACK|PERF):` — the word 
 
 | Key | Action | Defined in |
 |-----|--------|------------|
-| `<Leader>st` | `require('custom.todo').search()` | `lua/plugins/snacks/keys.lua` |
+| `<Leader>st` | `require('custom.todo').search()` | `lua/plugins/core/snacks/keys.lua` |
 
 ---
 

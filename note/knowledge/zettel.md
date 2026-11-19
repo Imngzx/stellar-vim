@@ -2,7 +2,7 @@
 
 > **Purpose**: Create a Zettelkasten workspace and its notes (cards, inbox notes), find backlinks, and render a link graph.
 > **Location**: `lua/custom/zettel/init.lua` (logic), `lua/custom/zettel/contents.lua` (file templates)
-> **Loaded by**: `lua/plugins/snacks/keys.lua` (requires it for the snacks.nvim `keys` spec) and the `:ZettelInit` command in `lua/config/autocmds.lua`
+> **Loaded by**: `lua/plugins/core/snacks/keys.lua` (requires it for the snacks.nvim `keys` spec) and the `:ZettelInit` command in `lua/config/autocmds.lua`
 
 ---
 

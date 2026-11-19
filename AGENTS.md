@@ -14,7 +14,8 @@
 | `init.lua` | `custom.startup` → `config` → `config.resonance`, in that order |
 | `lua/custom/startup.lua` | `vim.loader.enable()`, disabled built-ins, `libs.power` picker switch, session setup |
 | `lua/config/` | Options, keymaps, autocmds; `resonance.lua` bootstraps resonance and loads every plugin config |
-| `lua/plugins/` | One resonance spec per file (`heirline/`, `snacks/` are directories) |
+| `lua/plugins/` | One resonance spec per file, auto-imported in VeryLazy by `config/scan.lua` (`heirline/` is a directory) |
+| `lua/plugins/core/` | Theme + core UI specs, imported at startup by `priority` (`snacks/` is a directory) |
 | `lua/custom/` | Self-written feature modules (session, workspace, coderunner, repl, …) |
 | `lua/libs/` | Shared helpers: `utils` (safe_load/safe_setup, OS checks), `power`, `bpm`, `git`, `icons`, `spell` |
 | `lua/lsp/servers.lua` | **Single registry** for LSP servers, formatters, linters, Mason tools. Spec format is documented in its header comment. |
@@ -45,7 +46,7 @@ only in its own repo.
    hard errors for the tests. Note `safe_setup('x', require('x').setup)`
    evaluates the `require` *before* `safe_setup` runs, so a require error
    escapes it — wrap it: `safe_setup('x', function() require('x').setup() end)`.
-2. **Theme first.** `plugins.catppuccin` loads before any UI plugin, or
+2. **Theme first.** `plugins.core.catppuccin` (`priority = 1000`) loads before any UI plugin, or
    the UI flickers.
 3. **Non-core plugin configs are required inside the `User VeryLazy`
    autocmd** in `config/resonance.lua`. Requiring them at top level makes
@@ -111,10 +112,11 @@ No startup regression allowed.
 
 ## 5. Common tasks
 
-**Add a plugin** — create `lua/plugins/<name>.lua` with
-`require('resonance').load({{ src = ..., event/cmd/keys/ft = ..., config = function() ... end }})`,
-then `safe_load('plugins.<name>')` inside the VeryLazy block of
-`config/resonance.lua`.
+**Add a plugin** — create `lua/plugins/<name>.lua` that returns its spec:
+`return { 'https://…', event/cmd/keys/ft = ..., config = function() ... end }`.
+`config/scan.lua` picks it up in VeryLazy; no edit to `config/resonance.lua`.
+Startup-critical plugins go in `lua/plugins/core/` (ordered by `priority`).
+See `note/knowledge/resonance.md`.
 
 **Add a custom module** — `lua/custom/<name>.lua` per §3, wire it via
 `safe_setup` in `config/resonance.lua`, add `note/knowledge/<name>.md`,
@@ -126,7 +128,7 @@ binaries need absolute paths (`stdpath('data') .. '/mason/bin/<bin>'`) and
 often `--stdio`; check the filetype with `vim.filetype.match()`.
 
 **Statusline** — `lua/plugins/heirline/` (`statusline.lua`, `colors.lua`).
-**Picker** — `lua/plugins/snacks/picker.lua`; gate expensive features on
+**Picker** — `lua/plugins/core/snacks/picker.lua`; gate expensive features on
 `require('libs.power').is_ac()`.
 
 ---

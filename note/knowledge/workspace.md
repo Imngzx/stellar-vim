@@ -19,7 +19,7 @@ Two independent features: loading a project-local `.nvim.lua`, and a power-aware
 
 | Key | Action | Defined in |
 |---|---|---|
-| `<leader>ft` | `M.picker()` (Find Workspace (Tab)) | `lua/plugins/snacks/keys.lua` |
+| `<leader>ft` | `M.picker()` (Find Workspace (Tab)) | `lua/plugins/core/snacks/keys.lua` |
 
 ## Dependencies
 

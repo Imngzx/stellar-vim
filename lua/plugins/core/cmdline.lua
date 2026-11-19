@@ -1,6 +1,6 @@
 local row = 0.25
 
-require('resonance').load({
+return {
   'https://github.com/aurora0x27/popup.nvim',
 
   lazy = true,
@@ -93,4 +93,4 @@ require('resonance').load({
       },
     })
   end
-})
+}

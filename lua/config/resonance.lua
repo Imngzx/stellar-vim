@@ -28,22 +28,15 @@ resonance.load({
 local utils = require('libs.utils')
 local safe_load = utils.safe_load
 local safe_setup = utils.safe_setup
+local scan = require('config.scan')
 
 --plugins
+safe_setup('config.scan', function()
+  scan.import('plugins.core')
+end)
 
--- [Theme]
--- load theme first to avoid flickering
-safe_load('plugins.catppuccin')
-
--- load core ui elements at the same time
-safe_load('plugins.snacks')
-safe_load('plugins.cmdline')
-safe_load('plugins.ui')
-
-safe_load('plugins.tool')
-
--- idk why it wont load if it's inside the block ((
-safe_load('plugins.discord')
+-- [Core] lua/plugins/core/: theme + core UI, loaded now, highest `priority`
+-- first (catppuccin = 1000, so the theme lands before any UI plugin)
 
 -- NOTE: the reson I wrap my plugins with this block is because the mechanics of luajit
 -- although resonance.nvim will blocks luajit to require the plugin until resonance sends it to rtp
@@ -57,12 +50,9 @@ vim.api.nvim_create_autocmd('User', {
     -- restore session
     safe_setup('custom.workspace')
 
-    -- every lua/plugins/* spec not in EAGER/SKIP
+    -- every top-level lua/plugins/* spec (core/ is skipped, see config/scan.lua)
     -- (Mason's PATH is set by plugins.lsp, see lsp.add_mason_to_path)
-    local plugins = require('config.scan').scan_plugins()
-    for i = 1, #plugins do
-      safe_load('plugins.' .. plugins[i])
-    end
+    safe_setup('config.scan', function() scan.import('plugins') end)
 
     -- coding
     safe_setup('custom.autopairs')

@@ -1,11 +1,12 @@
 local path_sep = require('libs.utils').is_windows() and '\\' or '/'
 
-require('resonance').load({
+return {
   plugin = {
     src = 'https://github.com/catppuccin/nvim',
     name = 'catppuccin',
     version = 'main',
   },
+  priority = 1000,
   lazy = false,
   setup = function()
     require('catppuccin').setup({
@@ -68,4 +69,4 @@ require('resonance').load({
     })
     vim.cmd.colorscheme('catppuccin')
   end
-})
+}

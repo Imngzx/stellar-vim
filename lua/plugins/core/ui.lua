@@ -1,4 +1,4 @@
-require('resonance').load({
+return {
   {
     'https://github.com/nvim-mini/mini.icons',
     lazy = true,
@@ -52,4 +52,4 @@ require('resonance').load({
       vim_key('n', '<Leader>l', '<Cmd>noh<CR>', kopts)
     end
   },
-})
+}

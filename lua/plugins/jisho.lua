@@ -1,4 +1,4 @@
-require('resonance').load({
+return {
   'https://github.com/Imngzx/jisho.nvim',
 
   dependencies = { 'https://github.com/atusy/budoux.lua', },
@@ -28,4 +28,4 @@ require('resonance').load({
       }
     })
   end,
-})
+}
