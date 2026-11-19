@@ -2,27 +2,23 @@
 -- 🎵 Install Resonance.nvim
 -- =====================================================================
 vim.pack.add({ 'https://github.com/Imngzx/resonance.nvim' })
+-- vim.pack installs and manages resonance itself; resonance.load() is for
+-- every other plugin. Pin a branch or tag here if you want one, e.g.
+-- { src = 'https://github.com/Imngzx/resonance.nvim', version = 'main' }.
 
 -- =====================================================================
 -- 🚀 Configuration
 -- =====================================================================
+-- setup() runs before any resonance.load() below, so its options apply to
+-- every plugin from the first one.
 local resonance = require('resonance')
-resonance.load({
-  'https://github.com/Imngzx/resonance.nvim',
-  version = 'main',
-  lazy = false,
-  keys = {
-    { 'n', '<leader>pL', '<cmd>Resonance<cr>', { desc = '[Float] Resonance UI' } },
+vim.keymap.set('n', '<leader>pL', '<cmd>Resonance<cr>', { desc = '[Float] Resonance UI' })
+resonance.setup({
+  ui = {
+    border = 'rounded',
+    width = 0.65,
+    height = 0.75,
   },
-  config = function()
-    resonance.setup({
-      ui = {
-        border = 'rounded',
-        width = 0.65,
-        height = 0.75,
-      }
-    })
-  end
 })
 
 local utils = require('libs.utils')
@@ -38,11 +34,11 @@ end)
 -- [Core] lua/plugins/core/: theme + core UI, loaded now, highest `priority`
 -- first (catppuccin = 1000, so the theme lands before any UI plugin)
 
--- NOTE: the reson I wrap my plugins with this block is because the mechanics of luajit
--- although resonance.nvim will blocks luajit to require the plugin until resonance sends it to rtp
--- but luajit will still read the config file (not the plugin)
--- this will cause some slow startup time
--- It doesnt meant that resonance is not lazy-loading
+-- NOTE: the specs in lua/plugins/ are imported in VeryLazy, not here.
+-- Requiring a spec file runs it -- Lua parses it and builds its tables and
+-- closures -- even though the plugin it describes stays lazy. Importing
+-- them all at startup would cost that time before the first screen.
+-- Resonance still lazy-loads the plugins themselves either way.
 
 vim.api.nvim_create_autocmd('User', {
   pattern = 'VeryLazy',
