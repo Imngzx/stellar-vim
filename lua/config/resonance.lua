@@ -113,31 +113,9 @@ vim.api.nvim_create_autocmd('User', {
   end
 })
 
--- The replay lives in its OWN autocmd, registered after the VeryLazy one, so
--- it runs after every trigger has been registered but is NOT aborted when a
--- plugin's setup() raises (popup.nvim raises on this neovim build).
---
--- `replay_for_buffer` fires only the trigger groups that have not yet run
--- for the buffer, so the UI plugins (heirline, bpm, treesitter, lsp, ...)
--- register their triggers during VeryLazy -- AFTER BufReadPost/BufEnter
--- already fired -- and still get their chance to load.
-vim.api.nvim_create_autocmd('User', {
-  pattern = 'VeryLazy',
-  callback = function()
-    -- Synchronous on purpose: a scheduled callback runs after this callback
-    -- returns, by which point the `once = true` triggers have already been
-    -- consumed and the replay fires into nothing.
-    local api = vim.api
-    local bufs = api.nvim_list_bufs()
-    for i = 1, #bufs do
-      local buf = bufs[i]
-      if api.nvim_buf_is_loaded(buf) and api.nvim_buf_get_name(buf) ~= '' then
-        pcall(resonance.replay_for_buffer, buf)
-      end
-    end
-  end,
-})
-
-
--- NOTE: must put this at the end of your init.lua!
-resonance.trigger_verylazy()
+-- VeryLazy fires on its own (resonance.setup()/load() arm it), and right
+-- after the VeryLazy handlers above have run, Resonance replays the read
+-- events for every open file. So the UI plugins registered during VeryLazy
+-- (heirline, bpm, treesitter, lsp, ...) still load for `nvim <file>`.
+-- No trigger_verylazy() or replay loop needed. To turn the replay off:
+-- resonance.setup({ replay = false })
