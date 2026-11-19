@@ -125,8 +125,9 @@ return {
 
     cmd = 'Neogit',
     keys = {
-      { 'n', '<leader>gpt', function() require('neogit').open() end, { desc = 'Neogit (Tab)' } },
+      { 'n', '<leader>gpt', function() require('neogit').open({ kind = 'replace' }) end, { desc = 'Neogit (Tab)' } },
       { 'n', '<leader>gps', function() require('neogit').open({ kind = 'split_below_all' }) end, { desc = 'Neogit (Split Below)' } },
+      { 'n', '<leader>gpf', function() require('neogit').open({ kind = 'floating' }) end, { desc = 'Neogit (Float)' } },
       { 'n', '<leader>gpv', function() require('neogit').open({ kind = 'vsplit' }) end, { desc = 'Neogit (VSplit)' } },
     },
 
@@ -237,6 +238,27 @@ return {
             ['c'] = 'CommitPopup', ['P'] = 'PushPopup', ['p'] = 'PullPopup',
           },
         },
+      })
+
+      -- With kind = 'replace', closing Neogit puts the old buffer back in the
+      -- same window but leaves Neogit's highlight namespace on it. That breaks
+      -- highlight resolution (heirline tabline icons lose their colour).
+      local api = vim.api
+      api.nvim_create_autocmd('BufWinEnter', {
+        group = api.nvim_create_augroup('custom.neogit_hl_ns', { clear = true }),
+        desc = 'Neogit: drop its leftover window highlight namespace',
+        callback = function(args)
+          if vim.bo[args.buf].filetype:find('^Neogit') then return end
+          local win = api.nvim_get_current_win()
+          local ns = api.nvim_get_hl_ns({ winid = win })
+          if ns <= 0 then return end
+          for name, id in pairs(api.nvim_get_namespaces()) do
+            if id == ns then
+              if name:find('^neogit%-') then api.nvim_win_set_hl_ns(win, 0) end
+              return
+            end
+          end
+        end,
       })
     end
   },
