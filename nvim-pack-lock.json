@@ -173,7 +173,7 @@
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
-      "rev": "08574788c25b05a68e0b91ebfe03030565fbee6e",
+      "rev": "2993e8fd592487d3bb0d2c4642272ddc6186e239",
       "src": "https://github.com/Imngzx/resonance.nvim"
     },
     "showkeys": {
