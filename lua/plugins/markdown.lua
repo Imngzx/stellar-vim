@@ -1,4 +1,4 @@
-require('resonance').load({
+return {
   {
     'https://github.com/MeanderingProgrammer/render-markdown.nvim',
     -- cmd = { 'Tg', 'TgLogout', 'TgSend', 'TgPr' },
@@ -95,4 +95,4 @@ require('resonance').load({
       require('mkdp').setup()
     end,
   }
-})
+}
