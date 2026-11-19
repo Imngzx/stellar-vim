@@ -43,8 +43,12 @@ plugin with resonance's `cond` (`cond = false` / a function returning false).
 
 - `vim.uv.fs_scandir` on `stdpath('config')/lua/<mod>`, **top level only**.
 - `foo.lua` → `foo`; a directory counts only if it has `init.lua`
-  (`heirline/`, `core/snacks/`). `core/` has no `init.lua`, which is why
-  `import('plugins')` never reaches it.
+  (`heirline/`, `core/snacks/`).
+- A folder that is imported on its own is never returned by its parent's
+  scan: `import('plugins.core')` marks `plugins.core`, so
+  `import('plugins')` skips `core/` even if it gains an `init.lua`. This
+  relies on the child being imported first (core at startup, plugins in
+  VeryLazy).
 - Sorted, so load order doesn't depend on the filesystem.
 
 ## Gotchas

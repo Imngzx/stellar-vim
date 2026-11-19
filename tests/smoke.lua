@@ -52,6 +52,12 @@ assert_truthy(resonance.load, 'resonance.load not found')
 assert_truthy(resonance.trigger_verylazy, 'resonance.trigger_verylazy not found')
 pass('resonance.nvim API available')
 
+-- resonance loads `lazy = false` specs (snacks, catppuccin) on VimEnter, but
+-- `-c luafile` runs before VimEnter and the `-c qall` after it exits before
+-- VimEnter ever fires. Fire it once here, as a real start would.
+vim.api.nvim_exec_autocmds('VimEnter', { modeline = false })
+pass('VimEnter fired')
+
 -- ============================================================
 -- 3. Trigger VeryLazy to load all plugins
 -- ============================================================

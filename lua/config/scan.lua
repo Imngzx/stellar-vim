@@ -13,6 +13,11 @@ local safe_setup = utils.safe_setup
 
 local lua_dir = vim.fn.stdpath('config') .. '/lua/'
 
+-- Every mod passed to import(). A scan never returns a folder that is
+-- imported on its own (plugins/core/), even if it gains an init.lua --
+-- otherwise import('plugins') would register its specs a second time.
+local imported = {}
+
 -- A single spec: a URL string first, or an explicit src/url/plugin field.
 local function is_spec(t)
   if type(t) ~= 'table' then return false end
@@ -46,7 +51,8 @@ function M.scan(mod)
     local entry
     if kind == 'file' then
       entry = name:match('^(.+)%.lua$')
-    elseif kind == 'directory' and uv_fs_stat(dir .. '/' .. name .. '/init.lua') then
+    elseif kind == 'directory' and not imported[mod .. '.' .. name]
+      and uv_fs_stat(dir .. '/' .. name .. '/init.lua') then
       entry = name
     end
 
@@ -78,6 +84,7 @@ end
 --- rest. Disable a plugin with the spec's `cond`.
 ---@param mod string e.g. 'plugins', 'plugins.core'
 function M.import(mod)
+  imported[mod] = true
   local names = M.scan(mod)
 
   local entries, n = {}, 0
