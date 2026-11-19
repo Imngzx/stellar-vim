@@ -306,4 +306,20 @@ function M.lsp_config()
   })
 end
 
+--- Put Mason's bin directory on PATH, so the servers, formatters and
+--- linters it installs are found by name. Safe to call more than once.
+---
+--- Called from plugins/lsp.lua at load time -- not from mason's own spec,
+--- which only loads on a :Mason command and would leave PATH unset.
+function M.add_mason_to_path()
+  local env = vim.env
+  local is_windows = require('libs.utils').is_windows()
+  local mason_bin = vim.fs.joinpath(vim.fn.stdpath('data'), 'mason', 'bin')
+  if is_windows then mason_bin = mason_bin:gsub('/', '\\') end
+  if not env.PATH:find(mason_bin, 1, true) then
+    local sep = is_windows and ';' or ':'
+    env.PATH = mason_bin .. sep .. env.PATH
+  end
+end
+
 return M

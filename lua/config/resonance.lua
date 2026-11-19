@@ -58,15 +58,7 @@ vim.api.nvim_create_autocmd('User', {
     safe_setup('custom.workspace', require('custom.workspace').setup)
     safe_load('plugins.fzf')
 
-    -- coding
-    local fn, env = vim.fn, vim.env
-    local mason_bin = vim.fs.joinpath(fn.stdpath('data'), 'mason', 'bin')
-    local is_windows = utils.is_windows()
-    if is_windows then mason_bin = mason_bin:gsub('/', '\\') end
-    if not env.PATH:find(mason_bin, 1, true) then
-      local sep = is_windows and ';' or ':'
-      env.PATH = mason_bin .. sep .. env.PATH
-    end
+    -- coding (Mason's PATH is set by plugins.lsp, see lsp.add_mason_to_path)
     safe_load('plugins.treesitter')
     safe_load('plugins.lsp')
     safe_load('plugins.treesitter-context')
