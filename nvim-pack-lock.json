@@ -27,7 +27,7 @@
       "version": "'main'"
     },
     "codecompanion.nvim": {
-      "rev": "5a454c91d77c8464dad6ef12e663618cd427ad9e",
+      "rev": "14b4993a24fac8bb122ce524e25bb0f7f392afd6",
       "src": "https://github.com/olimorris/codecompanion.nvim"
     },
     "colorful-menu.nvim": {
@@ -51,7 +51,7 @@
       "src": "https://github.com/dirichy/flash-any-pinyin.nvim"
     },
     "flash-any.nvim": {
-      "rev": "485b12994b6eb959eb94195aed498bda9ac93c5a",
+      "rev": "1e11bb17292bd25b918ffdb8887c092886d7d2ed",
       "src": "https://github.com/dirichy/flash-any.nvim",
       "version": "'main'"
     },
@@ -88,15 +88,15 @@
       "src": "https://github.com/mason-org/mason.nvim"
     },
     "mini.diff": {
-      "rev": "91d6ce4b7f400439fe761f01a58280f2c0f99c01",
+      "rev": "f527407247245d121ca65d539d7a8a3686938915",
       "src": "https://github.com/nvim-mini/mini.diff"
     },
     "mini.hipatterns": {
-      "rev": "7a79e5f000beb530ade0fa9faec70f01469dbcb3",
+      "rev": "012ae1f3070ad47973d09c730091be2ee4bef09c",
       "src": "https://github.com/nvim-mini/mini.hipatterns"
     },
     "mini.icons": {
-      "rev": "fc90b3925a2a68282be06e28cfe0cbb366c75dad",
+      "rev": "5d58117d176c133f4cb5585ec8cb3450881c89a0",
       "src": "https://github.com/nvim-mini/mini.icons"
     },
     "neogit": {
@@ -132,7 +132,7 @@
       "src": "https://github.com/kevinhwang91/nvim-hlslens"
     },
     "nvim-lint": {
-      "rev": "52107ce2076a27a285af781248e2c59bad817cd0",
+      "rev": "6bf29b9dbdad60b38b489b23309c22ba6d4c915a",
       "src": "https://github.com/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
@@ -173,7 +173,7 @@
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
-      "rev": "a367acf1d577aee594305ef8b73e3108759b47a6",
+      "rev": "cecf496cbda6ed4ce708ebc6034e5fa9f26ffa09",
       "src": "https://github.com/Imngzx/resonance.nvim"
     },
     "showkeys": {
