@@ -89,7 +89,7 @@ map('n', '<leader>pt', function()
   cmd('startinsert')
 end, { desc = '[Panel] Open Smart Terminal' })
 
-map('n', 'mdd', function() vim.cmd('delm!') end, { expr = true, desc = 'Delete all markers' })
+map('n', 'mdd', function() vim.cmd('delm!') end, { desc = 'Delete all markers' })
 
 -- Search (Better n/N behavior)
 map('x', 'n', "'Nn'[v:searchforward]", { expr = true, desc = 'Next search result' })
