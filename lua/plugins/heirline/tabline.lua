@@ -253,6 +253,8 @@ local function make_perfect_buflist(child_template, left_trunc, right_trunc, get
       local total_width = 0
       local active_idx = 1
       local bufs_len = #bufs
+      -- buffers may have gone since the last draw
+      if self._offset > bufs_len then self._offset = bufs_len > 0 and bufs_len or 1 end
 
       for i = 1, bufs_len do
         local bufnr = bufs[i]

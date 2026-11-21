@@ -128,6 +128,11 @@ local NON_SCOPE_TYPES = {
 
 local scope_memo = {}
 
+-- Whole `_`-separated word: 'if' is in 'if_statement', not in 'identifier'
+local function has_word(type_str, word)
+  return ('_' .. type_str .. '_'):find('_' .. word .. '_', 1, true) ~= nil
+end
+
 local function identify_scope(type_str)
   local cached = scope_memo[type_str]
   if cached ~= nil then return cached or nil end
@@ -158,9 +163,9 @@ local function identify_scope(type_str)
     res = 'tag'
   elseif type_str:find('table', 1, true) or type_str:find('dict', 1, true) or type_str:find('object', 1, true) then
     res = 'object'
-  elseif type_str:find('array', 1, true) or type_str:find('list', 1, true) then
+  elseif type_str:find('array', 1, true) or type_str:find('^list') then
     res = 'array'
-  elseif type_str:find('if', 1, true) or type_str:find('for', 1, true) or type_str:find('while', 1, true) or type_str:find('match', 1, true) then
+  elseif has_word(type_str, 'if') or has_word(type_str, 'for') or has_word(type_str, 'while') or has_word(type_str, 'match') then
     res = 'statement'
   elseif type_str:find('pair', 1, true) or type_str:find('property', 1, true) or type_str:find('field', 1, true) then
     res = 'field'
