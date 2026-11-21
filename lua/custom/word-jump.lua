@@ -4,6 +4,9 @@ local api = vim.api
 -- Cache C-API handles to bypass metatable lookups in hot loops (LuaJIT optimization)
 local set_extmark = api.nvim_buf_set_extmark
 local clear_namespace = api.nvim_buf_clear_namespace
+local get_cursor = api.nvim_win_get_cursor
+local set_cursor = api.nvim_win_set_cursor
+local fn_mode = vim.fn.mode
 local ns_id = api.nvim_create_namespace('flash_diy')
 
 -- Pre-split character pools to avoid runtime slicing
@@ -88,6 +91,19 @@ local function generate_labels(N)
   return labels, label_to_idx, prefix_map
 end
 
+--- Move to a 0-indexed column. After an operator a forward jump goes through
+--- charwise visual so it includes the target, like the built-in `f`; a
+--- backward jump stays exclusive, like `F`.
+local function jump_to(row, col)
+  if fn_mode(1):sub(1, 2) == 'no' then
+    local cur = get_cursor(0)
+    if row > cur[1] or (row == cur[1] and col > cur[2]) then
+      vim.cmd('normal! v')
+    end
+  end
+  set_cursor(0, { row, col })
+end
+
 function M.jump()
   print('⚡ Flash ❯  ')
   local ok, target_char = pcall(vim.fn.getcharstr)
@@ -128,7 +144,7 @@ function M.jump()
     return
   elseif count == 1 then
     cleanup()
-    api.nvim_win_set_cursor(0, { match_rows[1], match_cols[1] - 1 })
+    jump_to(match_rows[1], match_cols[1] - 1)
     return
   end
 
@@ -182,7 +198,7 @@ function M.jump()
   if label_to_idx[char1] then
     local idx = label_to_idx[char1]
     cleanup()
-    api.nvim_win_set_cursor(0, { match_rows[idx], match_cols[idx] - 1 })
+    jump_to(match_rows[idx], match_cols[idx] - 1)
     return
   end
 
@@ -198,7 +214,7 @@ function M.jump()
     local full_char = char1 .. char2
     local idx = label_to_idx[full_char]
     if idx then
-      api.nvim_win_set_cursor(0, { match_rows[idx], match_cols[idx] - 1 })
+      jump_to(match_rows[idx], match_cols[idx] - 1)
     end
   else
     cleanup()

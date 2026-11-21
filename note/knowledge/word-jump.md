@@ -53,6 +53,6 @@ Extmarks live in the `flash_diy` namespace.
 
 ## Gotchas
 
-- Overriding `f` removes built-in `f` behavior, including `;`/`,` repeat. The jump uses `nvim_win_set_cursor`, so in operator-pending mode the motion is not inclusive like the built-in `f` (`df<char>` does not delete the target character).
+- Overriding `f` removes built-in `f` behavior, including `;`/`,` repeat. In operator-pending mode a forward jump goes through charwise visual, so it is inclusive like the built-in `f` (`df<char>` deletes the target character); a backward jump is exclusive, like `F`.
 - The label is drawn as an overlay on the column *after* the match, so it covers the next character instead of the match.
 - Matches past 962 are dropped silently.
