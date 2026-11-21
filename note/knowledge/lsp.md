@@ -132,7 +132,7 @@ on AC, `plugins/fzf.lua` on battery), and a buffer-local map would shadow them.
 |--------|---------|-------|
 | `mason.nvim` | `:Mason*` cmds, `<leader>pm` | `<leader>pm` opens Mason, refreshes the registry and installs anything missing from `get_mason_tools()` — Mason packages are **not** auto-installed otherwise |
 | `nvim-lspconfig` | `BufReadPre`, `BufNewFile` | Provides default `lsp/<name>.lua` configs |
-| `conform.nvim` | `BufReadPost`, `<leader>cf` | `formatters_by_ft` from registry; format on save (`timeout_ms = 800`, `lsp_format = 'fallback'`); `stop_after_first` only for js/jsx/ts/tsx/html/css. `<leader>cf` formats async |
+| `conform.nvim` | `BufReadPost`, `BufNewFile`, `<leader>cf` | `formatters_by_ft` from registry; format on save (`timeout_ms = 800`, `lsp_format = 'fallback'`); `stop_after_first` only for js/jsx/ts/tsx/html/css. `<leader>cf` formats async |
 | `nvim-lint` | `BufReadPre`, `BufNewFile` | `linters_by_ft` from registry; `try_lint()` on `BufEnter`/`BufWritePost` (augroup `DIY_Linting`) |
 | `lazydev.nvim` | `ft = lua` | Library includes several plugins, the config `lua/` dir, yazi `types.yazi`, and Hyprland stubs (`/usr/share/hypr/stubs`) |
 | `blink.cmp` (v1) | `InsertEnter`, `CmdlineEnter` | `enter` preset; disabled in prompt buffers, snacks picker input, and inside treesitter comment nodes; sources: `lazydev` first for lua, `telegram` source for telegram ft; cmdline completion enabled (`<C-y>` select+accept); labels via colorful-menu |

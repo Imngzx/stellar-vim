@@ -50,7 +50,7 @@ return {
 
   {
     'https://github.com/stevearc/conform.nvim',
-    event = { 'BufReadPost' },
+    event = { 'BufReadPost', 'BufNewFile' },
     keys = {
       { 'n', '<leader>cf', function()
         require('conform').format({ async = true, lsp_format = 'fallback' })
