@@ -54,7 +54,7 @@ local function get_c_mode()
     _c_mode_cache = {
       'cd $dir &&',
       'mkdir -p out &&',
-      'gcc -Wall -Wextra -O2' .. C_EXTRA_FLAGS .. ' -o out/$fileNameWithoutExt $fileName -lm &&',
+      'gcc -std=c2y -Wall -Wextra -O2' .. C_EXTRA_FLAGS .. ' -o out/$fileNameWithoutExt $fileName -lm &&',
       './out/$fileNameWithoutExt',
     }
   else
@@ -62,7 +62,7 @@ local function get_c_mode()
     _c_mode_cache = {
       'cd $dir &&',
       'mkdir -p out &&',
-      'clang -Wall -Wextra -g -fsanitize=address,undefined' ..
+      'clang -std=c2y -Wall -Wextra -g -fsanitize=address,undefined' ..
       C_EXTRA_FLAGS .. ' -o out/$fileNameWithoutExt $fileName -lm &&',
       './out/$fileNameWithoutExt',
     }
@@ -78,7 +78,7 @@ local function get_cpp_mode()
     _cpp_mode_cache = {
       'cd $dir &&',
       'mkdir -p out &&',
-      'g++ -std=c++23 -Wall -Wextra -O2' ..
+      'g++ -std=c++26 -Wall -Wextra -O2' ..
       CPP_EXTRA_FLAGS .. ' -o out/$fileNameWithoutExt $fileName &&',
       './out/$fileNameWithoutExt',
     }
@@ -87,7 +87,7 @@ local function get_cpp_mode()
     _cpp_mode_cache = {
       'cd $dir &&',
       'mkdir -p out &&',
-      'clang++ -std=c++23 -Wall -Wextra -g -fsanitize=address,undefined' ..
+      'clang++ -std=c++26 -Wall -Wextra -g -fsanitize=address,undefined' ..
       CPP_EXTRA_FLAGS .. ' -o out/$fileNameWithoutExt $fileName -lm &&',
       './out/$fileNameWithoutExt',
     }

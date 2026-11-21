@@ -36,8 +36,8 @@ Execution (`execute_cmd`): `silent! write` the current buffer, close any previou
 
 ```lua
 vim.g.coderunner = {
-  c_build_type = 2,       -- 1 = Release (gcc -O2), 2 = Debug (clang -g -fsanitize=address,undefined)
-  cpp_build_type = 2,     -- 1 = Release (g++ -O2), 2 = Debug (clang++ ... sanitizers); both -std=c++23
+  c_build_type = 2,       -- 1 = Release (gcc -O2), 2 = Debug (clang -g -fsanitize=address,undefined); both -std=c2y
+  cpp_build_type = 2,     -- 1 = Release (g++ -O2), 2 = Debug (clang++ ... sanitizers); both -std=c++26
   c_extra_flags = '',     -- appended directly after the opt/sanitizer flags
   cpp_extra_flags = '',
   project_commands = {},  -- per-filetype overrides of the single-file command table, e.g. { go = { 'go run $fileName' } }
