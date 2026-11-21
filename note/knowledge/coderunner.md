@@ -38,7 +38,7 @@ Execution (`execute_cmd`): `silent! write` the current buffer, close any previou
 vim.g.coderunner = {
   c_build_type = 2,       -- 1 = Release (gcc -O2), 2 = Debug (clang -g -fsanitize=address,undefined); both -std=c2y
   cpp_build_type = 2,     -- 1 = Release (g++ -O2), 2 = Debug (clang++ ... sanitizers); both -std=c++26
-  c_extra_flags = '',     -- appended directly after the opt/sanitizer flags
+  c_extra_flags = '',     -- appended after the opt/sanitizer flags (a separating space is added)
   cpp_extra_flags = '',
   project_commands = {},  -- per-filetype overrides of the single-file command table, e.g. { go = { 'go run $fileName' } }
 }
@@ -74,12 +74,13 @@ Checked in order:
 | Condition | Command |
 |-----------|---------|
 | `Cargo.toml` found upward from the buffer | `cd <root> && cargo run`, with `--bin <name>` when the current Rust file matches a `[[bin]]` `path`, `src/bin/<name>.rs`, `src/bin/<name>/main.rs`, or `src/main.rs` (uses `[package].name`) |
-| `Makefile` in the buffer's directory | `make` |
-| `build.zig` in the buffer's directory | `zig build run` |
-| `package.json` in the buffer's directory | `npm start` |
-| `go.mod` in the buffer's directory | `go run .` |
+| `Makefile` | `cd <dir> && make` |
+| `build.zig` | `cd <dir> && zig build run` |
+| `package.json` | `cd <dir> && npm start` |
+| `go.mod` | `cd <dir> && go run .` |
 
-Only Cargo is searched upward; the others check only the buffer's directory (or cwd for unnamed buffers).
+All are searched upward from the buffer's directory (cwd for unnamed buffers). For the non-Cargo files, `<dir>` is
+the nearest directory holding any of them; if it holds several, the order above decides.
 
 ---
 

@@ -36,8 +36,11 @@ local C_BUILD_TYPE = cfg.c_build_type or 2
 local CPP_BUILD_TYPE = cfg.cpp_build_type or 2
 
 -- Custom compiler flags (overrides defaults)
-local C_EXTRA_FLAGS = cfg.c_extra_flags or ''
-local CPP_EXTRA_FLAGS = cfg.cpp_extra_flags or ''
+local function extra_flags(flags)
+  return (flags and flags ~= '') and (' ' .. flags) or ''
+end
+local C_EXTRA_FLAGS = extra_flags(cfg.c_extra_flags)
+local CPP_EXTRA_FLAGS = extra_flags(cfg.cpp_extra_flags)
 
 -- Custom project commands
 local PROJECT_COMMANDS = cfg.project_commands or {}
@@ -380,17 +383,26 @@ function M.run()
   execute_cmd(cmd)
 end
 
+local PROJECT_FILES = { 'Makefile', 'build.zig', 'package.json', 'go.mod' }
+local PROJECT_RUNNERS = { 'make', 'zig build run', 'npm start', 'go run .' }
+
 function M.build_project_command()
   local cargo_cmd = cargo_project_command()
   if cargo_cmd then return cargo_cmd end
 
   local path = nvim_buf_get_name(0)
-  local cwd = path ~= '' and fs_dirname(path) or uv_cwd()
+  local start_dir = path ~= '' and fs_dirname(path) or uv_cwd()
 
-  if uv_fs_stat(cwd .. '/Makefile') then return 'make' end
-  if uv_fs_stat(cwd .. '/build.zig') then return 'zig build run' end
-  if uv_fs_stat(cwd .. '/package.json') then return 'npm start' end
-  if uv_fs_stat(cwd .. '/go.mod') then return 'go run .' end
+  -- Nearest directory upward holding any project file; in it, first match wins
+  local found = fs_find(PROJECT_FILES, { path = start_dir, upward = true, limit = 1 })[1]
+  if found then
+    local root = fs_dirname(found)
+    for i = 1, #PROJECT_FILES do
+      if uv_fs_stat(root .. '/' .. PROJECT_FILES[i]) then
+        return 'cd ' .. shellescape(root) .. ' && ' .. PROJECT_RUNNERS[i]
+      end
+    end
+  end
 
   nvim_notify('No project config found (Makefile/Cargo.toml/etc.)', vim.log.levels.WARN,
     { title = TITLE })
