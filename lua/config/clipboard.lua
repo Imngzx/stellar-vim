@@ -47,10 +47,11 @@ vim.schedule(function()
         local obj = system(paste_cmd, paste_opts):wait(1000)
         local text = obj.stdout
 
-        if obj.code ~= 0 or type(text) ~= 'string' then return empty_res, 'v' end
+        if obj.code ~= 0 or type(text) ~= 'string' then return empty_res end
 
-        if text:byte(-1) == 10 then text = text:sub(1, -2) end
-        return v_split(text, '\n', { plain = true }), 'v'
+        -- Only the first return value reaches the provider. A trailing empty
+        -- item is how it tells a linewise yank from a charwise one.
+        return v_split(text, '\n', { plain = true })
       end
 
       vim.g.clipboard = {
