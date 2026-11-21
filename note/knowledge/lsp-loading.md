@@ -29,7 +29,7 @@ No keymaps or commands. It does **not** override `vim.lsp.handlers['$/progress']
   `diy_lsp_loading`.
 - Spinner timer ticks every **80 ms** (`vim.schedule_wrap`); window, buffer and timer are torn down when no tasks remain.
 - State is kept as parallel arrays (`t_tokens`, `t_clients`, `t_titles`, `t_messages`, `t_percentages`, `t_dones`)
-  plus `t_idx` (token → index). Removal shifts later entries down (O(n), n is small). The extmark spec table is reused
+  plus `t_idx` (key → index, key = `client_id:token`). Removal shifts later entries down (O(n), n is small). The extmark spec table is reused
   across frames, but `update_window()` still allocates line/chunk tables on every tick.
 
 ## Configuration
@@ -47,5 +47,6 @@ Hard-coded in the local `config` table at the top of the file (edit the source t
 
 ## Gotchas
 
-- Tasks are keyed by progress **token only**, not `(client, token)`. LSP tokens are client-scoped, so two clients
-  using the same token (e.g. small integers) can collide.
+- Tasks are keyed by `client_id .. ':' .. token`: LSP tokens are only unique per client.
+- A `begin` for a key that is still shown (finished, waiting out `keep_done_ms`) replaces the old line. The delayed
+  removal carries a serial (`t_end_serial`) and does nothing if the task was re-begun or removed in the meantime.

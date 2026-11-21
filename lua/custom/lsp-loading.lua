@@ -59,6 +59,9 @@ local t_percentages = {}
 local t_dones = {}
 local t_idx = {}
 local t_count = 0
+-- [key] = serial of the pending delayed removal; a re-begun task drops it
+local t_end_serial = {}
+local end_serial = 0
 
 local frame = 1
 local timer = nil
@@ -120,6 +123,7 @@ local function remove_task(token)
   t_percentages[t_count] = nil
   t_dones[t_count] = nil
   t_idx[token] = nil
+  t_end_serial[token] = nil
   t_count = t_count - 1
 end
 
@@ -268,14 +272,19 @@ function M.setup()
     group = group,
     callback = function(args)
       local client_id = args.data.client_id
-      local token = args.data.params.token
+      local raw_token = args.data.params.token
       local value = args.data.params.value
       local client = vim.lsp.get_client_by_id(client_id)
 
-      if not client or not token then return end
+      if not client or raw_token == nil or type(value) ~= 'table' then return end
       if ignore_set[client.name] then return end
 
+      -- Tokens are only unique per client
+      local token = client_id .. ':' .. tostring(raw_token)
+
       if value.kind == 'begin' then
+        -- A server may reuse a token while its finished line is still shown
+        remove_task(token)
         t_count = t_count + 1
         t_idx[token] = t_count
         t_tokens[t_count] = token
@@ -300,7 +309,11 @@ function M.setup()
 
           vim.schedule(update_window)
 
+          end_serial = end_serial + 1
+          local serial = end_serial
+          t_end_serial[token] = serial
           vim.defer_fn(function()
+            if t_end_serial[token] ~= serial then return end
             remove_task(token)
             update_window()
           end, config.keep_done_ms)
