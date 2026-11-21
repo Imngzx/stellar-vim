@@ -87,8 +87,8 @@ end
 -- 💡 [ LSP & Diagnostics ]
 -- ==========================================
 bind({
-  { ']]', function() Snacks.words.jump(vim.v.count1) end, desc = 'Next reference', mode = { 'n', 't' } },
-  { '[[', function() Snacks.words.jump(-vim.v.count1) end, desc = 'Prev reference', mode = { 'n', 't' } },
+  { ']]', function() Snacks.words.jump(vim.v.count1) end, desc = 'Next reference' },
+  { '[[', function() Snacks.words.jump(-vim.v.count1) end, desc = 'Prev reference' },
 })
 
 if is_ac then
