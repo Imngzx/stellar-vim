@@ -53,4 +53,4 @@ Files written from `contents.lua`: `.marksman.toml`, `.markdownlint.json`, `.edi
 ## Gotchas
 
 - `backlinks()` matches only the exact `[[stem]]`. Aliased or heading links (`[[stem|alias]]`, `[[stem#h]]`) are not found. The graph regex keeps the `|alias`/`#h` part in the target name.
-- Template files are written asynchronously, so `init_workspace()` can open `index.md` before its content has been written.
+- Template files are written synchronously (existing files are left alone), so `index.md` is on disk before `init_workspace()` opens it.

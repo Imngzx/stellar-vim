@@ -91,18 +91,13 @@ function M.init_workspace()
           vim.fs.mkdir(dir, { parents = true })
         end
       end
+      -- Sync: index.md has to exist before the :edit below
       local function write_file(filepath, content)
-        fs_stat(filepath, function(_, stat)
-          if not stat then
-            fs_open(filepath, 'w', 438, function(_, fd)
-              if fd then
-                fs_write(fd, content, -1, function()
-                  fs_close(fd)
-                end)
-              end
-            end)
-          end
-        end)
+        if fs_stat(filepath) then return end
+        local fd = fs_open(filepath, 'w', 438)
+        if not fd then return end
+        fs_write(fd, content, -1)
+        fs_close(fd)
       end
       write_file(path .. '/.marksman.toml', contents.TOML_CONTENT)
       write_file(path .. '/.markdownlint.json', contents.JSON_CONTENT)
