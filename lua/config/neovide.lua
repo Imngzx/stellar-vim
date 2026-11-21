@@ -24,7 +24,4 @@ if g.neovide then
   -- vim.g.neovide_normal_opacity = 0.8
   -- Running in Neovide → disable snacks scroll
   g.snacks_scroll = false
-else
-  -- Running in terminal → enable snacks scroll & ui2
-  g.snacks_scroll = require('libs.power').is_ac()
 end
