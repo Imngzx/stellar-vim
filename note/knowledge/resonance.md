@@ -1,4 +1,8 @@
-# config/resonance.lua + config/scan.lua — plugin import
+# config/resonance.lua — plugin import
+
+The scanning and importing is done by resonance.nvim itself
+(`resonance.import()`, `lua/resonance/scandir.lua` in the plugin); there is
+no `config/scan.lua`.
 
 ## Layout
 
@@ -18,7 +22,8 @@ the `custom.*` modules (explicit, they take opts).
 
 ## import(mod) — lazy.nvim style
 
-1. `safe_load` every module from `scan(mod)`.
+1. `pcall(require)` every module from `scan(mod)`; a failure goes to the
+   `on_error` callback in `config/resonance.lua` (fatal under `NVIM_CONFIG_STRICT=1`).
 2. Collect what they return: a spec (`[1]` is a URL, or `src`/`url`/
    `plugin` field) or a list of specs. Anything else is ignored: `nil` (the
    file called `require('resonance').load()` itself — the old style) or a

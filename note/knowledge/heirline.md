@@ -2,7 +2,7 @@
 
 ## Overview
 
-Provides the statusline, tabline, and winbar through `heirline.nvim`. Auto-imported in the `User VeryLazy` block by `config/scan.lua` (`lua/plugins/heirline/init.lua` returns the spec); the plugin itself triggers on `BufReadPost`, `BufNewFile`, or `BufEnter` (resonance replays these for buffers opened before VeryLazy). `bpm.nvim` is registered in the same file and triggers on `BufReadPost`/`BufNewFile`.
+Provides the statusline, tabline, and winbar through `heirline.nvim`. Auto-imported in the `User VeryLazy` block by `resonance.import('plugins')` (`lua/plugins/heirline/init.lua` returns the spec); the plugin itself triggers on `BufReadPost`, `BufNewFile`, or `BufEnter` (resonance replays these for buffers opened before VeryLazy). `bpm.nvim` is registered in the same file and triggers on `BufReadPost`/`BufNewFile`.
 
 ## Files
 

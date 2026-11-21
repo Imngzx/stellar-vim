@@ -154,7 +154,7 @@ So I use fzf-lua instead of snacks during power-saver mode.
 - `yazi`
 - `lazygit`
 - `python`
-- `pandoc` for markdown rendering in browser `<leader>cz`
+- `pandoc` for pasting rich text as markdown `<leader>cp` (browser preview on `<leader>cz` uses `mpls`, installed via Mason)
 - `fcitx5` on **Linux**
 - `im-select` for **WSL**
 - `tdlib`, `npm`, `kitty`||`ghostty` on **Linux** and **MacOS**, for [**ChuYanLon/telegram.nvim**](https://github.com/ChuYanLon/telegram.nvim)

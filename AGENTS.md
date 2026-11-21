@@ -14,7 +14,7 @@
 | `init.lua` | `custom.startup` → `config` → `config.resonance`, in that order |
 | `lua/custom/startup.lua` | `vim.loader.enable()`, disabled built-ins, `libs.power` picker switch, session setup |
 | `lua/config/` | Options, keymaps, autocmds; `resonance.lua` bootstraps resonance and loads every plugin config |
-| `lua/plugins/` | One resonance spec per file, auto-imported in VeryLazy by `config/scan.lua` (`heirline/` is a directory) |
+| `lua/plugins/` | One resonance spec per file, auto-imported in VeryLazy by `resonance.import('plugins')` (`heirline/` is a directory) |
 | `lua/plugins/core/` | Theme + core UI specs, imported at startup by `priority` (`snacks/` is a directory) |
 | `lua/custom/` | Self-written feature modules (session, workspace, coderunner, repl, …) |
 | `lua/libs/` | Shared helpers: `utils` (safe_load/safe_setup, OS checks), `power`, `bpm`, `git`, `icons`, `spell` |
@@ -111,8 +111,8 @@ No startup regression allowed.
 
 ## 5. Plugins
 
-Plugin specs are **auto-imported** by `lua/config/scan.lua`; nothing is
-listed by hand in `config/resonance.lua`. Full details:
+Plugin specs are **auto-imported** by `resonance.import()` (called from
+`config/resonance.lua`); nothing is listed by hand there. Full details:
 `note/knowledge/resonance.md`.
 
 | Folder | Imported | Use for |
@@ -138,12 +138,12 @@ return {
 
 Spec fields resonance accepts: `src`/`url`/`[1]`, `name`, `version`,
 `dependencies`, `event`, `cmd`, `keys`, `ft`, `lazy`, `cond`, `build`,
-`config`/`setup`. `priority` is ours (stripped by `scan.lua` before
+`config`/`setup`. `priority` belongs to `import()` (stripped before
 `resonance.load`) and only matters inside `core/`. `lazy = false` means
 "load on VimEnter" and cannot be combined with `event`/`cmd`/`ft`.
 
 Rules:
-- **The spec must be recognizable.** `scan.lua` only registers a table whose
+- **The spec must be recognizable.** `import()` only registers a table whose
   `[1]` is a full URL or that has `src`/`url`/`plugin`; anything else is
   ignored silently.
 - **One top-level file or folder per plugin group.** Split a big config into
@@ -195,7 +195,7 @@ because a tool is missing.
 | `wl-clipboard` | clipboard on Wayland Linux | Linux |
 | `fcitx5` / `im-select` | `custom/language-switcher` | Linux / WSL |
 | `lazygit`, `yazi` | snacks lazygit key, `custom/yazi` | optional |
-| `pandoc` | `custom/md-paste` (`<leader>cz`) | optional |
+| `pandoc` | `custom/md-paste` rich-text paste (`<leader>cp`) | optional |
 | `gpg` | neogit commit verification | optional |
 | `tdlib`, `kitty`/`ghostty` | telegram.nvim; snacks image | optional |
 | `tectonic` | LaTeX rendering | optional |
