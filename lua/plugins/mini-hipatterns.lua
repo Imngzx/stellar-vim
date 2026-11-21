@@ -43,41 +43,35 @@ return {
       },
     }
 
-    for kw, config in pairs(todo_keywords) do
-      local hl_group = 'HandcraftedTodo_' .. kw
-      local sign_hl_group = 'HandcraftedTodoSign_' .. kw
+    local function set_hls()
+      local Snacks = require('snacks')
+      local base_bg = Snacks.util.color('Normal', 'bg') or '#1e1e2e'
 
-      local function set_hls()
-        local Snacks = require('snacks')
-        local base_bg = Snacks.util.color('Normal', 'bg') or '#1e1e2e'
+      for kw, config in pairs(todo_keywords) do
+        local fg_color = Snacks.util.color(config.group, 'fg') or '#ffffff'
 
-        for kw, config in pairs(todo_keywords) do
-          local hl_group = 'HandcraftedTodo_' .. kw
-          local sign_hl_group = 'HandcraftedTodoSign_' .. kw
-
-          local fg_color = Snacks.util.color(config.group, 'fg') or '#ffffff'
-
-          vim.api.nvim_set_hl(0, hl_group, { fg = base_bg, bg = fg_color, bold = true })
-          vim.api.nvim_set_hl(0, sign_hl_group, { fg = fg_color, bg = 'NONE', bold = true })
-        end
+        vim.api.nvim_set_hl(0, 'HandcraftedTodo_' .. kw, { fg = base_bg, bg = fg_color, bold = true })
+        vim.api.nvim_set_hl(0, 'HandcraftedTodoSign_' .. kw, { fg = fg_color, bg = 'NONE', bold = true })
       end
+    end
 
-      -- 初始化与主题切换绑定
-      set_hls()
-      vim.api.nvim_create_autocmd('ColorScheme', {
-        group = vim.api.nvim_create_augroup('HandcraftedTodoHL', { clear = true }),
-        callback = set_hls,
-      })
+    -- 初始化与主题切换绑定
+    set_hls()
+    vim.api.nvim_create_autocmd('ColorScheme', {
+      group = vim.api.nvim_create_augroup('HandcraftedTodoHL', { clear = true }),
+      callback = set_hls,
+    })
 
+    for kw, config in pairs(todo_keywords) do
       -- 将规则塞入 mini.hipatterns 引擎
       highlighters['todo_' .. kw:lower()] = {
         -- %f[%w] 代表单词边界，等同于 \C\<
         pattern = '%f[%w]()' .. kw .. ':()',
-        group = hl_group,
+        group = 'HandcraftedTodo_' .. kw,
 
         extmark_opts = {
           sign_text = config.icon, -- 左侧图标
-          sign_hl_group = sign_hl_group, -- 左侧图标的颜色
+          sign_hl_group = 'HandcraftedTodoSign_' .. kw, -- 左侧图标的颜色
           priority = 2000,
         },
       }
