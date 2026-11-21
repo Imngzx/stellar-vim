@@ -101,11 +101,11 @@ Internal helpers: `register_server`, `build_by_ft`, `make_dedupe`/`dedupe`.
 
 Inlay hints are enabled automatically when the client supports `textDocument/inlayHint`.
 
+`gd` / `gD` / `gr` / `gI` / `gy` are not set here: they are the global picker maps (`plugins/core/snacks/keys.lua`
+on AC, `plugins/fzf.lua` on battery), and a buffer-local map would shadow them.
+
 | Key | Action |
 |-----|--------|
-| `gd` | Goto Definition |
-| `gr` | Goto References |
-| `gI` | Goto Implementation |
 | `<leader>D` | Type Definition |
 | `<leader>dS` | Document Symbols |
 | `<leader>cS` | Workspace Symbols |

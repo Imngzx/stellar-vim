@@ -262,9 +262,8 @@ function M.lsp_config()
         vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
       end
 
-      map('n', 'gd', vim_lsp_buf.definition, 'Goto Definition')
-      map('n', 'gr', vim_lsp_buf.references, 'Goto References')
-      map('n', 'gI', vim_lsp_buf.implementation, 'Goto Implementation')
+      -- gd / gD / gr / gI / gy are the global picker maps (snacks keys.lua on
+      -- AC, plugins/fzf.lua on battery); buffer maps here would shadow them.
       map('n', '<leader>D', vim_lsp_buf.type_definition, 'Type Definition')
       map('n', '<leader>dS', vim_lsp_buf.document_symbol, 'Document Symbols')
       map('n', '<leader>cS', vim_lsp_buf.workspace_symbol, 'Workspace Symbols')
