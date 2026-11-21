@@ -425,6 +425,10 @@ pass('Testing transparent toggle...')
 local transparent = require('custom.transparent')
 transparent.setup({ auto_enable = false })
 transparent.toggle()
+assert_truthy(vim.g.bg_transparent == true, 'toggle() did not enable transparency')
+-- back off: the state is persisted, and this runs against the real data dir
+vim.cmd('TransparentToggle')
+assert_truthy(vim.g.bg_transparent == false, ':TransparentToggle did not disable transparency')
 pass('Transparent toggle works')
 
 -- ============================================================

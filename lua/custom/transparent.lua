@@ -33,9 +33,6 @@ local config = {
 }
 
 local exclude_set = {}
-for _, v in ipairs(config.exclude_groups) do
-  exclude_set[v] = true
-end
 
 local cache_path = fn.stdpath('data') .. package.config:sub(1, 1) .. 'transparent_state'
 
@@ -178,6 +175,12 @@ function M.setup(opts)
   opts = opts or {}
   config = vim.tbl_extend('force', config, opts)
 
+  exclude_set = {}
+  local exclude_groups = config.exclude_groups
+  for i = 1, #exclude_groups do
+    exclude_set[exclude_groups[i]] = true
+  end
+
   vim.g.bg_transparent = cache_read()
 
   if opts.auto_enable ~= nil then
@@ -210,12 +213,15 @@ function M.setup(opts)
   })
 end
 
-vim.api.nvim_create_user_command('TransparentEnable', M.enable,
+-- Wrapped: a command callback receives its args table, which toggle() would
+-- take as the state to set.
+vim.api.nvim_create_user_command('TransparentEnable', function() M.enable() end,
   { desc = 'Enable background transparency' })
-vim.api.nvim_create_user_command('TransparentDisable', M.disable,
+vim.api.nvim_create_user_command('TransparentDisable', function() M.disable() end,
   { desc = 'Disable background transparency' })
-vim.api.nvim_create_user_command('TransparentToggle', M.toggle,
+vim.api.nvim_create_user_command('TransparentToggle', function() M.toggle() end,
   { desc = 'Toggle background transparency' })
-vim.keymap.set('n', '<leader>ut', M.toggle, { desc = 'Toggle transparent background' })
+vim.keymap.set('n', '<leader>ut', function() M.toggle() end,
+  { desc = 'Toggle transparent background' })
 
 return M

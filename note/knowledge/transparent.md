@@ -2,7 +2,7 @@
 
 > **Purpose**: Toggle background transparency by stripping `bg`/`ctermbg` from highlight groups, with the state saved across sessions.
 > **Location**: `lua/custom/transparent.lua`
-> **Loaded by**: `config/resonance.lua` → `safe_setup('custom.transparent', require('custom.transparent').setup, { auto_enable = false })` (inside the `User VeryLazy` block). The commands and keymap are created at module load.
+> **Loaded by**: `config/resonance.lua` → `safe_setup('custom.transparent', { auto_enable = false })` (inside the `User VeryLazy` block). The commands and keymap are created at module load.
 
 ---
 
@@ -22,7 +22,7 @@
 |---------------|--------|
 | `:TransparentEnable` | `M.enable()` |
 | `:TransparentDisable` | `M.disable()` |
-| `:TransparentToggle` | `M.toggle(...)` (takes no arguments) |
+| `:TransparentToggle` | `M.toggle()` |
 | `<leader>ut` (n) | `M.toggle()` |
 
 ## Options (`setup`)
@@ -46,6 +46,7 @@
 
 ## Gotchas
 
-- `config/resonance.lua` passes `auto_enable = false`, so every startup forces transparency off and overwrites the saved state. In practice the state does not persist.
-- `exclude_set` is built from the default `exclude_groups` at module load, so `exclude_groups` passed to `setup()` has no effect.
-- `:TransparentToggle` passes the command's args table to `M.toggle(opt)`. `opt` is non-nil, so the command always enables and never toggles off. Use `<leader>ut` instead.
+- Passing `auto_enable` to `setup()` overwrites the saved state on every startup. `config/resonance.lua` passes `auto_enable = false`, so every startup begins opaque and the state does not persist; drop the option there to make it persist.
+- `exclude_set` is rebuilt from `exclude_groups` in `setup()`; before `setup()` runs nothing is excluded.
+- The commands and the keymap call `M.toggle()` / `M.enable()` / `M.disable()` through wrappers: a command callback receives its args table, which `toggle(opt)` would take as the state to set.
+- `tests/smoke.lua` toggles on and back off against the real data dir; a run that dies in between leaves transparency saved as on.
