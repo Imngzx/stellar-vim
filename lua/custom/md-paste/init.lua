@@ -131,6 +131,7 @@ function M.setup(opts)
     '<leader>cp',
     smart_paste,
     {
+      buf = 0,
       silent = true,
       desc = '[Markdown] Smart paste',
     }
