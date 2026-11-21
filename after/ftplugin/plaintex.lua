@@ -1,6 +1,4 @@
-local plaintex_loaded = vim.b.plaintex_loaded
-
-if plaintex_loaded then return end
-plaintex_loaded = true
+if vim.b.plaintex_loaded then return end
+vim.b.plaintex_loaded = true
 
 require('libs.spell').setup()
