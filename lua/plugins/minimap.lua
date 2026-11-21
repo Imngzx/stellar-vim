@@ -1,6 +1,7 @@
 -- lua/plugins/neominimap.lua
 vim.g.neominimap = {
-  auto_enable = true,
+  -- loaded on a key press: auto-enabling would make the first Toggle turn it off
+  auto_enable = false,
   layout = 'float',
   float = {
     minimap_width = 20,
@@ -20,31 +21,52 @@ vim.g.neominimap = {
   notification_level = vim.log.levels.OFF,
 }
 
+-- The float covers the right edge of the window, so the plugin's README
+-- wants nowrap + a wide sidescrolloff. Applied only while the minimap is
+-- on, and put back after.
+local saved_opts
+
+local function sync_opts()
+  local enabled = require('neominimap.api').enabled()
+  if enabled and not saved_opts then
+    saved_opts = { wrap = vim.o.wrap, sidescrolloff = vim.o.sidescrolloff }
+    vim.opt.wrap = false
+    vim.opt.sidescrolloff = 36
+  elseif not enabled and saved_opts then
+    vim.opt.wrap = saved_opts.wrap
+    vim.opt.sidescrolloff = saved_opts.sidescrolloff
+    saved_opts = nil
+  end
+end
+
+local function minimap(action)
+  return function()
+    vim.cmd('Neominimap ' .. action)
+    sync_opts()
+  end
+end
+
+local function set_hl()
+  vim.api.nvim_set_hl(0, 'NeominimapBackground', { bg = 'NONE' })
+  local block_color = require('snacks').util.color('Visual', 'bg') or '#45475a'
+  vim.api.nvim_set_hl(0, 'NeominimapCursorLine', { bg = block_color })
+end
+
 return {
   'https://github.com/Isrothy/neominimap.nvim',
 
   keys = {
-    { 'n', '<leader>nm', '<cmd>Neominimap Toggle<cr>', { desc = 'Toggle minimap' } },
+    { 'n', '<leader>nm', minimap('Toggle'), { desc = 'Toggle minimap' } },
     { 'n', '<leader>ns', '<cmd>Neominimap ToggleFocus<cr>', { desc = 'Focus minimap' } },
-    { 'n', '<leader>no', '<cmd>Neominimap Enable<cr>', { desc = 'Open minimap' } },
-    { 'n', '<leader>nc', '<cmd>Neominimap Disable<cr>', { desc = 'Close minimap' } },
+    { 'n', '<leader>no', minimap('Enable'), { desc = 'Open minimap' } },
+    { 'n', '<leader>nc', minimap('Disable'), { desc = 'Close minimap' } },
     { 'n', '<leader>nr', '<cmd>Neominimap Refresh<cr>', { desc = 'Refresh minimap' } },
   },
   config = function()
-    vim.opt.wrap = false
-    vim.opt.sidescrolloff = 36
-
     vim.api.nvim_create_autocmd('ColorScheme', {
-      pattern = '*',
-      callback = function()
-        vim.api.nvim_set_hl(0, 'NeominimapBackground', { bg = 'NONE' })
-
-        local block_color = require('snacks').util.color('Visual', 'bg') or '#45475a'
-
-        vim.api.nvim_set_hl(0, 'NeominimapCursorLine', { bg = block_color })
-      end,
+      group = vim.api.nvim_create_augroup('NeominimapHL', { clear = true }),
+      callback = set_hl,
     })
-    -- 强行触发一次
-    vim.api.nvim_exec_autocmds('ColorScheme')
+    set_hl()
   end
 }
