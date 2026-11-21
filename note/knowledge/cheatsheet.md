@@ -23,10 +23,11 @@
 
 ## Collection
 
-- Modes `n`, `v`, `i` only: global maps (`nvim_get_keymap`) plus the **current buffer's** local maps (`nvim_buf_get_keymap(0, ...)`).
+- Modes `n`, `v`, `i`, `o`, `t`: global maps (`nvim_get_keymap`) plus the **current buffer's** local maps (`nvim_buf_get_keymap(0, ...)`). Buffer maps are only read when the buffer is a real file (`buftype == ''`), so the dashboard's one-letter actions stay out.
+- Hidden: `<Plug>` maps and Neovim's own defaults (desc starting with `:help ` or `vim.`).
 - Maps without a `desc` are skipped.
-- Entries are merged by `lhs`; the badge `[NVI]` shows which modes have the map. A buffer-local map replaces the global entry's desc/modes.
-- Display: leading space (leader) becomes `<Space> + `; descriptions longer than the column are cut off with `...`.
+- Global and buffer-local maps are separate entries (a buffer map never hides a global one with the same `lhs`); within each, entries are merged by `lhs` and the badge `[NVIOT]` shows which modes have the map. Buffer-local descriptions start with `󰈙`.
+- Display: only the leading space (leader) becomes `<Space> + `, other spaces become `<Space>`; there is always at least one space before the description, which is cut off with `...` to fit the column.
 
 ## Grouping
 
@@ -34,11 +35,11 @@
 
 | Prefix | Group |
 |--------|-------|
-| `<leader>a` `b` `c` `d` `f` `g` `n` `p` `r` `s` `t` `T` `u` `z` `<Tab>` | AI, Buffer/Workspace, Code/LSP, Debug, Find, Git, Minimap, Panel/Tools, Code Runner, Search Meta, Translate, Telegram, UI & Toggles, Zettelkasten, Workspace/Tabs |
+| `<leader>a` `b` `c` `d` `f` `g` `j` `n` `p` `q` `r` `s` `t` `T` `u` `w` `z` `<Tab>` | AI, Buffer/Workspace, Code/LSP, Debug, Find, Git, Multicursor, Minimap, Panel/Tools, Quit/Restart, Code Runner, Search Meta, Translate, Telegram, UI & Toggles, Write/Save, Zettelkasten, Workspace/Tabs |
 | `g`, `[`, `]`, `s`, `z` | Goto/LSP, Prev, Next, Surround, Fold/UFO |
 | `<C-`, `<A-`, `<S-` | Ctrl/Window, Alt/Move, Shift/Buffer |
 
-Keys within a group are sorted by `lhs`. Each group goes into whichever column is currently shortest. The number of columns is `floor((columns * 0.8 - 4) / 52)` (at least 1).
+Keys within a group are sorted by `lhs`. Each group goes into whichever column is currently shortest. The number of columns is `floor((columns * 0.8 - 4) / 54)` (at least 1).
 
 ---
 

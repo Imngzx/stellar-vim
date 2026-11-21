@@ -19,12 +19,14 @@ local table_sort = table.sort
 local string_rep = string.rep
 local string_sub = string.sub
 local string_gsub = string.gsub
+local string_find = string.find
 
 local nvim_buf_set_lines = api.nvim_buf_set_lines
 local nvim_buf_set_extmark = api.nvim_buf_set_extmark
 local nvim_get_keymap = api.nvim_get_keymap
 local nvim_buf_get_keymap = api.nvim_buf_get_keymap
 local nvim_get_current_buf = api.nvim_get_current_buf
+local nvim_get_option_value = api.nvim_get_option_value
 local nvim_strwidth = api.nvim_strwidth
 local strcharpart = fn.strcharpart
 
@@ -58,13 +60,16 @@ local group_rules = {
   { p = ' d', n = ' Debug (DAP)', hl = 'DiagnosticError' },
   { p = ' f', n = '󰈞 Find / Search', hl = 'DiagnosticInfo' },
   { p = ' g', n = '󰊢 Git / Neogit', hl = 'Constant' },
+  { p = ' j', n = '󰚔 Multicursor', hl = 'Keyword' },
   { p = ' n', n = '🗺️ Minimap', hl = 'Function' },
   { p = ' p', n = '󰏖 Panel / Tools', hl = 'Operator' },
+  { p = ' q', n = '󰗼 Quit / Restart', hl = 'DiagnosticWarn' },
   { p = ' r', n = ' Code Runner', hl = 'DiagnosticInfo' },
   { p = ' s', n = ' Search Meta', hl = 'Type' },
   { p = ' t', n = ' Translate', hl = 'Function' },
   { p = ' T', n = ' Telegram', hl = 'DiagnosticError' },
   { p = ' u', n = '󰙵 UI & Toggles', hl = 'DiagnosticHint' },
+  { p = ' w', n = '󰆓 Write / Save', hl = 'String' },
   { p = ' z', n = ' Zettelkasten', hl = 'Label' },
   { p = ' <Tab>', n = '󰓩 Workspace/Tabs', hl = 'String' },
 
@@ -82,8 +87,20 @@ for i = 1, #group_rules do
   _groups[group_rules[i].p] = { name = group_rules[i].n, hl = group_rules[i].hl, keys = {}, count = 0 }
 end
 
+-- Only the leading space is the leader; any other space is a literal <Space>.
 local function format_lhs(lhs)
-  return string_gsub(string_gsub(lhs, ' ', '<Space> + '), '<lt>', '<')
+  lhs = string_gsub(lhs, '<lt>', '<')
+  if string_sub(lhs, 1, 1) == ' ' then
+    return '<Space> + ' .. string_gsub(string_sub(lhs, 2), ' ', '<Space>')
+  end
+  return (string_gsub(lhs, ' ', '<Space>'))
+end
+
+-- <Plug> hooks and Neovim's own defaults (desc ":help …" / "vim.…") are noise.
+local function is_hidden(m)
+  return string_sub(m.lhs, 1, 6) == '<Plug>'
+    or string_sub(m.desc, 1, 6) == ':help '
+    or string_find(m.desc, '^vim%.') ~= nil
 end
 
 local function sort_fn(a, b) return a.lhs < b.lhs end
@@ -97,31 +114,24 @@ local function build_data()
   _other_group.count = 0
   for i = 1, #group_rules do _groups[group_rules[i].p].count = 0 end
 
-  local COL_WIDTH = 52
-  local BADGE_BYTES = 7
-  local LHS_DISP_WIDTH = 26
-  local DESC_MAX_DISP = COL_WIDTH - LHS_DISP_WIDTH - 2
+  local COL_WIDTH = 54
+  local BADGE_BYTES = 9 -- ' [NVIOT] '
+  local LHS_DISP_WIDTH = 28
   local _maps_count = 0
 
-  local function process_map(m, is_n, is_v, is_i, is_buf)
-    if not (m.desc and m.desc ~= '' and m.lhs ~= '') then return end
-    local ex = _maps_dict[m.lhs]
+  -- Global and buffer-local maps are keyed separately, so a buffer map with
+  -- the same lhs (e.g. the dashboard's <CR>) never hides the global one.
+  local function process_map(m, mode, is_buf)
+    if not (m.desc and m.desc ~= '' and m.lhs ~= '') or is_hidden(m) then return end
+    local key = (is_buf and 'b' or 'g') .. m.lhs
+    local ex = _maps_dict[key]
     if not ex then
-      local new_map = { lhs = m.lhs, desc = m.desc, n = is_n, v = is_v, i = is_i, is_buf = is_buf }
-      _maps_dict[m.lhs] = new_map
+      ex = { lhs = m.lhs, desc = m.desc, is_buf = is_buf }
+      _maps_dict[key] = ex
       _maps_count = _maps_count + 1
-      _maps_list[_maps_count] = new_map
-    elseif not ex.is_buf or is_buf then
-      if is_buf and not ex.is_buf then
-        ex.is_buf = true
-        ex.n, ex.v, ex.i = is_n, is_v, is_i
-        ex.desc = m.desc
-      else
-        if is_n then ex.n = true end
-        if is_v then ex.v = true end
-        if is_i then ex.i = true end
-      end
+      _maps_list[_maps_count] = ex
     end
+    ex[mode] = true
   end
 
   local em_idx = 0
@@ -138,19 +148,20 @@ local function build_data()
     return pad > 0 and (str .. string_rep(' ', pad)) or str
   end
 
-  local function fetch_maps(mode)
-    local is_n, is_v, is_i = (mode == 'n'), (mode == 'v'), (mode == 'i')
-    local global_maps = nvim_get_keymap(mode)
-    for i = 1, #global_maps do process_map(global_maps[i], is_n, is_v, is_i, false) end
+  -- Buffer maps only from real file buffers (LSP keys); special buffers like
+  -- the dashboard only add their own one-letter actions.
+  local with_buf = nvim_get_option_value('buftype', { buf = 0 }) == ''
 
+  local function fetch_maps(mode)
+    local global_maps = nvim_get_keymap(mode)
+    for i = 1, #global_maps do process_map(global_maps[i], mode, false) end
+    if not with_buf then return end
     local buf_maps = nvim_buf_get_keymap(0, mode)
-    for i = 1, #buf_maps do process_map(buf_maps[i], is_n, is_v, is_i, true) end
+    for i = 1, #buf_maps do process_map(buf_maps[i], mode, true) end
   end
 
-  fetch_maps('n')
-  fetch_maps('v')
-  fetch_maps('i')
-
+  local modes = { 'n', 'v', 'i', 'o', 't' }
+  for i = 1, #modes do fetch_maps(modes[i]) end
 
   for i = 1, _maps_count do
     local map = _maps_list[i]
@@ -246,21 +257,25 @@ local function build_data()
         cell_str = pad_cell(cell_str)
       else
         local m = item.map
-        local mode_str = ' [' ..
-          (m.n and 'N' or '-') .. (m.v and 'V' or '-') .. (m.i and 'I' or '-') .. '] '
+        local mode_str = ' [' .. (m.n and 'N' or '-') .. (m.v and 'V' or '-')
+          .. (m.i and 'I' or '-') .. (m.o and 'O' or '-') .. (m.t and 'T' or '-') .. '] '
         local lhs_str = format_lhs(m.lhs)
         local raw_lhs = mode_str .. lhs_str
 
+        -- always at least one space between the key and its description
         local pad_len = LHS_DISP_WIDTH - nvim_strwidth(raw_lhs)
-        local full_lhs = pad_len > 0 and (raw_lhs .. string_rep(' ', pad_len)) or raw_lhs
+        if pad_len < 1 then pad_len = 1 end
+        local full_lhs = raw_lhs .. string_rep(' ', pad_len)
         local full_lhs_bytes = #full_lhs
 
         push_em(row - 1, current_byte, current_byte + BADGE_BYTES, 'NonText')
         push_em(row - 1, current_byte + BADGE_BYTES, current_byte + BADGE_BYTES + #lhs_str, 'Keyword')
 
-        local desc_str = m.desc
-        if nvim_strwidth(desc_str) > DESC_MAX_DISP then
-          desc_str = strcharpart(desc_str, 0, DESC_MAX_DISP - 3) .. '...'
+        local desc_str = m.is_buf and ('󰈙 ' .. m.desc) or m.desc
+        local desc_max = COL_WIDTH - nvim_strwidth(full_lhs) - 2
+        if desc_max < 8 then desc_max = 8 end
+        if nvim_strwidth(desc_str) > desc_max then
+          desc_str = strcharpart(desc_str, 0, desc_max - 3) .. '...'
         end
 
         push_em(row - 1, current_byte + full_lhs_bytes, current_byte + full_lhs_bytes + #desc_str,
