@@ -73,6 +73,8 @@ vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile' }, {
       vim.bo[buf].buftype = 'acwrite'
 
       -- 为这个 Buffer 专门设置一个监听器：只在敲下 `:w` 时触发
+      -- BufReadPost fires again on :e; keep a single hook per buffer
+      vim.api.nvim_clear_autocmds({ group = aug, event = 'BufWriteCmd', buffer = buf })
       vim.api.nvim_create_autocmd('BufWriteCmd', {
         group = aug,
         buf = buf,
