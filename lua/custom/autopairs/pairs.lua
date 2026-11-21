@@ -86,8 +86,14 @@ local function make_cr_handler(_, mode)
   end
 end
 
+-- <C-g>U keeps the cursor move inside the same insert, so `.` repeats the
+-- whole pair; it only exists in insert mode.
+local function left_key(mode)
+  return mode == 'i' and '<C-g>U<Left>' or '<Left>'
+end
+
 local function make_open_handler(key, mode)
-  local insert_str = key .. open_pairs[key] .. '<Left>'
+  local insert_str = key .. open_pairs[key] .. left_key(mode)
 
   return function()
     local _, next_char = get_context(mode)
@@ -106,8 +112,9 @@ end
 
 local function make_quote_handler(key, mode)
   local double_key = key .. key
-  local insert_str = double_key .. '<Left>'
-  local triple_insert_str = double_key .. double_key .. '<Left><Left><Left>'
+  local left = left_key(mode)
+  local insert_str = double_key .. left
+  local triple_insert_str = double_key .. double_key .. left .. left .. left
 
   return function()
     local prev_char, next_char, line, col = get_context(mode)
