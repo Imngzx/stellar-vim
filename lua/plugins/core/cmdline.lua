@@ -9,6 +9,8 @@ return {
     require('popup').setup({
       cursor_hack = vim.g.neovide,
       enable_ui2 = true,
+      -- headless: ui2 never attaches, so there is nothing to hook into
+      no_register = #vim.api.nvim_list_uis() == 0,
       views = {
         cmdline = {
           width = 0.45,
