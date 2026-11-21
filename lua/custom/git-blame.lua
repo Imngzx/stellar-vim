@@ -29,7 +29,7 @@ local os_date = os.date
 local math_max = math.max
 local math_floor = math.floor
 local str_sub = string.sub
-local str_format = string.format
+local str_gsub = string.gsub
 local tbl_concat = table.concat
 
 local NS = nvim_create_namespace('DIYGitBlame')
@@ -109,7 +109,7 @@ local function parse_porcelain(stdout)
   return blames
 end
 
--- Cached formatting: single str_format call per unique commit SHA
+-- Cached formatting: one template substitution per unique commit SHA
 local function format_blame(commit)
   if not commit then return nil end
   if commit.sha and commit.sha:match('^0+$') then return config.message_when_not_committed end
@@ -131,12 +131,12 @@ local function format_blame(commit)
 
   local summary = truncate(commit.summary or '', config.max_summary_length)
 
-  local text = str_format(
-    '  󰈔 %s,  %s (%s)',
-    summary,
-    author,
-    date_str
-  )
+  local text = str_gsub(config.message_template, '<(%w+)>', {
+    sha = str_sub(commit.sha, 1, 7),
+    author = author,
+    date = date_str,
+    summary = summary,
+  })
 
   formatted_cache[commit.sha] = text
   return text
