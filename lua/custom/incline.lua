@@ -205,7 +205,7 @@ function M.setup(opts)
   nvim_create_autocmd('ColorScheme', {
     group = group,
     callback = function()
-      win_cache = {}
+      for win_id in pairs(win_cache) do M.close(win_id) end
       vim.schedule(update_incline)
     end
   })
