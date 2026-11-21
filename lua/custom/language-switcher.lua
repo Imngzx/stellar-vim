@@ -23,7 +23,6 @@ local is_windows = util.is_windows() and not is_wsl
 ---@field cmd_get table Command to get current status
 ---@field cmd_off table Command to turn off/switch to English
 ---@field get_cmd_on fun(target: string|nil): table|nil Returns the command to restore status
----@field sync_off_on_enter boolean Whether to run off command synchronously on enter/focus
 
 ---@param opts CliImeOpts
 local function setup_cli_ime(opts)
@@ -31,16 +30,17 @@ local function setup_cli_ime(opts)
 
   create_autocmd('InsertLeave', {
     group = aug,
-    callback = function()
+    callback = function(args)
+      local buf = args.buf
       system(opts.cmd_get, { text = true }, function(obj)
-        if obj.code == 0 and obj.stdout then
-          schedule(function()
-            vim.b.saved_im = trim(obj.stdout)
-          end)
-        end
+        schedule(function()
+          -- Off only after the state was read, or the read sees "off"
+          system(opts.cmd_off)
+          if obj.code == 0 and obj.stdout and api.nvim_buf_is_valid(buf) then
+            vim.b[buf].saved_im = trim(obj.stdout)
+          end
+        end)
       end)
-      -- Force switch to English/Off
-      system(opts.cmd_off)
     end,
   })
 
@@ -57,11 +57,7 @@ local function setup_cli_ime(opts)
   create_autocmd({ 'VimEnter', 'FocusGained', 'CmdlineLeave' }, {
     group = aug,
     callback = function()
-      if opts.sync_off_on_enter then
-        system(opts.cmd_off, { text = true }):wait()
-      else
-        system(opts.cmd_off)
-      end
+      system(opts.cmd_off)
     end,
   })
 end
@@ -81,7 +77,6 @@ function M.fcitx()
     cmd_get = { FCITX5_REMOTE },
     cmd_off = cmd_off,
     get_cmd_on = function(target) return target == '2' and cmd_on or nil end,
-    sync_off_on_enter = true, -- original fcitx logic waited synchronously
   })
 end
 
@@ -115,7 +110,6 @@ function M.wsl_ime()
     get_cmd_on = function(target)
       return (target and target ~= '1033') and { IM_SELECT_EXE, target } or nil
     end,
-    sync_off_on_enter = false,
   })
 end
 

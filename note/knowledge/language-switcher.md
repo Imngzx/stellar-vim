@@ -46,12 +46,12 @@ All backends use the same three autocmds:
 | WSL | `im-select.exe` (layout id) | `im-select.exe 1033` | `im-select.exe <id>` if saved id ≠ `1033` | `vim.b.saved_im` |
 | Windows | `IMC_GETOPENSTATUS` via `ImmGetDefaultIMEWnd` | `IMC_SETOPENSTATUS 0` | `IMC_SETOPENSTATUS 1` | `vim.b.saved_ime_status` |
 
-On fcitx5, the off command on `VimEnter`/`FocusGained`/`CmdlineLeave` runs synchronously (`:wait()`); on WSL it is async.
+Every CLI call is async (`vim.system` without `:wait()`), so a hung IME daemon cannot freeze the editor.
 
 ---
 
 ## Gotchas
 
 - The setup runs on `User VeryLazy`, which resonance fires after `UIEnter`, so the `VimEnter` autocmd is registered too late and never fires at startup.
-- CLI backends: on `InsertLeave` the "read state" and "off" commands are started async and at the same time, so the read can see the state after it was already switched off. When that happens, the IME won't be restored on the next `InsertEnter`.
+- CLI backends: on `InsertLeave` the "off" command is started from the "read state" callback, never alongside it, so the read cannot see the state after the switch. The state is saved on the buffer that left Insert mode.
 - Only fcitx5 is supported on Linux (no ibus). macOS takes the fcitx5 path and does nothing without `fcitx5-remote`.
