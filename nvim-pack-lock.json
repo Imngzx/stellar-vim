@@ -144,7 +144,7 @@
       "src": "https://github.com/nvim-neotest/nvim-nio"
     },
     "nvim-treesitter": {
-      "rev": "37e52c733ada9d8d544d53a763140ef1ba404353",
+      "rev": "52773f0d13a0c11d0c3ef33c14ab6ecc1c17148b",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
@@ -173,7 +173,7 @@
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
-      "rev": "5e5ce99f47e66054733ebe4b972b21ff7385fb90",
+      "rev": "3d26192a9370e649810a0f0b2bf08a0eff4052a1",
       "src": "https://github.com/Imngzx/resonance.nvim"
     },
     "showkeys": {
