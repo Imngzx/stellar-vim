@@ -1,7 +1,7 @@
 {
   "plugins": {
     "ascetic.nvim": {
-      "rev": "dce1c74cf8d5fb9f0348f8f0a762cf8a8a33ce37",
+      "rev": "40320cffbb7f7ef6171195a352934480ed120948",
       "src": "https://github.com/Imngzx/ascetic.nvim"
     },
     "atone.nvim": {
@@ -72,7 +72,7 @@
       "src": "https://github.com/rebelot/heirline.nvim"
     },
     "jisho.nvim": {
-      "rev": "03853edc4cbec9e0c86bc1331835eb1fde57f22d",
+      "rev": "bb4015c9fc45cf0521dfa5441b6c9a218276bf3a",
       "src": "https://github.com/Imngzx/jisho.nvim"
     },
     "lazydev.nvim": {
