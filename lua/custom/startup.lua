@@ -9,6 +9,12 @@ if loader then
   loader.enable()
 end
 
+-- Snacks.image detects terminals by name; under herdr on WSL (noctty) the
+-- name doesn't match, so force kitty graphics mode. Native Linux is untouched.
+if vim.env.TERM_PROGRAM == 'herdr' and require('libs.utils').is_wsl() then
+  vim.env.SNACKS_KITTY = '1'
+end
+
 vim_g.markdown_recommended_style = 0
 
 local disabled_built_ins = {
