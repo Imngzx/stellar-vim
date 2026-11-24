@@ -27,7 +27,7 @@
       "version": "'main'"
     },
     "codecompanion.nvim": {
-      "rev": "14b4993a24fac8bb122ce524e25bb0f7f392afd6",
+      "rev": "f52f9cadc668620e6e95e5d5b59240535bf5474d",
       "src": "https://github.com/olimorris/codecompanion.nvim"
     },
     "colorful-menu.nvim": {
@@ -51,7 +51,7 @@
       "src": "https://github.com/dirichy/flash-any-pinyin.nvim"
     },
     "flash-any.nvim": {
-      "rev": "1e11bb17292bd25b918ffdb8887c092886d7d2ed",
+      "rev": "6ff4f412b05b546554c790cf81c86dba12e6811f",
       "src": "https://github.com/dirichy/flash-any.nvim",
       "version": "'main'"
     },
@@ -64,7 +64,7 @@
       "src": "https://github.com/rafamadriz/friendly-snippets"
     },
     "fzf-lua": {
-      "rev": "a8312697c30b4d3b110fa3dc56e3699107aed9a0",
+      "rev": "a3b5e6bebcc604d0286fffa1c4eb05b066a2a198",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "heirline.nvim": {
@@ -88,7 +88,7 @@
       "src": "https://github.com/mason-org/mason.nvim"
     },
     "mini.diff": {
-      "rev": "f527407247245d121ca65d539d7a8a3686938915",
+      "rev": "92385df93f81a0934e50c03615865041bc074b28",
       "src": "https://github.com/nvim-mini/mini.diff"
     },
     "mini.hipatterns": {
@@ -100,7 +100,7 @@
       "src": "https://github.com/nvim-mini/mini.icons"
     },
     "neogit": {
-      "rev": "17929b7b0b9c05fe3dfc788fbba9881eb9c1cbec",
+      "rev": "0468adaa4af22ede35c0df6bdd81e93a9c217733",
       "src": "https://github.com/NeogitOrg/neogit"
     },
     "neominimap.nvim": {
@@ -136,7 +136,7 @@
       "src": "https://github.com/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "4648fd8ba5c678d7e2db75ae44ffac269bb589d8",
+      "rev": "7d22e678970d95d8d18494ec389c52b07111c53a",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-nio": {
