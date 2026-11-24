@@ -12,8 +12,7 @@ This repository hosts my [NeoVim](https://neovim.io/) configuration for my daily
 
 Use this on **Linux** for best experience ฅ₍^•⩊ •マⳊ
 
-> [!TIP]
-> Preview video can be seen [here](https://github.com/Imngzx/resonance.nvim)
+<https://github.com/user-attachments/assets/47e870a8-48a5-4d85-a613-c9dcf9103ba2>
 
 ![Preview image](https://github.com/user-attachments/assets/9a469134-1fb6-4be4-b310-510057dea321)
 
