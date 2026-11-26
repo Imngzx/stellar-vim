@@ -73,24 +73,24 @@ M.servers = {
   },
 
   -- [c, c++]
-  -- clangd = {
-  --   'c-language',
-  --   mason = have_exe('clangd') == 0,
-  --   formatter = {
-  --     name = 'clang_format',
-  --     mason = false,
-  --     ft = { 'c', 'c.doxygen', 'cpp', 'cpp.doxygen', 'objc', 'objcpp', 'cuda' }
-  --   },
-  -- },
-  clice = {
-    false,
-    mason = false,
+  clangd = {
+    'c-language',
+    mason = have_exe('clangd') == 0,
     formatter = {
-      name = 'clang-format',
+      name = 'clang_format',
       mason = false,
       ft = { 'c', 'c.doxygen', 'cpp', 'cpp.doxygen', 'objc', 'objcpp', 'cuda' }
     },
   },
+  -- clice = {
+  --   false,
+  --   mason = false,
+  --   formatter = {
+  --     name = 'clang-format',
+  --     mason = false,
+  --     ft = { 'c', 'c.doxygen', 'cpp', 'cpp.doxygen', 'objc', 'objcpp', 'cuda' }
+  --   },
+  -- },
   neocmake = {
     'cmake',
     mason = true,
