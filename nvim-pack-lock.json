@@ -75,6 +75,10 @@
       "rev": "fae936abb5e0345b85c3a03ecf38525b0828b992",
       "src": "https://github.com/rebelot/heirline.nvim"
     },
+    "imselect.nvim": {
+      "rev": "8a52f04d64202df52856011164f89497bc64315b",
+      "src": "https://github.com/dirichy/imselect.nvim"
+    },
     "jisho.nvim": {
       "rev": "bb4015c9fc45cf0521dfa5441b6c9a218276bf3a",
       "src": "https://github.com/Imngzx/jisho.nvim"

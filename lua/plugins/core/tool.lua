@@ -1,6 +1,13 @@
 -- [Key note] Load on VeryLazy
 return {
   {
+    'https://github.com/dirichy/imselect.nvim',
+    event = 'InsertEnter',
+    config = function()
+      require('imselect').setup()
+    end
+  },
+  {
     'https://github.com/folke/which-key.nvim',
     lazy = true,
     config = function()

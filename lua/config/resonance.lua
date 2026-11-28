@@ -84,7 +84,10 @@ vim.api.nvim_create_autocmd('User', {
     -- Util
     safe_setup('custom.coderunner')
     safe_setup('custom.repl')
-    safe_setup('custom.language-switcher')
+
+    -- use this as backup
+    -- safe_setup('custom.language-switcher')
+
     safe_setup('custom.todo')
     safe_load('custom.sudo')
 
