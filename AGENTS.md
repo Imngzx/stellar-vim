@@ -143,6 +143,7 @@ Spec fields resonance accepts: `src`/`url`/`[1]`, `name`, `version`,
 "load on VimEnter" and cannot be combined with `event`/`cmd`/`ft`.
 
 Rules:
+
 - **The spec must be recognizable.** `import()` only registers a table whose
   `[1]` is a full URL or that has `src`/`url`/`plugin`; anything else is
   ignored silently.
@@ -185,7 +186,7 @@ because a tool is missing.
 |---|---|---|
 | Neovim 0.13 nightly | everything (`vim.pack`, `vim.async`) | yes |
 | `git` | `vim.pack`, `libs/git.lua`, neogit, snacks git | yes |
-| `gcc`/`cc`, `make` | treesitter parsers, flash-any `build = 'make'` | yes |
+| `gcc`/`cc`, `make` | treesitter parsers, flash-any | yes |
 | `tree-sitter-cli` | nvim-treesitter (main) parser builds | yes |
 | `rg`, `fd` | snacks/fzf pickers, `custom/zettel` | yes |
 | `curl`, `unzip`, `tar`, `gzip` | Mason installs | yes |
