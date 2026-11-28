@@ -6,6 +6,7 @@ return {
       'https://github.com/nvim-lua/plenary.nvim',
       'https://github.com/nvim-treesitter/nvim-treesitter',
     },
+    cond = false,
 
     cmd = { 'CodeCompanion', 'CodeCompanionChat', 'CodeCompanionCmd', 'CodeCompanionActions' },
 

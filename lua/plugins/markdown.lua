@@ -47,7 +47,8 @@ return {
     'https://github.com/MeanderingProgrammer/render-markdown.nvim',
     -- cmd = { 'Tg', 'TgLogout', 'TgSend', 'TgPr' },
     ft = { 'markdown', 'norg', 'rmd', 'org', 'codecompanion', 'telegram' },
-    cond = require('libs.power').is_ac,
+    -- cond = require('libs.power').is_ac,
+    cond = false,
     config = function()
       local render_markdown = require('render-markdown')
       render_markdown.setup(render_opts)
