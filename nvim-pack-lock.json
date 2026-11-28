@@ -26,10 +26,6 @@
       "src": "https://github.com/catppuccin/nvim",
       "version": "'main'"
     },
-    "codecompanion.nvim": {
-      "rev": "1f0e1d0703c543c00f4d25d654dc325dbd675854",
-      "src": "https://github.com/olimorris/codecompanion.nvim"
-    },
     "colorful-menu.nvim": {
       "rev": "196ddf16d5f8fec09ba7f20e6b153aa5188e907b",
       "src": "https://github.com/xzbdmw/colorful-menu.nvim"
@@ -175,10 +171,6 @@
     "promise-async": {
       "rev": "119e8961014c9bfaf1487bf3c2a393d254f337e2",
       "src": "https://github.com/kevinhwang91/promise-async"
-    },
-    "render-markdown.nvim": {
-      "rev": "a67f826164c38c836fc6060f32b275c4c43317a7",
-      "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "resonance.nvim": {
       "rev": "b6793b0c15109a5b258224245fd9edcb5a2ae833",
