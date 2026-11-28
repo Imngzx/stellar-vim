@@ -27,7 +27,7 @@
       "version": "'main'"
     },
     "codecompanion.nvim": {
-      "rev": "e262a7b7777cfdd09b271326198ff5bdf1a4d754",
+      "rev": "1f0e1d0703c543c00f4d25d654dc325dbd675854",
       "src": "https://github.com/olimorris/codecompanion.nvim"
     },
     "colorful-menu.nvim": {
@@ -55,7 +55,7 @@
       "src": "https://github.com/dirichy/flash-any-pinyin.nvim"
     },
     "flash-any.nvim": {
-      "rev": "f4b064d43beaa1325a1ff5f0524f741a717b5622",
+      "rev": "577130641ef4bd7726ad8e165bb8e9292752334a",
       "src": "https://github.com/dirichy/flash-any.nvim",
       "version": "'main'"
     },
@@ -152,7 +152,7 @@
       "src": "https://github.com/nvim-neotest/nvim-nio"
     },
     "nvim-treesitter": {
-      "rev": "52773f0d13a0c11d0c3ef33c14ab6ecc1c17148b",
+      "rev": "2d797b8323dc163566f3d7db9e3511af3d5cb637",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
