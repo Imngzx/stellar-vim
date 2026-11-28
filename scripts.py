@@ -9,15 +9,24 @@ import sys
 from pathlib import Path
 
 
-def get_dirs() -> tuple[Path, Path]:
+def get_dirs() -> tuple[Path, Path, Path]:
     cfg = Path(__file__).parent.resolve()
-    sys_name = platform.system()
-    if sys_name == "Windows":
-        localappdata = Path(os.getenv("LOCALAPPDATA", r"~\AppData\Local")).expanduser()
-        data = localappdata / "nvim-data"
+    if platform.system() == "Windows":
+        localappdata = Path(
+            os.getenv("LOCALAPPDATA") or r"~\AppData\Local"
+        ).expanduser()
+        data_base = Path(os.getenv("XDG_DATA_HOME") or localappdata).expanduser()
+        state_base = Path(os.getenv("XDG_STATE_HOME") or localappdata).expanduser()
+        data = data_base / "nvim-data"
+        state = state_base / "nvim-data"
     else:
-        data = Path(os.getenv("XDG_DATA_HOME", "~/.local/share")).expanduser() / "nvim"
-    return cfg, data
+        data = (
+            Path(os.getenv("XDG_DATA_HOME") or "~/.local/share").expanduser() / "nvim"
+        )
+        state = (
+            Path(os.getenv("XDG_STATE_HOME") or "~/.local/state").expanduser() / "nvim"
+        )
+    return cfg, data, state
 
 
 def run_git(cfg: Path) -> bool:
@@ -40,31 +49,30 @@ def run_git(cfg: Path) -> bool:
         sys.exit(1)
 
 
-def clean_plugins(data: Path, force: bool = False) -> None:
-    pack = data / "site" / "pack"
-    if not pack.exists():
-        print("[+] No plugin directory found")
+def clean_plugins(data: Path, state: Path, force: bool = False) -> None:
+    candidates = [
+        ("plugins", data / "site" / "pack"),
+        ("resonance state", state / "resonance"),
+    ]
+    targets = [(name, path) for name, path in candidates if path.exists()]
+    if not targets:
+        print("[+] No plugin or resonance state directories found")
         return
     if not force:
-        print(f"[-] Use --force to delete {pack}")
+        paths = ", ".join(str(path) for _, path in targets)
+        print(f"[-] Use --force to delete: {paths}")
         sys.exit(1)
-    print(f"[*] Removing plugins: {pack}")
-    shutil.rmtree(pack, ignore_errors=True)
-    print("[+] Cleaned plugins")
+    for name, path in targets:
+        print(f"[*] Removing {name}: {path}")
+        shutil.rmtree(path, ignore_errors=True)
+        print(f"[+] Cleaned {name}")
 
 
-def clean_data(data: Path, force: bool = False) -> None:
+def clean_data(data: Path, state: Path, force: bool = False) -> None:
     targets = []
     if data.exists():
         targets.append(("share", data))
-    if platform.system() == "Windows":
-        localappdata = Path(os.getenv("LOCALAPPDATA", r"~\AppData\Local")).expanduser()
-        state = localappdata / "nvim-data" / "state"
-    else:
-        state = (
-            Path(os.getenv("XDG_STATE_HOME", "~/.local/state")).expanduser() / "nvim"
-        )
-    if state.exists():
+    if state != data and state.exists():
         targets.append(("state", state))
     if not targets:
         print("[+] No data/state directories found")
@@ -99,13 +107,13 @@ def clean_config(cfg: Path, force: bool = False) -> None:
     print("[+] Cleaned config")
 
 
-def full_uninstall(cfg: Path, data: Path, force: int) -> None:
+def full_uninstall(cfg: Path, data: Path, state: Path, force: int) -> None:
     if force < 2:
         print("[-] Full uninstall requires --force twice (e.g., --force --force)")
         sys.exit(1)
     print("[!] FULL UNINSTALL - removing everything:")
     clean_config(cfg, force=True)
-    clean_data(data, force=True)
+    clean_data(data, state, force=True)
 
 
 def main():
@@ -121,22 +129,14 @@ def main():
     )
     args = p.parse_args()
 
-    cfg = Path(__file__).parent.resolve()
-    sys_name = platform.system()
-    if sys_name == "Windows":
-        data = (
-            Path(os.getenv("LOCALAPPDATA", r"~\AppData\Local")).expanduser()
-            / "nvim-data"
-        )
-    else:
-        data = Path(os.getenv("XDG_DATA_HOME", "~/.local/share")).expanduser() / "nvim"
+    cfg, data, state = get_dirs()
 
     if args.action in ("update", "both"):
         run_git(cfg)
     if args.action in ("clean", "both"):
-        clean_plugins(data, force=args.force > 0)
+        clean_plugins(data, state, force=args.force > 0)
     if args.action == "uninstall":
-        full_uninstall(cfg, data, force=args.force)
+        full_uninstall(cfg, data, state, force=args.force)
 
 
 if __name__ == "__main__":

@@ -333,7 +333,7 @@ As you can see there's a python script in this config, this is still experimenta
 
 # use these at your own risk, feel free to make issues and pr
 python3 scripts.py update                     # Git pull --rebase --autostash
-python3 scripts.py clean --force              # Remove plugins (site/pack/core)
+python3 scripts.py clean --force              # Remove plugins (site/pack) & resonance state
 python3 scripts.py both --force               # Update + clean
 python3 scripts.py uninstall --force --force  # FULL UNINSTALL (double --force for safety)
 
