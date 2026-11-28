@@ -27,7 +27,7 @@
       "version": "'main'"
     },
     "codecompanion.nvim": {
-      "rev": "f52f9cadc668620e6e95e5d5b59240535bf5474d",
+      "rev": "e262a7b7777cfdd09b271326198ff5bdf1a4d754",
       "src": "https://github.com/olimorris/codecompanion.nvim"
     },
     "colorful-menu.nvim": {
@@ -51,7 +51,7 @@
       "src": "https://github.com/dirichy/flash-any-pinyin.nvim"
     },
     "flash-any.nvim": {
-      "rev": "6ff4f412b05b546554c790cf81c86dba12e6811f",
+      "rev": "3af7ca2bccec71dc84d7cd3085002d619ed5dd2c",
       "src": "https://github.com/dirichy/flash-any.nvim",
       "version": "'main'"
     },
@@ -136,7 +136,7 @@
       "src": "https://github.com/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "7d22e678970d95d8d18494ec389c52b07111c53a",
+      "rev": "76f4cafc49677a34dc8ad8142b773d78ab4a041e",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-nio": {
@@ -189,7 +189,7 @@
       "src": "https://github.com/ChuYanLon/telegram.nvim"
     },
     "tiny-inline-diagnostic.nvim": {
-      "rev": "46ae9b3c8f3039e96ff4497d190ad0aee091f30d",
+      "rev": "6e8ced487784ddc1e2dabf58a379b3d84b333b16",
       "src": "https://github.com/rachartier/tiny-inline-diagnostic.nvim"
     },
     "venv-selector.nvim": {
