@@ -91,11 +91,35 @@ end, { desc = '[Panel] Open Smart Terminal' })
 
 map('n', 'mdd', '<cmd>delm!<cr>', { desc = 'Delete all markers' })
 
--- Search (Better n/N behavior)
-map('x', 'n', "'Nn'[v:searchforward]", { expr = true, desc = 'Next search result' })
-map('o', 'n', "'Nn'[v:searchforward]", { expr = true, desc = 'Next search result' })
-map('x', 'N', "'nN'[v:searchforward]", { expr = true, desc = 'Prev search result' })
-map('o', 'N', "'nN'[v:searchforward]", { expr = true, desc = 'Prev search result' })
+-- Search (Better n/N behavior + flash-any search_repeat)
+-- Workflow: <leader>sf / <leader>sF + <CR> confirms a flash-any search and
+-- clears @/, handing n/N/gn/gN to flash-any (e.g. dn, cgn + `.` to replace,
+-- dgn to delete). Native /, ?, *, # refill @/ and switch back automatically.
+-- Normal-mode n/N are wired the same way in plugins/core/ui.lua (hlslens).
+map({ 'x', 'o' }, 'n', function()
+  if package.loaded['flash-any'] and vim.fn.getreg('/') == '' then
+    return "<Cmd>lua require('flash-any').search_repeat('n', { forward = true })<CR>"
+  end
+  return vim.v.searchforward == 1 and 'n' or 'N'
+end, { expr = true, desc = 'Next search result' })
+map({ 'x', 'o' }, 'N', function()
+  if package.loaded['flash-any'] and vim.fn.getreg('/') == '' then
+    return "<Cmd>lua require('flash-any').search_repeat('N', { forward = false })<CR>"
+  end
+  return vim.v.searchforward == 1 and 'N' or 'n'
+end, { expr = true, desc = 'Prev search result' })
+map({ 'n', 'x', 'o' }, 'gn', function()
+  if package.loaded['flash-any'] and vim.fn.getreg('/') == '' then
+    return "<Cmd>lua require('flash-any').search_repeat('gn')<CR>"
+  end
+  return 'gn'
+end, { expr = true, desc = 'Select next search match' })
+map({ 'n', 'x', 'o' }, 'gN', function()
+  if package.loaded['flash-any'] and vim.fn.getreg('/') == '' then
+    return "<Cmd>lua require('flash-any').search_repeat('gN')<CR>"
+  end
+  return 'gN'
+end, { expr = true, desc = 'Select prev search match' })
 
 -- ==========================================
 -- 🏢 [ Workspace / Tabs (Powered by BPM) ]

@@ -268,32 +268,27 @@ return {
     dependencies = {
       'https://github.com/folke/flash.nvim',
       'https://github.com/dirichy/flash-any-pinyin.nvim',
+      'https://github.com/dirichy/flash-any-japanese.nvim',
       -- 'https://github.com/dirichy/flash-any-nerdfont.nvim',
     },
-    build = 'make',
     version = 'main',
+    cmd = 'FlashAnyBuildTable',
     keys = {
       { { 'n', 'x', 'o' }, '<CR>', function() require('flash-any').jump() end, { desc = 'Flash-any' } },
       { { 'n', 'x', 'o' }, '<S-CR>', function() require('flash').treesitter() end, { desc = 'Flash treesitter' } },
       { 'o', 'r', function() require('flash-any').remote() end, { desc = 'Remote flash' } },
       { { 'o', 'x' }, 'R', function() require('flash').treesitter_search() end, { desc = 'Treesitter search' } },
-      { { 'c' }, '<c-s>', function() require('flash').toggle() end, { desc = 'Toggle flash search' } }
+      { { 'c' }, '<c-s>', function() require('flash').toggle() end, { desc = 'Toggle flash search' } },
+      { { 'n', 'x', 'o' }, '<leader>sf', function() require('flash-any').search() end, { desc = 'Flash-any search (forward)' } },
+      { { 'n', 'x', 'o' }, '<leader>sF', function() require('flash-any').search({ search = { forward = false } }) end, { desc = 'Flash-any search (backward)' } },
     },
     config = function()
-      require('flash').setup({
-        modes = {
-          char = {
-            enabled = false,
-            matcher = function(win, state, range)
-              return require('flash-any').char(win, state, range)
-            end,
-          }
-        }
-      })
       require('flash-any').setup({
+        -- Set char = true (and add `lazy = true` to this spec) to wrap f/F/t/T too.
         sources = {
           'pinyin',
           -- 'nerdfont',
+          { name = 'japanese', matcher = 'initial' },
           'latin',
         },
       })

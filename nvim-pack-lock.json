@@ -46,12 +46,16 @@
       "rev": "f190de76d2eca0380ddcb2425cd582d740699b55",
       "src": "https://github.com/hat0uma/csvview.nvim"
     },
+    "flash-any-japanese.nvim": {
+      "rev": "e7a37f06fde6c7bead8abb4870222d34d7448759",
+      "src": "https://github.com/dirichy/flash-any-japanese.nvim"
+    },
     "flash-any-pinyin.nvim": {
       "rev": "566e0b55b9eaec689a17b74be5e5610a89658827",
       "src": "https://github.com/dirichy/flash-any-pinyin.nvim"
     },
     "flash-any.nvim": {
-      "rev": "3af7ca2bccec71dc84d7cd3085002d619ed5dd2c",
+      "rev": "f4b064d43beaa1325a1ff5f0524f741a717b5622",
       "src": "https://github.com/dirichy/flash-any.nvim",
       "version": "'main'"
     },
