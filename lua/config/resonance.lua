@@ -18,6 +18,20 @@ resonance.setup({
     border = 'rounded',
     width = 0.65,
     height = 0.75,
+    keys = {
+      close = { 'q', '<Esc>' },
+      toggle_details = '<CR>',
+      resonate = 'r',
+      update = 'u',
+      update_all = 'U',
+      skip = 's',
+      uninstall = 'dd',
+      search = 'S',
+      open_dir = 'D',
+      review = 'C',
+      checkout = 'c',
+      dag = 'A',
+    },
   },
 })
 
