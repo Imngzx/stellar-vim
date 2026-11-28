@@ -38,18 +38,7 @@ return {
       local kopts = { noremap = true, silent = true }
 
       local vim_key = vim.keymap.set
-      vim_key('n', 'n', function()
-        if package.loaded['flash-any'] and vim.fn.getreg('/') == '' then
-          return [[<Cmd>lua require('flash-any').search_repeat('n')<CR><Cmd>normal! zv<CR>]]
-        end
-        return [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>normal! zv<CR><Cmd>lua require('hlslens').start()<CR>]]
-      end, { expr = true, silent = true, desc = 'Next search result' })
-      vim_key('n', 'N', function()
-        if package.loaded['flash-any'] and vim.fn.getreg('/') == '' then
-          return [[<Cmd>lua require('flash-any').search_repeat('N')<CR><Cmd>normal! zv<CR>]]
-        end
-        return [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>normal! zv<CR><Cmd>lua require('hlslens').start()<CR>]]
-      end, { expr = true, silent = true, desc = 'Prev search result' })
+      -- Normal-mode n/N (with hlslens + flash-any) live in config/keymaps.lua.
       vim_key('n', '*', [[*<Cmd>lua require('hlslens').start()<CR>]], kopts)
       vim_key('n', '#', [[#<Cmd>lua require('hlslens').start()<CR>]], kopts)
       vim_key('n', 'g*', [[g*<Cmd>lua require('hlslens').start()<CR>]], kopts)

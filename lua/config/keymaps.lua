@@ -91,11 +91,29 @@ end, { desc = '[Panel] Open Smart Terminal' })
 
 map('n', 'mdd', '<cmd>delm!<cr>', { desc = 'Delete all markers' })
 
--- Search (Better n/N behavior + flash-any search_repeat)
--- Workflow: <leader>sf / <leader>sF + <CR> confirms a flash-any search and
--- clears @/, handing n/N/gn/gN to flash-any (e.g. dn, cgn + `.` to replace,
--- dgn to delete). Native /, ?, *, # refill @/ and switch back automatically.
--- Normal-mode n/N are wired the same way in plugins/core/ui.lua (hlslens).
+-- ==========================================
+-- 🔍 [ Search Repeat (hlslens + flash-any) ]
+-- ==========================================
+-- Unified n/N/gn/gN across Normal, Visual, and Operator-pending modes:
+-- - Confirming <leader>sf / <leader>sF clears @/, handing repeats to flash-any
+--   (e.g. n/N, dn, cgn + `.` to replace, dgn to delete).
+-- - Native /, ?, *, # refill @/ and switch back to native search (+ hlslens
+--   in Normal mode once loaded).
+-- - In Visual/Operator-pending modes, n always searches forward and N backward.
+map('n', 'n', function()
+  if package.loaded['flash-any'] and vim.fn.getreg('/') == '' then
+    return [[<Cmd>lua require('flash-any').search_repeat('n')<CR><Cmd>normal! zv<CR>]]
+  end
+  local lens = package.loaded['hlslens'] and [[<Cmd>lua require('hlslens').start()<CR>]] or ''
+  return [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>normal! zv<CR>]] .. lens
+end, { expr = true, silent = true, desc = 'Next search result' })
+map('n', 'N', function()
+  if package.loaded['flash-any'] and vim.fn.getreg('/') == '' then
+    return [[<Cmd>lua require('flash-any').search_repeat('N')<CR><Cmd>normal! zv<CR>]]
+  end
+  local lens = package.loaded['hlslens'] and [[<Cmd>lua require('hlslens').start()<CR>]] or ''
+  return [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>normal! zv<CR>]] .. lens
+end, { expr = true, silent = true, desc = 'Prev search result' })
 map({ 'x', 'o' }, 'n', function()
   if package.loaded['flash-any'] and vim.fn.getreg('/') == '' then
     return "<Cmd>lua require('flash-any').search_repeat('n', { forward = true })<CR>"
