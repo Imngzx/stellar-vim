@@ -1,3 +1,5 @@
+local startup_stats
+
 return {
   enabled = true,
   preset = {
@@ -18,13 +20,14 @@ return {
     { section = 'header' },
     { section = 'keys', gap = 1, padding = 1 },
     function()
-      local stats = require('resonance').stats()
-      local ms = string.format('%.2f ms', stats.startuptime)
+      startup_stats = startup_stats and startup_stats.startuptime > 0 and startup_stats
+        or require('resonance').stats()
+      local ms = string.format('%.2f ms', startup_stats.startuptime)
       return {
         align = 'center',
         text = {
           { '󱐋 ', hl = 'Special' },
-          { stats.loaded .. ' / ' .. stats.count, hl = 'Special' },
+          { startup_stats.loaded .. ' / ' .. startup_stats.count, hl = 'Special' },
           { ' plugins loaded in ', hl = 'Comment' },
           { ms, hl = 'Special' },
         },
